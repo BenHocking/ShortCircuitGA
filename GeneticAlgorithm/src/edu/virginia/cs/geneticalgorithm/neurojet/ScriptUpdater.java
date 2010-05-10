@@ -25,7 +25,7 @@ import edu.virginia.cs.geneticalgorithm.StandardGenotype;
  */
 public class ScriptUpdater {
 
-    private final GeneInterpreterMap _mapping = new GeneInterpreterMap();
+    private final GeneInterpreterMap<Pattern> _mapping = new GeneInterpreterMap<Pattern>();
     private DoubleValueGenerator _desiredActGenerator = null; // So we'll know if this somehow never got set
     private int _desiredActPos = 0;
     private DoubleValueGenerator _timeStepGenerator = null; // So we'll know if this somehow never got set

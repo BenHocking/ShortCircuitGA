@@ -31,7 +31,8 @@ public final class MathUtils {
      * @param x result of a function that ranges from 0 to 1
      * @param max maximum value to return
      * @return scaled result between min and max (unless x is less than 0 or greater than 1)
-     * @sa {@link #scaleInt(int, double, int)}
+     * @see {@link #scaleInt(int, double, int)}
+     * @see {@link #scale(double, double, double, boolean)}
      */
     public static double scale(final double min, final double x, final double max) {
         return (x * (max - min)) + min;
@@ -43,8 +44,25 @@ public final class MathUtils {
      * @param min minimum value to return
      * @param x result of a function that ranges from 0 to 1
      * @param max maximum value to return
+     * @return scaled result between min and max (even if x is outside 0..1 boundary)
+     * @see {@link #scaleInt(int, double, int)}
+     * @see {@link #scale(double, double, double)}
+     * @see {@link #imposeBounds(double, double, double)}
+     */
+    public static double scale(final double min, final double x, final double max, final boolean enforceBounds) {
+        if (!enforceBounds) return scale(min, x, max);
+        return scale(min, imposeBounds(min, x, max), max);
+    }
+
+    /**
+     * Scales range from min to max instead of from 0 to 1
+     * 
+     * @param min minimum value to return
+     * @param x result of a function that ranges from 0 to 1
+     * @param max maximum value to return
      * @return scaled result between min and max (even if x is less than 0 or greater than 1)
-     * @sa {@link #scale(double, double, double)}
+     * @see {@link #scale(double, double, double)}
+     * @see {@link #scale(double, double, double, boolean)}
      */
     public static int scaleInt(final int min, final double x, final int max) {
         final int retval = (int) (Math.floor(x * (max - min + 1)) + min);
