@@ -15,8 +15,10 @@ public class ArrayNumberUtils {
 
     public static <T extends Number> double sum(final List<T> numberList) {
         double retval = 0;
-        for (final Integer i : new IntegerRange(numberList.size())) {
-            retval += numberList.get(i).doubleValue();
+        if (!numberList.isEmpty()) {
+            for (final Integer i : new IntegerRange(numberList.size())) {
+                retval += numberList.get(i).doubleValue();
+            }
         }
         return retval;
     }
@@ -25,8 +27,10 @@ public class ArrayNumberUtils {
         if (list1.size() != list2.size())
             throw new IllegalArgumentException("Lists being added together must be of the same size.");
         final List<Double> retval = new ArrayList<Double>(list1.size());
-        for (final Integer i : new IntegerRange(list1.size())) {
-            retval.add(list1.get(i) + list2.get(i));
+        if (!list1.isEmpty()) {
+            for (final Integer i : new IntegerRange(list1.size())) {
+                retval.add(list1.get(i) + list2.get(i));
+            }
         }
         return retval;
     }
@@ -34,8 +38,10 @@ public class ArrayNumberUtils {
     public static void accum(final List<Double> list1, final List<Double> list2) {
         if (list1.size() != list2.size())
             throw new IllegalArgumentException("Lists being added together must be of the same size.");
-        for (final Integer i : new IntegerRange(list1.size())) {
-            list1.set(i, list1.get(i) + list2.get(i));
+        if (!list1.isEmpty()) {
+            for (final Integer i : new IntegerRange(list1.size())) {
+                list1.set(i, list1.get(i) + list2.get(i));
+            }
         }
     }
 
@@ -43,26 +49,38 @@ public class ArrayNumberUtils {
         if (list1.size() != list2.size())
             throw new IllegalArgumentException("Lists being added together must be of the same size.");
         final List<Double> retval = new ArrayList<Double>(list1.size());
-        for (final Integer i : new IntegerRange(list1.size())) {
-            retval.add(list1.get(i) / list2.get(i));
+        if (!list1.isEmpty()) {
+            for (final Integer i : new IntegerRange(list1.size())) {
+                retval.add(list1.get(i) / list2.get(i));
+            }
         }
         return retval;
     }
 
     public static List<Double> divide(final List<Double> list, final double val) {
         final List<Double> retval = new ArrayList<Double>(list.size());
-        for (final Integer i : new IntegerRange(list.size())) {
-            retval.add(list.get(i) / val);
+        if (!list.isEmpty()) {
+            for (final Integer i : new IntegerRange(list.size())) {
+                retval.add(list.get(i) / val);
+            }
         }
         return retval;
     }
 
+    /**
+     * 
+     * @param values
+     * @param first (inclusive)
+     * @param last (inclusive)
+     * @return
+     */
     public static double mean(final String[] values, final int first, final int last) {
         double sum = 0.0;
-        final int trueLast = Math.min(last, values.length - 1);
-        if (trueLast < first) return sum;
-        for (final Integer i : new IntegerRange(first, trueLast)) {
-            sum += Double.parseDouble(values[i]);
+        final int trueLast = Math.min(last + 1, values.length);
+        if (trueLast >= first) {
+            for (final Integer i : new IntegerRange(first, trueLast)) {
+                sum += Double.parseDouble(values[i]);
+            }
         }
         return sum / (trueLast - first + 1);
     }
@@ -77,8 +95,10 @@ public class ArrayNumberUtils {
         if (list1.size() != list2.size())
             throw new IllegalArgumentException("Lists being added together must be of the same size.");
         final List<Double> retval = new ArrayList<Double>(list1.size());
-        for (final Integer i : new IntegerRange(list1.size())) {
-            retval.add(list2.get(i).doubleValue() != 0 ? list1.get(i) / list2.get(i) : Double.valueOf(0));
+        if (!list1.isEmpty()) {
+            for (final Integer i : new IntegerRange(list1.size())) {
+                retval.add(list2.get(i).doubleValue() != 0 ? list1.get(i) / list2.get(i) : Double.valueOf(0));
+            }
         }
         return retval;
     }

@@ -12,7 +12,7 @@ import java.util.List;
 
 import edu.virginia.cs.common.ArrayNumberUtils;
 import edu.virginia.cs.common.IntegerRange;
-import edu.virginia.cs.geneticalgorithm.Fitness;
+import edu.virginia.cs.geneticalgorithm.AbstractFitness;
 import edu.virginia.cs.geneticalgorithm.Genotype;
 import edu.virginia.cs.geneticalgorithm.StandardGenotype;
 
@@ -21,7 +21,7 @@ import edu.virginia.cs.geneticalgorithm.StandardGenotype;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 27, 2010
  */
-public class NeuroJetQuickFitness implements Fitness {
+public class NeuroJetQuickFitness extends AbstractFitness {
 
     private final File _mainFile;
     private final List<File> _scriptFiles;
@@ -52,26 +52,31 @@ public class NeuroJetQuickFitness implements Fitness {
         String line;
         // timeStep is in ms. This should be equivalent to 1/timestep measured in seconds
         final double HzConvFactor = 1000.0 / timeStep;
-        double actFitness = 0;
+        double actFitness = -1;
         while ((line = actReader.readLine()) != null) {
             final String[] activities = line.split("\\s");
             final int lastElement = activities.length;
             for (final Integer i : new IntegerRange(0, 100, lastElement)) {
                 final double deviationFrac = (desiredAct - HzConvFactor * ArrayNumberUtils.mean(activities, i, i + 99))
                                              / desiredAct;
+                if (actFitness < 0) actFitness = 0;
                 actFitness += deviationFrac * deviationFrac;
             }
         }
         actReader.close();
-        if (actFitness == 0) actFitness += 1000000; // Never encountered any input
-        return actFitness;
+        if (actFitness < 0 || Double.isNaN(actFitness) || Double.isInfinite(actFitness)) {
+            actFitness = 1000000; // Never encountered any input
+        }
+        assert (actFitness > 0);
+        // Small deviations are what we want, but large fitness values are considered better
+        return 1000.0 / actFitness;
     }
 
     /**
      * @see edu.virginia.cs.geneticalgorithm.Fitness#fitness(edu.virginia.cs.geneticalgorithm.Genotype)
      */
     @Override
-    public List<Double> fitness(final Genotype individual) {
+    public List<Double> fitnessValues(final Genotype individual) {
 
         if (!(individual instanceof StandardGenotype)) throw new RuntimeException("individual must be of type StandardGenotype");
         final StandardGenotype genotype = (StandardGenotype) individual;
@@ -100,16 +105,16 @@ public class NeuroJetQuickFitness implements Fitness {
             final Process p = builder.start();
             final long start = System.currentTimeMillis();
             p.waitFor();
-            retval.add(Double.valueOf(System.currentTimeMillis() - start));
+            retval.add(1.0 / (System.currentTimeMillis() - start + 1));
             // Read the resulting activity files
             final double desiredAct = _updater.getDesiredAct(genotype);
             final double timeStep = _updater.getTimeStep(genotype);
             final File trnAct = new File(tempDir, "trnWithinAct.dat");
             final double trnFitness = generateQuickFitness(trnAct, desiredAct, timeStep);
-            retval.add(Double.valueOf(trnFitness));
+            retval.add(trnFitness);
             final File tstAct = new File(tempDir, "tstWithinAct.dat");
             final double tstFitness = generateQuickFitness(tstAct, desiredAct, timeStep);
-            retval.add(Double.valueOf(tstFitness));
+            retval.add(tstFitness);
         }
         catch (final IOException e) {
             throw new RuntimeException(e);

@@ -9,11 +9,14 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.virginia.cs.common.DoubleValueGenerator;
 import edu.virginia.cs.common.IntegerValueGenerator;
+import edu.virginia.cs.common.ValueGenerator;
 import edu.virginia.cs.geneticalgorithm.GeneInterpreterMap;
 import edu.virginia.cs.geneticalgorithm.IntervalGene;
 import edu.virginia.cs.geneticalgorithm.StandardGenotype;
@@ -26,32 +29,60 @@ import edu.virginia.cs.geneticalgorithm.StandardGenotype;
 public class ScriptUpdater {
 
     private final GeneInterpreterMap<Pattern> _mapping = new GeneInterpreterMap<Pattern>();
-    private DoubleValueGenerator _desiredActGenerator = null; // So we'll know if this somehow never got set
-    private int _desiredActPos = 0;
-    private DoubleValueGenerator _timeStepGenerator = null; // So we'll know if this somehow never got set
-    private int _timeStepPos = 0;
+    private final Map<String, Pattern> _supportingMap = new HashMap<String, Pattern>();
+    private ValueGenerator _desiredActGenerator = null; // So we'll know if this somehow never got set
+    private int _desiredActPos = -1;
+    private ValueGenerator _timeStepGenerator = null; // So we'll know if this somehow never got set
+    private int _timeStepPos = -1;
 
     private Pattern generatePattern(final String varName) {
         return Pattern.compile("insert" + varName + "here", Pattern.CANON_EQ | Pattern.CASE_INSENSITIVE);
     }
 
-    public void addMapping(final int genePosition, final String varName, final double lowerBound, final double upperBound) {
-        _mapping.put(generatePattern(varName), new DoubleValueGenerator(lowerBound, upperBound), genePosition);
+    /**
+     * 
+     * @param genePosition
+     * @param varName
+     * @param lowerBound
+     * @param upperBound
+     */
+    public void addDoubleMapping(final int genePosition, final String varName, final double lowerBound, final double upperBound) {
+        final ValueGenerator generator = new DoubleValueGenerator(lowerBound, upperBound);
+        final Pattern p = generatePattern(varName);
+        _supportingMap.put(varName, p);
+        _mapping.put(p, generator, genePosition);
+        if (genePosition == _desiredActPos) {
+            _desiredActGenerator = generator;
+        }
+        else if (genePosition == _timeStepPos) {
+            _timeStepGenerator = generator;
+        }
     }
 
     public void addDesiredActMapping(final int genePosition, final String varName, final double lowerBound, final double upperBound) {
-        _desiredActGenerator = new DoubleValueGenerator(lowerBound, upperBound);
         _desiredActPos = genePosition;
-        _mapping.put(generatePattern(varName), _desiredActGenerator, genePosition);
+        addDoubleMapping(genePosition, varName, lowerBound, upperBound);
     }
 
     public void addTimeStepMapping(final int genePosition, final String varName, final double lowerBound, final double upperBound) {
-        _timeStepGenerator = new DoubleValueGenerator(lowerBound, upperBound);
         _timeStepPos = genePosition;
-        _mapping.put(generatePattern(varName), _timeStepGenerator, genePosition);
+        addDoubleMapping(genePosition, varName, lowerBound, upperBound);
     }
 
-    public void addMapping(final int genePosition, final String varName, final int lowerBound, final int upperBound) {
+    public void addIntegerMapping(final int genePosition, final String varName, final int lowerBound, final int upperBound) {
+        final Pattern p = generatePattern(varName);
+        _supportingMap.put(varName, p);
+        _mapping.put(p, new IntegerValueGenerator(lowerBound, upperBound), genePosition);
+    }
+
+    /**
+     * Creates an integer mapping that uses another integer mapping as a lower bound
+     * @param genePosition
+     * @param varName
+     * @param lowerBound
+     * @param upperBound
+     */
+    public void addIntegerMapping(final int genePosition, final String varName, final String lowerBound, final int upperBound) {
         _mapping.put(generatePattern(varName), new IntegerValueGenerator(lowerBound, upperBound), genePosition);
     }
 
@@ -82,4 +113,5 @@ public class ScriptUpdater {
         out.close();
         in.close();
     }
+
 }

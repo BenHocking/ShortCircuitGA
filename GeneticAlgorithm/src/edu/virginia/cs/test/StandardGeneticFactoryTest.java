@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.virginia.cs.common.SingleItemList;
+import edu.virginia.cs.geneticalgorithm.AbstractFitness;
 import edu.virginia.cs.geneticalgorithm.Fitness;
 import edu.virginia.cs.geneticalgorithm.Gene;
 import edu.virginia.cs.geneticalgorithm.GeneticFactory;
@@ -29,13 +30,13 @@ public final class StandardGeneticFactoryTest {
     private static int GENOTYPE_SIZE = 5;
     private static int NUM_GENERATIONS = 20;
 
-    private class TrivialStandardFitness implements Fitness {
+    private class TrivialStandardFitness extends AbstractFitness {
 
         /**
          * @see edu.virginia.cs.geneticalgorithm.Fitness#fitness(edu.virginia.cs.geneticalgorithm.Genotype)
          */
         @Override
-        public List<Double> fitness(final Genotype individual) {
+        public List<Double> fitnessValues(final Genotype individual) {
             double retval = 0;
             for (final Gene g : individual) {
                 if (g == StandardGene.ONE) retval += 1.0;

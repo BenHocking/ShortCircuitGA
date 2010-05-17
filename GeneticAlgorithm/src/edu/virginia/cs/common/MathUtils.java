@@ -27,9 +27,9 @@ public final class MathUtils {
     /**
      * Scales range from min to max instead of from 0 to 1
      * 
-     * @param min minimum value to return
+     * @param min minimum value to return (unless x < 0)
      * @param x result of a function that ranges from 0 to 1
-     * @param max maximum value to return
+     * @param max maximum value to return (unless x > 1)
      * @return scaled result between min and max (unless x is less than 0 or greater than 1)
      * @see {@link #scaleInt(int, double, int)}
      * @see {@link #scale(double, double, double, boolean)}
@@ -51,7 +51,7 @@ public final class MathUtils {
      */
     public static double scale(final double min, final double x, final double max, final boolean enforceBounds) {
         if (!enforceBounds) return scale(min, x, max);
-        return scale(min, imposeBounds(min, x, max), max);
+        return scale(min, imposeBounds(0, x, 1), max);
     }
 
     /**

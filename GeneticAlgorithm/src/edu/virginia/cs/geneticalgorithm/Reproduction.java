@@ -35,11 +35,8 @@ public final class Reproduction {
         double bestFit = 0; // Best is maximal, and all fitness values need to be positive
         final Distribution distribution = new Distribution();
         for (final Genotype i : population) {
-            final List<Double> fitList = fitFn.fitness(i);
-            double fit = 0.0;
-            for (final Double d : fitList) {
-                fit += d;
-            }
+            final List<Double> fitList = fitFn.fitnessValues(i);
+            final double fit = fitFn.totalFitness(i);
             distribution.add(new DistributionMember(fitList, i));
             totalFit += fit;
             if (fit > bestFit) bestFit = fit;

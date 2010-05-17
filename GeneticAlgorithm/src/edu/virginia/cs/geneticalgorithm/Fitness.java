@@ -12,5 +12,7 @@ import java.util.List;
  */
 public interface Fitness {
 
-    public List<Double> fitness(final Genotype individual);
+    public List<Double> fitnessValues(final Genotype individual);
+
+    public double totalFitness(final Genotype individual);
 }

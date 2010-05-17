@@ -8,7 +8,7 @@ package edu.virginia.cs.common;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 2, 2010
  */
-public class IntegerValueGenerator implements ValueGenerator {
+public final class IntegerValueGenerator implements ValueGenerator {
 
     private final int _min;
     private final int _max;

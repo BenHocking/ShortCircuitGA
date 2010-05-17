@@ -23,7 +23,7 @@ public class DoubleValueGenerator implements ValueGenerator {
      */
     @Override
     public String generate(final double x) {
-        return String.valueOf(MathUtils.scale(_min, x, _max));
+        return String.valueOf(MathUtils.scale(_min, x, _max, true));
     }
 
 }
