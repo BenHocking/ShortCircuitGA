@@ -17,8 +17,12 @@ import java.util.regex.Pattern;
 import edu.virginia.cs.common.DoubleValueGenerator;
 import edu.virginia.cs.common.IntegerValueGenerator;
 import edu.virginia.cs.common.ValueGenerator;
+import edu.virginia.cs.geneticalgorithm.CompositeGeneInterpreter;
+import edu.virginia.cs.geneticalgorithm.ConstantGeneInterpreter;
+import edu.virginia.cs.geneticalgorithm.GeneInterpreter;
 import edu.virginia.cs.geneticalgorithm.GeneInterpreterMap;
 import edu.virginia.cs.geneticalgorithm.IntervalGene;
+import edu.virginia.cs.geneticalgorithm.SimpleGeneInterpreter;
 import edu.virginia.cs.geneticalgorithm.StandardGenotype;
 
 /**
@@ -41,6 +45,26 @@ public class ScriptUpdater {
 
     /**
      * 
+     * @param genePosition Not used
+     * @param varName
+     * @param value
+     */
+    public void addConstantMapping(final int genePosition, final String varName, final String value) {
+        _mapping.put(generatePattern(varName), new ConstantGeneInterpreter(value));
+    }
+
+    /**
+     * 
+     * @param genePosition Not used
+     * @param varName
+     * @param value
+     */
+    public void addConstantMapping(final int genePosition, final String varName, final Number value) {
+        _mapping.put(generatePattern(varName), new ConstantGeneInterpreter(value));
+    }
+
+    /**
+     * 
      * @param genePosition
      * @param varName
      * @param lowerBound
@@ -50,7 +74,7 @@ public class ScriptUpdater {
         final ValueGenerator generator = new DoubleValueGenerator(lowerBound, upperBound);
         final Pattern p = generatePattern(varName);
         _supportingMap.put(varName, p);
-        _mapping.put(p, generator, genePosition);
+        _mapping.put(p, new SimpleGeneInterpreter(genePosition, generator));
         if (genePosition == _desiredActPos) {
             _desiredActGenerator = generator;
         }
@@ -72,7 +96,7 @@ public class ScriptUpdater {
     public void addIntegerMapping(final int genePosition, final String varName, final int lowerBound, final int upperBound) {
         final Pattern p = generatePattern(varName);
         _supportingMap.put(varName, p);
-        _mapping.put(p, new IntegerValueGenerator(lowerBound, upperBound), genePosition);
+        _mapping.put(p, new SimpleGeneInterpreter(genePosition, new IntegerValueGenerator(lowerBound, upperBound)));
     }
 
     /**
@@ -83,7 +107,10 @@ public class ScriptUpdater {
      * @param upperBound
      */
     public void addIntegerMapping(final int genePosition, final String varName, final String lowerBound, final int upperBound) {
-        _mapping.put(generatePattern(varName), new IntegerValueGenerator(lowerBound, upperBound), genePosition);
+        final Pattern lP = _supportingMap.get(lowerBound);
+        final GeneInterpreter lower = _mapping.get(lP);
+        final GeneInterpreter upper = new ConstantGeneInterpreter(Integer.toString(upperBound));
+        _mapping.put(generatePattern(varName), new CompositeGeneInterpreter(genePosition, lower, upper, true));
     }
 
     public double getDesiredAct(final StandardGenotype genotype) {
@@ -93,7 +120,7 @@ public class ScriptUpdater {
     }
 
     public double getTimeStep(final StandardGenotype genotype) {
-        if (_desiredActGenerator == null) return 1; // Assume 1 ms as the time step size
+        if (_timeStepGenerator == null) return 1; // Assume 1 ms as the time step size
         final String retvalStr = _timeStepGenerator.generate(((IntervalGene) genotype.get(_timeStepPos)).getValue());
         return Double.parseDouble(retvalStr);
     }
@@ -101,6 +128,10 @@ public class ScriptUpdater {
     public void createScriptFromTemplate(final File script, final File template, final StandardGenotype genotype)
             throws IOException {
         final BufferedReader in = new BufferedReader(new FileReader(template));
+        final File parentDir = script.getParentFile();
+        if (!parentDir.exists()) {
+            parentDir.mkdirs();
+        }
         final PrintStream out = new PrintStream(new FileOutputStream(script));
         String line;
         while ((line = in.readLine()) != null) {

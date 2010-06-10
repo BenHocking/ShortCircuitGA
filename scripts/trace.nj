@@ -1,12 +1,10 @@
 @CreateVar(
-  numPatterns 32
-  numTrainTrials 200
-  numTestTrials 25
+  numTrainTrials 5
   dwellTime 144       # ms
   OffRate InsertIHere # ms
   OnRate InsertJHere           # ms
   ActivityHz InsertGHere
-  mePct 0.3 # Percent of Activity due to me
+  mePct InsertXHere # Percent of Activity due to me
   PyrToInternrnWtAdjDecayRate 10 # ms
   InternrnExcDecayRate InsertAHere # ms
   InternrnAxonalDelay InsertCHere #ms
@@ -80,12 +78,7 @@
   @SetVar(setLambda 0.5) # ms
 }
 
-@CreateVar(
-  actFileName testWithinAct:^(filePostfix)
-  KFileName KVals:^(filePostfix)
-)
-
-@PrintVar(InternrnExcDecayRate filePostfix actFileName KFileName InternrnAxonalDelay)
+@PrintVar(InternrnExcDecayRate filePostfix InternrnAxonalDelay)
 
 @CreateVar(halfWidth ^Calc(^(dendFilterWidth)/2))
 
@@ -101,7 +94,7 @@
   mu ^(setMu)
   Phase 0
   Activity ^Calc(^(ActivityHz) * ^(deltaT) / 1000)
-  ni 5000
+  ni 2048
   DendriteToSomaFilter DTSFilt
   SynapseFilter WtFilt
   FBInternrnAxonalDelay ^Num2Int(^Calc(round[^(InternrnAxonalDelay)/^(deltaT)]))
@@ -165,7 +158,7 @@
 )
 
 # Reset files that are appended to
-@FileReset(^(actFileName))
+@FileReset(trnWithinAct.dat tstWithinAct.dat)
 
 @SetVar(seed 1)
 @SeedRNG()
@@ -174,7 +167,6 @@
 @DeleteData(InitPtn)
 @MakeRandSequence(-name InitPtn -Nend ^(ni) -len ^(Period) -p ^(Activity))
 
-@CreateVar(trialDur ^Calc(^(numPatterns)*^(Period)))
 @MakeSequence(-name blank -len ^(tonelen) -non 0 -Nstart 1)
 
 @MakeSequence(-name tone -len ^(tonelen) -st ^(tonelen) -non ^(me))
@@ -186,55 +178,10 @@
 @CreateVar(firstRecur ^Calc(^(lastN)+1))
 @PrintVar(deltaT alpha firstRecur Activity me MidPoint)
 
-@CreateVar(tmp.KMult 1 tmp.cnt 0 MeasuredActHz 0 tmp.ActDev1 100 tmp.ActDev2 100 tmp.ActDevPctThresh 0.01)
-?While([[abs[^(tmp.ActDev1)] > ^(tmp.ActDevPctThresh)] | [abs[^(tmp.ActDev2)] > ^(tmp.ActDevPctThresh)]] & [^(tmp.cnt) < 100]) {
-  @SetVar(
-    KFB ^Calc(^(KFB) * ^(tmp.KMult))
-    K0 ^Calc(^(K0) * ^(tmp.KMult))
-    tmp.cnt ^Calc(^(tmp.cnt) + 1)
-    tmp.ActDevPctThresh ^Calc(^(tmp.ActDevPctThresh) + 0.0025)
-  )
-  @PrintVar(KFB K0)
-  @ResetFiring()
-  @Test(-name InitPtn -time ^SequenceLength(-from InitPtn) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
-  @Test(-name testTraceSeq -time ^(tonelen) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
-  @SetVar(MeasuredActHz ^Calc(^(AveTestAct) * 1000 / ^(deltaT)))
-  @SetVar(tmp.ActDev1 ^Calc([^(MeasuredActHz)-^(ActivityHz)]/^(ActivityHz)))
-  @PrintVar(MeasuredActHz tmp.ActDev1)
-  @SetVar(tmp.KMult ^Calc(sqrt[1 + [^(tmp.ActDev1) / [3 + [2 * sqrt[^(tmp.cnt)]]]]]))
-  # It comes down too fast
-  ?If(^(tmp.KMult) > 1) {
-    @SetVar(tmp.KMult ^Calc(pow[^(tmp.KMult),0.8]))
-  }
-  @PrintVar(tmp.KMult)
-  @SetVar(
-    KFB ^Calc(^(KFB) * ^(tmp.KMult))
-    K0 ^Calc(^(K0) * ^(tmp.KMult))
-    KFF ^Calc(^(KFF) * ^(tmp.KMult))
-    tmp.ActDevPctThresh ^Calc(^(tmp.ActDevPctThresh) + 0.0025)
-  )
-  @PrintVar(KFB K0 KFF tmp.cnt)
-  @Test(-name blank -time ^(tonelen) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
-  @SetVar(MeasuredActHz ^Calc(^(AveTestAct) * 1000 / ^(deltaT)))
-  @SetVar(tmp.ActDev2 ^Calc([^(MeasuredActHz)-^(ActivityHz)]/^(ActivityHz)))
-  @PrintVar(MeasuredActHz tmp.ActDev2)
-  @SetVar(tmp.KMult ^Calc(sqrt[1 + [^(tmp.ActDev2) / [3 + 2 * sqrt[^(tmp.cnt)]]]]))
-  # It comes down too fast
-  ?If(^(tmp.KMult) > 1) {
-    @SetVar(tmp.KMult ^Calc(pow[^(tmp.KMult),0.8]))
-  }
-  @PrintVar(tmp.KMult)
-}
-@DeleteData(tmp.KMult tmp.cnt tmp.ActDevPctThresh tmp.ActDev1 tmp.ActDev2)
-
-@SaveData(-from KFB -to ^(KFileName))
-@SaveData(-from K0 -to ^(KFileName) -append)
-@SaveData(-from KFF -to ^(KFileName) -append)
-
 @SetVar(seed 1)
 @SeedRNG()
 
-@PrintVar(deltaT alpha trialDur Activity me MidPoint)
+@PrintVar(deltaT alpha Activity me MidPoint)
 
 @Test(-name testTraceSeq -time ^SequenceLength(-from testTraceSeq) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
 @PrintVar(AveTestAct)
@@ -254,7 +201,8 @@
   @SaveData(-from TrainingActivity -to trnWithinAct.dat -append)
   @Test(-name testTraceSeq -time ^SequenceLength(-from testTraceSeq) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
   @PrintVar(AveTestAct)
-  @SaveData(-from TestingBuffer -to tstBuff:^(i):.dat)
+  @SaveData(-from TestingActivity -to tstWithinAct.dat -append)
+#  @SaveData(-from TestingBuffer -to tstBuff:^(i):.dat)
   @DeleteData(TestingBuffer)
 }
 @DeleteData(TrainingActivity)

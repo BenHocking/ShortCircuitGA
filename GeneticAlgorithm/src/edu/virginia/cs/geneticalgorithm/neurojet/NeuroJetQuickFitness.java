@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,11 +32,14 @@ public class NeuroJetQuickFitness extends AbstractFitness {
     private static Integer _counter = 0;
     // Made package just to avoid warnings about dead code
     static final boolean DELETE_WORKING_FILES = true;
+    static final boolean DEBUG = false;
 
     public NeuroJetQuickFitness(final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet,
                                 final File workingDir) {
         if (scriptFiles == null || scriptFiles.size() == 0)
             throw new IllegalArgumentException("Argument scriptFiles cannot be null or empty");
+        if (neuroJet == null || !neuroJet.canExecute())
+            throw new IllegalArgumentException("Argument neuroJet must refer to an executable");
         _mainFile = scriptFiles.get(0);
         _scriptFiles = scriptFiles;
         _updater = updater;
@@ -47,29 +51,35 @@ public class NeuroJetQuickFitness extends AbstractFitness {
         this(scriptFiles, updater, neuroJet, null);
     }
 
-    private double generateQuickFitness(final File activityFile, final double desiredAct, final double timeStep) throws IOException {
-        final BufferedReader actReader = new BufferedReader(new FileReader(activityFile));
-        String line;
-        // timeStep is in ms. This should be equivalent to 1/timestep measured in seconds
-        final double HzConvFactor = 1000.0 / timeStep;
-        double actFitness = -1;
-        while ((line = actReader.readLine()) != null) {
-            final String[] activities = line.split("\\s");
-            final int lastElement = activities.length;
-            for (final Integer i : new IntegerRange(0, 100, lastElement)) {
-                final double deviationFrac = (desiredAct - HzConvFactor * ArrayNumberUtils.mean(activities, i, i + 99))
-                                             / desiredAct;
-                if (actFitness < 0) actFitness = 0;
-                actFitness += deviationFrac * deviationFrac;
+    private double generateQuickFitness(final File activityFile, final double desiredAct, final double timeStep) {
+        try {
+            final BufferedReader actReader = new BufferedReader(new FileReader(activityFile));
+            String line;
+            // timeStep is in ms. This should be equivalent to 1/timestep measured in seconds
+            final double HzConvFactor = 1000.0 / timeStep;
+            double actFitness = -1;
+            while ((line = actReader.readLine()) != null) {
+                final String[] activities = line.split("\\s");
+                final int lastElement = activities.length;
+                for (final Integer i : new IntegerRange(0, 100, lastElement)) {
+                    final double deviationFrac = (desiredAct - HzConvFactor * ArrayNumberUtils.mean(activities, i, i + 99))
+                                                 / desiredAct;
+                    if (actFitness < 0) actFitness = 0;
+                    actFitness += deviationFrac * deviationFrac;
+                }
             }
+            actReader.close();
+            if (actFitness < 0 || Double.isNaN(actFitness) || Double.isInfinite(actFitness)) {
+                actFitness = 1000000; // Never encountered any input
+            }
+            assert (actFitness > 0);
+            // Small deviations are what we want, but large fitness values are considered better
+            return 1000.0 / actFitness;
         }
-        actReader.close();
-        if (actFitness < 0 || Double.isNaN(actFitness) || Double.isInfinite(actFitness)) {
-            actFitness = 1000000; // Never encountered any input
+        catch (final IOException e) {
+            System.out.println(e);
+            return 0; // Something went wrong with the program. Label this as a DOA individual
         }
-        assert (actFitness > 0);
-        // Small deviations are what we want, but large fitness values are considered better
-        return 1000.0 / actFitness;
     }
 
     /**
@@ -81,12 +91,26 @@ public class NeuroJetQuickFitness extends AbstractFitness {
         if (!(individual instanceof StandardGenotype)) throw new RuntimeException("individual must be of type StandardGenotype");
         final StandardGenotype genotype = (StandardGenotype) individual;
         // Each fitness calculation happens in its own directory, allowing this function to be run in parallel
+        File scriptFile = _mainFile;
         File tempDir;
         synchronized (_counter) {
             tempDir = new File(_workingDir, String.valueOf(++_counter));
         }
+        // Remove any existing files
+        final File[] prevFiles = tempDir.listFiles();
+        if (prevFiles != null) {
+            for (final File f : prevFiles) {
+                f.delete();
+            }
+        }
+        if (DELETE_WORKING_FILES) {
+            tempDir.deleteOnExit();
+        }
         for (final File f : _scriptFiles) {
             final File script = new File(tempDir, f.getName());
+            if (f.equals(_mainFile)) {
+                scriptFile = script;
+            }
             try {
                 _updater.createScriptFromTemplate(script, f, genotype);
             }
@@ -99,16 +123,34 @@ public class NeuroJetQuickFitness extends AbstractFitness {
             // Launch NeuroJet
             final List<String> command = new ArrayList<String>();
             command.add(_neuroJet.getCanonicalPath());
-            command.add(_mainFile.getCanonicalPath());
+            command.add(scriptFile.getCanonicalPath());
             final ProcessBuilder builder = new ProcessBuilder(command);
             builder.directory(tempDir);
             final Process p = builder.start();
             final long start = System.currentTimeMillis();
+            if (DEBUG) {
+                final BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                String s;
+                while ((s = stdInput.readLine()) != null) {
+                    System.out.println(s);
+                }
+            }
+            final BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            final StringBuilder err = new StringBuilder();
+            String sErr;
+            while ((sErr = stdError.readLine()) != null) {
+                err.append(sErr);
+            }
+            if (err.length() > 0) {
+                System.out.println("Errors:\n" + err.toString());
+            }
             p.waitFor();
             retval.add(1.0 / (System.currentTimeMillis() - start + 1));
             // Read the resulting activity files
             final double desiredAct = _updater.getDesiredAct(genotype);
             final double timeStep = _updater.getTimeStep(genotype);
+            // TODO: Improve upon this hack
+            Thread.sleep(1000); // Make sure we catch up with O/S
             final File trnAct = new File(tempDir, "trnWithinAct.dat");
             final double trnFitness = generateQuickFitness(trnAct, desiredAct, timeStep);
             retval.add(trnFitness);

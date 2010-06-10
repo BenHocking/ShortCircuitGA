@@ -20,6 +20,7 @@ public final class Reproduction {
     private final boolean _allowDuplicates;
     private final List<Double> _bestFits = new ArrayList<Double>();
     private final List<Double> _meanFits = new ArrayList<Double>();
+    public static int DEBUG_LEVEL = 1;
 
     public Reproduction(final boolean allowDuplicates) {
         _allowDuplicates = allowDuplicates;
@@ -34,13 +35,19 @@ public final class Reproduction {
         double totalFit = 0;
         double bestFit = 0; // Best is maximal, and all fitness values need to be positive
         final Distribution distribution = new Distribution();
+        int ctr = 0;
+        if (DEBUG_LEVEL == 1) System.out.print("Evaluating individual:");
         for (final Genotype i : population) {
+            if (DEBUG_LEVEL > 1) System.out.println("Finding fitness of individual #" + ++ctr);
+            if (DEBUG_LEVEL == 1) System.out.print(" " + ++ctr);
             final List<Double> fitList = fitFn.fitnessValues(i);
             final double fit = fitFn.totalFitness(i);
+            if (DEBUG_LEVEL > 1) System.out.println("\tfitness: " + fit);
             distribution.add(new DistributionMember(fitList, i));
             totalFit += fit;
             if (fit > bestFit) bestFit = fit;
         }
+        if (DEBUG_LEVEL == 1) System.out.println(" ... done");
         // Calculate statistics
         _bestFits.add(Double.valueOf(bestFit));
         _meanFits.add(Double.valueOf(totalFit / population.size()));

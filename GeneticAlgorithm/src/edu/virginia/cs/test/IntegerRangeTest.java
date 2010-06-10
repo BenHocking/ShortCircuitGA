@@ -13,7 +13,7 @@ import org.junit.Test;
 import edu.virginia.cs.common.IntegerRange;
 
 /**
- * TODO Add description
+ * Test harness for IntegerRange class
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 16, 2010
  */
