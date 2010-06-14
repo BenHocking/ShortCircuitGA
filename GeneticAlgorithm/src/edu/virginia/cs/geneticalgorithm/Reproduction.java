@@ -18,12 +18,15 @@ import edu.virginia.cs.common.UnorderedPair;
 public final class Reproduction {
 
     private final boolean _allowDuplicates;
+    private final boolean _keepAllHistory;
     private final List<Double> _bestFits = new ArrayList<Double>();
     private final List<Double> _meanFits = new ArrayList<Double>();
+    private final List<Distribution> _popHist = new ArrayList<Distribution>();
     public static int DEBUG_LEVEL = 1;
 
-    public Reproduction(final boolean allowDuplicates) {
+    public Reproduction(final boolean allowDuplicates, final boolean keepAllHistory) {
         _allowDuplicates = allowDuplicates;
+        _keepAllHistory = keepAllHistory;
     }
 
     public List<Genotype> reproduce(final List<Genotype> population, final Fitness fitFn, final Select selFn, final Crossover xFn) {
@@ -61,6 +64,9 @@ public final class Reproduction {
                 retval.add(kids.getLast());
             }
         }
+        if (_keepAllHistory) {
+            _popHist.add(new Distribution(distribution));
+        }
         return _allowDuplicates ? (List<Genotype>) retval : new ArrayList<Genotype>(retval);
     }
 
@@ -76,6 +82,14 @@ public final class Reproduction {
      */
     public List<Double> getBestFits() {
         return new ArrayList<Double>(_bestFits);
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public List<Distribution> getHistory() {
+        return _popHist;
     }
 
     /**

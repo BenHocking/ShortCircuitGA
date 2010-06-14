@@ -10,7 +10,7 @@ import edu.virginia.cs.common.ValueGenerator;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 28, 2010
  */
-public class SimpleGeneInterpreter implements GeneInterpreter {
+public final class SimpleGeneInterpreter implements GeneInterpreter {
 
     private final int _genePos;
     private final ValueGenerator _generator;

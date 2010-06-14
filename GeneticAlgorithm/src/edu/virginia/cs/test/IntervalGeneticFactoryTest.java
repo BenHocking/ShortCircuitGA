@@ -3,12 +3,12 @@
  */
 package edu.virginia.cs.test;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import edu.virginia.cs.common.SingleItemList;
 import edu.virginia.cs.geneticalgorithm.AbstractFitness;
 import edu.virginia.cs.geneticalgorithm.Fitness;
 import edu.virginia.cs.geneticalgorithm.Gene;
@@ -41,7 +41,7 @@ public final class IntervalGeneticFactoryTest {
             for (final Gene g : individual) {
                 retval += ((IntervalGene) g).getValue();
             }
-            return new SingleItemList<Double>(retval);
+            return Collections.singletonList(retval);
         }
 
     }
@@ -53,7 +53,8 @@ public final class IntervalGeneticFactoryTest {
         final GeneticFactory factory = new IntervalGeneticFactory(seed);
         List<Genotype> population = factory.createPopulation(POP_SIZE, GENOTYPE_SIZE);
         boolean allowDuplicates = true;
-        Reproduction reproduction = new Reproduction(allowDuplicates);
+        final boolean keepHistory = false;
+        Reproduction reproduction = new Reproduction(allowDuplicates, keepHistory);
         for (int i = 0; i < NUM_GENERATIONS; ++i) {
             population = reproduction.reproduce(population, _fitFn, factory.getSelectFunction(), factory.getCrossoverFunction());
         }
@@ -63,7 +64,7 @@ public final class IntervalGeneticFactoryTest {
         Assert.assertEquals(4.223457345238561, reproduction.getBestFit(), tolerance);
         Assert.assertEquals(3.4821626627095483, reproduction.getMeanFit(), tolerance);
         allowDuplicates = false;
-        reproduction = new Reproduction(allowDuplicates);
+        reproduction = new Reproduction(allowDuplicates, keepHistory);
         for (int i = 0; i < NUM_GENERATIONS; ++i) {
             population = reproduction.reproduce(population, _fitFn, factory.getSelectFunction(), factory.getCrossoverFunction());
         }

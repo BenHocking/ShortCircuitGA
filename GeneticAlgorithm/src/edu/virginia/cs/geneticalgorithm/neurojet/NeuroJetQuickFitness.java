@@ -9,7 +9,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.virginia.cs.common.ArrayNumberUtils;
 import edu.virginia.cs.common.IntegerRange;
@@ -22,7 +24,7 @@ import edu.virginia.cs.geneticalgorithm.StandardGenotype;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 27, 2010
  */
-public class NeuroJetQuickFitness extends AbstractFitness {
+public final class NeuroJetQuickFitness extends AbstractFitness {
 
     private final File _mainFile;
     private final List<File> _scriptFiles;
@@ -33,6 +35,7 @@ public class NeuroJetQuickFitness extends AbstractFitness {
     // Made package just to avoid warnings about dead code
     static final boolean DELETE_WORKING_FILES = true;
     static final boolean DEBUG = false;
+    private final Map<Genotype, List<Double>> _fitMap = new HashMap<Genotype, List<Double>>();
 
     public NeuroJetQuickFitness(final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet,
                                 final File workingDir) {
@@ -57,24 +60,29 @@ public class NeuroJetQuickFitness extends AbstractFitness {
             String line;
             // timeStep is in ms. This should be equivalent to 1/timestep measured in seconds
             final double HzConvFactor = 1000.0 / timeStep;
-            double actFitness = -1;
+            double actFitness = 0;
+            int numSums = 0;
             while ((line = actReader.readLine()) != null) {
                 final String[] activities = line.split("\\s");
                 final int lastElement = activities.length;
                 for (final Integer i : new IntegerRange(0, 100, lastElement)) {
                     final double deviationFrac = (desiredAct - HzConvFactor * ArrayNumberUtils.mean(activities, i, i + 99))
                                                  / desiredAct;
-                    if (actFitness < 0) actFitness = 0;
                     actFitness += deviationFrac * deviationFrac;
+                    ++numSums;
                 }
             }
             actReader.close();
-            if (actFitness < 0 || Double.isNaN(actFitness) || Double.isInfinite(actFitness)) {
+            if (numSums == 0 || Double.isNaN(actFitness) || Double.isInfinite(actFitness)) {
                 actFitness = 1000000; // Never encountered any input
+            }
+            else {
+                // Calculate average squared deviation
+                actFitness /= numSums;
             }
             assert (actFitness > 0);
             // Small deviations are what we want, but large fitness values are considered better
-            return 1000.0 / actFitness;
+            return 1.0 / actFitness;
         }
         catch (final IOException e) {
             System.out.println(e);
@@ -87,8 +95,9 @@ public class NeuroJetQuickFitness extends AbstractFitness {
      */
     @Override
     public List<Double> fitnessValues(final Genotype individual) {
-
         if (!(individual instanceof StandardGenotype)) throw new RuntimeException("individual must be of type StandardGenotype");
+        List<Double> retval = _fitMap.get(individual);
+        if (retval != null) return retval;
         final StandardGenotype genotype = (StandardGenotype) individual;
         // Each fitness calculation happens in its own directory, allowing this function to be run in parallel
         File scriptFile = _mainFile;
@@ -118,7 +127,7 @@ public class NeuroJetQuickFitness extends AbstractFitness {
                 throw new RuntimeException(e);
             }
         }
-        final List<Double> retval = new ArrayList<Double>();
+        retval = new ArrayList<Double>();
         try {
             // Launch NeuroJet
             final List<String> command = new ArrayList<String>();
@@ -167,6 +176,8 @@ public class NeuroJetQuickFitness extends AbstractFitness {
             // however, such an approach would get old fast.
             throw new RuntimeException(e);
         }
+        // Create copy in case the individual is changed after the fitness has been calculated
+        _fitMap.put(individual.clone(), retval);
         return retval;
     }
 }

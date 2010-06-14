@@ -8,14 +8,35 @@ import java.util.Random;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 25, 2010
  */
-final class StandardMutator implements Mutator {
+public final class StandardMutator implements Mutator {
 
     private final Random _rng;
-    private final double _mutateRate;
+    private double _mutateRate;
 
-    StandardMutator(final double mutateRate, final Random rng) {
+    /**
+     * Constructor that fully specifies a typical {@link Mutator} object
+     * @param mutateRate
+     * @param rng
+     */
+    public StandardMutator(final double mutateRate, final Random rng) {
         _rng = rng;
         _mutateRate = mutateRate;
+    }
+
+    /**
+     * 
+     * @param mutateRate
+     */
+    public void setMutateRate(final double mutateRate) {
+        _mutateRate = mutateRate;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public double getMutateRate() {
+        return _mutateRate;
     }
 
     /**

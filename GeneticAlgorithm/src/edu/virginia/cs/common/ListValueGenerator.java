@@ -10,7 +10,7 @@ import java.util.List;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 2, 2010
  */
-public class ListValueGenerator implements ValueGenerator {
+public final class ListValueGenerator implements ValueGenerator {
 
     private final List<Object> _list;
 

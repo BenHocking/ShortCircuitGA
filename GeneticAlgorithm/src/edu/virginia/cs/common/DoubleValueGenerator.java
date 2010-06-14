@@ -8,7 +8,7 @@ package edu.virginia.cs.common;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 2, 2010
  */
-public class DoubleValueGenerator implements ValueGenerator {
+public final class DoubleValueGenerator implements ValueGenerator {
 
     private final double _min;
     private final double _max;

@@ -1,0 +1,214 @@
+@CreateVar(
+  numTrainTrials 3
+  dwellTime 144       # ms
+  OffRate InsertIHere # ms
+  OnRate InsertJHere           # ms
+  ActivityHz InsertGHere
+  mePct InsertXHere # Percent of Activity due to me
+  PyrToInternrnWtAdjDecayRate 10 # ms
+  InternrnExcDecayRate InsertAHere # ms
+  InternrnAxonalDelay InsertCHere #ms
+  filePostfix InsertBHere
+  mySFR InsertHHere
+  KFBBase InsertKHere
+  KFFBase InsertLHere
+  K0Base InsertMHere
+  TraceDuration InsertNHere
+  setMu InsertOHere
+  setLambda InsertPHere
+)
+
+@SetVar(deltaT 1)
+@SetVar(Period ^Calc(round[^(dwellTime)/^(deltaT)]))
+
+@PrintVar(deltaT)
+@CreateVar(
+  minAxDelay InsertEHere
+  maxAxDelay InsertFHere
+  dendFilterWidth InsertDHere
+)
+
+#Default values
+?If(strcmp[^(InternrnExcDecayRate),Insert:A:Here]=0) {
+  @SetVar(InternrnExcDecayRate 3.5) # ms
+}
+?If(strcmp[^(filePostfix),Insert:B:Here]=0) {
+  @SetVar(filePostfix tstActWithin.dat)
+}
+?If(strcmp[^(InternrnAxonalDelay),Insert:C:Here]=0) {
+  @SetVar(InternrnAxonalDelay 2) # ms
+}
+?If(strcmp[^(dendFilterWidth),Insert:D:Here]=0) {
+  @SetVar(dendFilterWidth 7) # ms
+}
+?If(strcmp[^(minAxDelay),Insert:E:Here]=0) {
+  @SetVar(minAxDelay ^Num2Int(^Calc(round[2/^(deltaT)]))) # ms
+}
+?If(strcmp[^(maxAxDelay),Insert:F:Here]=0) {
+  @SetVar(maxAxDelay ^Num2Int(^Calc(round[2/^(deltaT)]))) # ms
+}
+?If(strcmp[^(ActivityHz),Insert:G:Here]=0) {
+  @SetVar(ActivityHz 1)
+}
+?If(strcmp[^(mySFR),Insert:H:Here]=0) {
+  @SetVar(mySFR 0)
+}
+?If(strcmp[^(OffRate),Insert:I:Here]=0) {
+  @SetVar(OffRate 100)
+}
+?If(strcmp[^(OnRate),Insert:J:Here]=0) {
+  @SetVar(OnRate 15)
+}
+?If(strcmp[^(KFBBase),Insert:K:Here]=0) {
+  @SetVar(KFBBase 0.01903)
+}
+?If(strcmp[^(KFFBase),Insert:L:Here]=0) {
+  @SetVar(KFFBase 0.00207)
+}
+?If(strcmp[^(K0Base),Insert:M:Here]=0) {
+  @SetVar(K0Base 0.02726)
+}
+?If(strcmp[^(TraceDuration),Insert:N:Here]=0) {
+  @SetVar(TraceDuration 500) # ms
+}
+?If(strcmp[^(setMu),Insert:O:Here]=0) {
+  @SetVar(setMu 0.01) # ms
+}
+?If(strcmp[^(setLambda),Insert:P:Here]=0) {
+  @SetVar(setLambda 0.5) # ms
+}
+
+@PrintVar(InternrnExcDecayRate filePostfix InternrnAxonalDelay)
+
+@CreateVar(halfWidth ^Calc(^(dendFilterWidth)/2))
+
+@CopyData(-to DTSFiltA -from "^Fn(^(deltaT),^(halfWidth),1-exp[-^(halfWidth)/5*^(tFn)])" -type mat -T)
+@CopyData(-to DTSFiltB -from "^Fn(^(halfWidth)+^(deltaT),^(dendFilterWidth),exp[-^(halfWidth)/5*[^(tFn)-^(halfWidth)]])" -type mat -T)
+@AppendData(-from 2 DTSFiltA DTSFiltB -to DTSFiltT -type mat)
+@CopyData(-to DTSFilt -from DTSFiltT -type mat -T)
+@SaveData(-from DTSFilt -to DTSFilt_:^(dendFilterWidth):.dat)
+@CopyData(-to WtFilt -from "^Fn(^(deltaT),1,1)" -type mat)
+
+@SetVar(
+  title "Trace Conditioning"
+  mu ^(setMu)
+  Phase 0
+  Activity ^Calc(^(ActivityHz) * ^(deltaT) / 1000)
+  ni 2048
+  DendriteToSomaFilter DTSFilt
+  SynapseFilter WtFilt
+  FBInternrnAxonalDelay ^Num2Int(^Calc(round[^(InternrnAxonalDelay)/^(deltaT)]))
+  FFInternrnAxonalDelay 1 # to allow it to be quasi in-sync
+  InternrnExcDecay ^Calc(1-exp[-^(deltaT)/^(InternrnExcDecayRate)])
+#  ResetPattern InitPtn
+)
+@SetVar(
+  ExtExc ^Calc(^(ni) * ^(Activity))
+)
+@MakeSequence(-name InitPtn -len 1 -non 1 -Nstart 1)
+
+?If(exists[wNoise]) { @SetVar(wNoise ^(mySFR)) }
+?If(exists[SynFailRate]) { @SetVar(SynFailRate ^(mySFR)) }
+
+@CreateVar(
+  me ^Calc(round[^(ni) * ^(ActivityHz) * ^(mePct) / 22.5]) # 22.5 is arbitrary
+)
+
+?If(exists[PyrToInternrnWtAdjDecay]) {
+  @SetVar(PyrToInternrnWtAdjDecay ^Calc(exp[-^(deltaT)/^(PyrToInternrnWtAdjDecayRate)]))
+}
+?If(exists[KdAdjDecay]) {
+  @SetVar(KdAdjDecay ^Calc(exp[-^(deltaT)/^(PyrToInternrnWtAdjDecayRate)]))
+}
+
+@SetVar(
+  NMDArise ^Calc(ceil[^(OnRate) / ^(deltaT)])
+  theta 0.5
+  Con 0.1
+  KFF ^Calc(^(KFFBase) * ^(dendFilterWidth))
+  KFB ^Calc(^(KFBBase) * ^(dendFilterWidth))
+  K0 ^Calc(^(K0Base) * ^(dendFilterWidth))
+  wStart ^Calc(^(ActivityHz) * ^(OffRate) * ^Calc(1-^(mySFR)) / 1000)
+  Reset 0 # Circular sequence
+  alpha ^Calc(exp[-^(deltaT)/^(OffRate)])
+  MidPoint ^Calc(^(mePct) * ^(ni) * ^(Activity) / ^(me))
+  xNoise ^Calc(^(mePct) * ^(ni) * ^(Activity) / ^(me))
+  xTestingNoise ^Calc(^(mePct) * ^(ni) * ^(Activity) / ^(me))
+  lambdaFB ^(setLambda)
+##  Begin Izhikevich Block  ## 
+# Remove for Classical model #
+    IzhA InsertQHere # 0.02
+    IzhB InsertRHere # -0.1
+    IzhC InsertSHere # -55
+    IzhD InsertTHere # 6
+    IzhvStart InsertUHere # -60   # stable point
+    IzhIMult InsertWHere # 12
+###  End Izhikevich Block  ### 
+)
+
+##  Begin Izhikevich Block  ## 
+# Remove for Classical model #
+@SetVar(
+    IzhuStart ^Calc(^(IzhvStart) * ^(IzhB))  # stable point 6 = -60 * -0.1
+)
+###  End Izhikevich Block  ### 
+
+@MakeRandSequence(-name InitPtn -len ^Calc(100/^(deltaT)) -p ^Calc(^(Activity)/^(MidPoint)))
+
+@CreateVar(
+  startN 1
+  lastN ^Calc(2 * ^(me))
+  tonelen ^Num2Int(^Calc(150 / ^(deltaT)))
+  pufflen ^Num2Int(^Calc(100 / ^(deltaT)))
+  tracelen ^Num2Int(^Calc(^(TraceDuration) / ^(deltaT)))
+)
+
+# Reset files that are appended to
+@FileReset(trnWithinAct.dat tstWithinAct.dat)
+
+@SetVar(seed 1)
+@SeedRNG()
+@CreateNetwork(-mindelay ^(minAxDelay) -maxdelay ^(maxAxDelay) -dist uniform -low ^Calc(0.9 * ^(wStart)) -high ^Calc(1.1 * ^(wStart)))
+
+@DeleteData(InitPtn)
+@MakeRandSequence(-name InitPtn -Nend ^(ni) -len ^(Period) -p ^(Activity))
+
+@MakeSequence(-name blank -len ^(tonelen) -non 0 -Nstart 1)
+
+@MakeSequence(-name tone -len ^(tonelen) -st ^(tonelen) -non ^(me))
+@MakeSequence(-name trace -len ^(tracelen) -st ^(tracelen) -non 0)
+@MakeSequence(-name puff -len ^(pufflen) -st ^(pufflen) -non ^(me) -Nstart ^Calc(^(me)+1))
+@MakeSequence(-name nopuff -len ^(pufflen) -st ^(pufflen) -non 0)
+@AppendData(-to trainTraceSeq -from 3 tone trace puff)
+@AppendData(-to testTraceSeq -from 3 tone trace nopuff)
+@CreateVar(firstRecur ^Calc(^(lastN)+1))
+@PrintVar(deltaT alpha firstRecur Activity me MidPoint)
+
+@SetVar(seed 1)
+@SeedRNG()
+
+@PrintVar(deltaT alpha Activity me MidPoint)
+
+@Test(-name testTraceSeq -time ^SequenceLength(-from testTraceSeq) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
+@PrintVar(AveTestAct)
+@SaveData(-from TestingBuffer -to tstBuff0.dat)
+%(i 1 ^(numTrainTrials)) {
+  @ResetFiring()
+  @Test(-name InitPtn -time ^SequenceLength(-from InitPtn) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
+  @Train(-name trainTraceSeq -trials 1 -nocomp -norecord 7 TrainingThresholds TrainingBusLines TrainingIntBusLines TrainingKWeights TrainingInhibitions TrainingFBInternrnExc TrainingFFInternrnExc)
+  ?If(^(i) = 1) {
+    @SaveData(-from TrainingBuffer -to firstTrnBuff.dat)
+  }
+  ?If(^(i) = ^(numTrainTrials)) {
+    @SaveData(-from TrainingBuffer -to trnBuff.dat)
+  }
+  @DeleteData(TrainingBuffer)
+  @PrintVar(AveTrainAct)
+  @SaveData(-from TrainingActivity -to trnWithinAct.dat -append)
+  @Test(-name testTraceSeq -time ^SequenceLength(-from testTraceSeq) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
+  @PrintVar(AveTestAct)
+  @SaveData(-from TestingActivity -to tstWithinAct.dat -append)
+#  @SaveData(-from TestingBuffer -to tstBuff:^(i):.dat)
+  @DeleteData(TestingBuffer)
+}
+@DeleteData(TrainingActivity)

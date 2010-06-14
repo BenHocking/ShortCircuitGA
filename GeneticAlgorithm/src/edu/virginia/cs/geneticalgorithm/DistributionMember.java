@@ -12,7 +12,7 @@ import edu.virginia.cs.common.OrderedPair;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 24, 2010
  */
-final class DistributionMember extends OrderedPair<List<Double>, Genotype> {
+public final class DistributionMember extends OrderedPair<List<Double>, Genotype> {
 
     /**
      * @param s
@@ -20,6 +20,14 @@ final class DistributionMember extends OrderedPair<List<Double>, Genotype> {
      */
     public DistributionMember(final List<Double> s, final Genotype i) {
         super(s, i);
+    }
+
+    /**
+     * Copy constructor. Warning: requires {@link Genotype} to implement clone correctly
+     * @param toCopy
+     */
+    public DistributionMember(final DistributionMember toCopy) {
+        super(toCopy.getFitnessValues(), toCopy.getGenotype().clone());
     }
 
     public Double getValue() {

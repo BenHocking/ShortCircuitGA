@@ -14,17 +14,21 @@ import edu.virginia.cs.common.IntegerRange;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 24, 2010
  */
-final class Distribution extends ArrayList<DistributionMember> {
+public final class Distribution extends ArrayList<DistributionMember> {
 
     public Distribution() {
         super();
     }
 
     /**
+     * Copy constructor with deep copy
      * @param distribution
      */
     public Distribution(final Distribution distribution) {
-        super(distribution);
+        super();
+        for (final DistributionMember m : distribution) {
+            add(new DistributionMember(m));
+        }
     }
 
     public DistributionMember getLast() {

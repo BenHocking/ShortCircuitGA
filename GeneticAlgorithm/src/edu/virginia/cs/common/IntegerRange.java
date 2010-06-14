@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 4, 2010
  */
-public class IntegerRange implements Iterable<Integer>, Iterator<Integer> {
+public final class IntegerRange implements Iterable<Integer>, Iterator<Integer> {
 
     private int _currentlyAt;
     private final int _step;

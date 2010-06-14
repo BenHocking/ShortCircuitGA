@@ -11,7 +11,7 @@ import java.util.List;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 6, 2010
  */
-public class ArrayNumberUtils {
+public final class ArrayNumberUtils {
 
     public static <T extends Number> double sum(final List<T> numberList) {
         double retval = 0;

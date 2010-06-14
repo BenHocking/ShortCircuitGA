@@ -1,5 +1,5 @@
 @CreateVar(
-  numTrainTrials 5
+  numTrainTrials 300
   dwellTime 144       # ms
   OffRate InsertIHere # ms
   OnRate InsertJHere           # ms
@@ -202,7 +202,12 @@
   @Test(-name testTraceSeq -time ^SequenceLength(-from testTraceSeq) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
   @PrintVar(AveTestAct)
   @SaveData(-from TestingActivity -to tstWithinAct.dat -append)
-#  @SaveData(-from TestingBuffer -to tstBuff:^(i):.dat)
+  ?If(^(i) = 1) {
+    @SaveData(-from TestingBuffer -to firstTstBuff.dat)
+  }
+  ?If(^(i) = ^(numTrainTrials)) {
+    @SaveData(-from TestingBuffer -to tstBuff.dat)
+  }
   @DeleteData(TestingBuffer)
 }
 @DeleteData(TrainingActivity)

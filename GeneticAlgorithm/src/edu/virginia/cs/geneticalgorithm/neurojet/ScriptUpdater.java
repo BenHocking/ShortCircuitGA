@@ -30,7 +30,7 @@ import edu.virginia.cs.geneticalgorithm.StandardGenotype;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 2, 2010
  */
-public class ScriptUpdater {
+public final class ScriptUpdater {
 
     private final GeneInterpreterMap<Pattern> _mapping = new GeneInterpreterMap<Pattern>();
     private final Map<String, Pattern> _supportingMap = new HashMap<String, Pattern>();

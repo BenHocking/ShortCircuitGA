@@ -3,12 +3,12 @@
  */
 package edu.virginia.cs.test;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import edu.virginia.cs.common.SingleItemList;
 import edu.virginia.cs.geneticalgorithm.AbstractFitness;
 import edu.virginia.cs.geneticalgorithm.Fitness;
 import edu.virginia.cs.geneticalgorithm.Gene;
@@ -41,7 +41,7 @@ public final class StandardGeneticFactoryTest {
             for (final Gene g : individual) {
                 if (g == StandardGene.ONE) retval += 1.0;
             }
-            return new SingleItemList<Double>(retval);
+            return Collections.singletonList(retval);
         }
 
     }
@@ -53,14 +53,15 @@ public final class StandardGeneticFactoryTest {
         final GeneticFactory factory = new StandardGeneticFactory(seed);
         List<Genotype> population = factory.createPopulation(POP_SIZE, GENOTYPE_SIZE);
         boolean allowDuplicates = true;
-        Reproduction reproduction = new Reproduction(allowDuplicates);
+        final boolean keepHistory = false;
+        Reproduction reproduction = new Reproduction(allowDuplicates, keepHistory);
         for (int i = 0; i < NUM_GENERATIONS; ++i) {
             population = reproduction.reproduce(population, _fitFn, factory.getSelectFunction(), factory.getCrossoverFunction());
         }
         Assert.assertEquals(GENOTYPE_SIZE, reproduction.getBestFit(), tolerance);
         Assert.assertEquals(4.45, reproduction.getMeanFit(), tolerance);
         allowDuplicates = false;
-        reproduction = new Reproduction(allowDuplicates);
+        reproduction = new Reproduction(allowDuplicates, keepHistory);
         for (int i = 0; i < NUM_GENERATIONS; ++i) {
             population = reproduction.reproduce(population, _fitFn, factory.getSelectFunction(), factory.getCrossoverFunction());
         }
