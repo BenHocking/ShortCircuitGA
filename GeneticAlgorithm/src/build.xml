@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<project name="ShortCircuitGA" default="all">
+	<property name="jarname" value="shortcircuitga.jar" />
+	<property name="test.src.dir" value="${basedir}" />
+	<property name="classes" value="${basedir}/../classes" />
+	<property name="test.classes" value="${basedir}/../test-classes" />
+	<property name="jars.dir" value="${basedir}/../jars" />
+	<property name="jar" location="${jars.dir}/${jarname}" />
+	<property name="test.pattern.junit" value="**/*Test.java" />
+	<property name="test.report.dir" value="${basedir}/report" />
+
+	<path id="used.jars.path">
+		<fileset dir="${jars.dir}">
+			<include name="*.jar" />
+			<exclude name="${jarname}" />
+		</fileset>
+	</path>
+
+	<target name="all" depends="jar, junit" />
+
+	<!-- Setup to build and run -->
+	<target name="_init">
+		<available classname="java.util.ServiceLoader" property="isJava6" />
+		<fail message="Java 6 or greater is required to build ShortCircuitGA" unless="isJava6" />
+
+		<echo>Making directory ${classes}</echo>
+		<mkdir dir="${classes}" description="Destination for compiled non-test classes" />
+		<echo>Making directory ${test.classes}</echo>
+		<mkdir dir="${test.classes}" description="Destination for compiled test classes" />
+		<path id="project.classpath">
+			<!-- include the test classes -->
+			<pathelement location="${classes}" />
+			<pathelement location="${test.classes}" />
+			<fileset dir="${jars.dir}">
+				<include name="*.jar" />
+			</fileset>
+		</path>
+		<!-- Make clean test report directory. -->
+		<delete dir="${test.report.dir}" />
+		<mkdir dir="${test.report.dir}" />
+	</target>
+	
+	<!-- compile -->
+	<target name="_compile" depends="_init" description="Compiling.">
+		<javac nowarn="yes"
+		       source="1.6"
+		       srcdir="${test.src.dir}"
+		       destdir="${classes}"
+		       debug="true"
+		       debuglevel="source,lines">
+			<include name="edu/**/*.java" />
+			<exclude name="**/*Test*.java" />
+			<classpath refid="project.classpath" />
+		</javac>
+	</target>
+
+	<target name="jar"
+	        depends="_compile, jar.nodep"
+	        description="Create the shortcircuitga.jar file." />
+
+	<target name="jar.nodep">
+		<!-- Convert class path into space separated list -->
+		<pathconvert property="mf.classpath" pathsep=" ">
+			<path refid="used.jars.path" />
+			<flattenmapper />
+		</pathconvert>
+		<echo message="Class-Path: ${mf.classpath}" />
+
+		<jar jarfile="${jar}" index="yes">
+			<!-- include class files -->
+			<fileset dir="${classes}">
+				<include name="**/*.class" />
+				<exclude name="**/*Test*.class" />
+			</fileset>
+
+			<manifest>
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Class-Path" value="${mf.classpath}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<!-- compile test -->
+	<target name="_compiletest" depends="_init" description="Compiling.">
+		<javac nowarn="yes"
+		       source="1.6"
+		       srcdir="${test.src.dir}"
+		       destdir="${test.classes}"
+		       debug="true"
+		       debuglevel="source,lines">
+			<include name="**/test/*.java" />
+			<classpath refid="project.classpath" />
+		</javac>
+	</target>
+
+	<!-- run junit tests -->
+	<target name="junit" depends="jar, _compiletest" description="Testing.">
+		<junit dir="${basedir}"
+		       printSummary="on"
+		       fork="true"
+		       haltonfailure="false">
+			<sysproperty key="basedir" value="${basedir}" />
+			<sysproperty key="java.awt.headless" value="true" />
+			<formatter type="plain" />
+			<classpath refid="project.classpath" />
+			<batchtest todir="${test.report.dir}">
+				<fileset dir="${test.src.dir}">
+					<include name="${test.pattern.junit}" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<!-- Clean all -->
+	<target name="clean"
+	        description="Remove what's needed to force complete rebuild.">
+		<fileset dir="${basedir}" id="todelete">
+			<include name="**/*.class" />
+		</fileset>
+		<delete verbose="no">
+			<fileset refid="todelete" />
+		</delete>
+		<delete dir="${classes}" />
+	</target>
+</project>
