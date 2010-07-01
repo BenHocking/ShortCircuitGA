@@ -58,17 +58,17 @@ public final class IntervalGeneticFactoryTest {
         for (int i = 0; i < NUM_GENERATIONS; ++i) {
             population = reproduction.reproduce(population, _fitFn, factory.getSelectFunction(), factory.getCrossoverFunction());
         }
-        Assert.assertEquals(3.793964434630042, reproduction.getBestFits().get(0), tolerance);
+        Assert.assertEquals(3.793964434630042, reproduction.getBestFits().get(0).get(0), tolerance);
         // As POP_SIZE -> inf, you would expect reproduction.getMeanFits().get(0) -> GENOTYPE_SIZE / 2 (i.e., 2.5)
         Assert.assertEquals(2.4418757761918597, reproduction.getMeanFits().get(0), tolerance);
-        Assert.assertEquals(4.223457345238561, reproduction.getBestFit(), tolerance);
+        Assert.assertEquals(4.223457345238561, reproduction.getBestFit().get(0), tolerance);
         Assert.assertEquals(3.4821626627095483, reproduction.getMeanFit(), tolerance);
         allowDuplicates = false;
         reproduction = new Reproduction(allowDuplicates, keepHistory);
         for (int i = 0; i < NUM_GENERATIONS; ++i) {
             population = reproduction.reproduce(population, _fitFn, factory.getSelectFunction(), factory.getCrossoverFunction());
         }
-        Assert.assertEquals(4.354381409706591, reproduction.getBestFit(), tolerance);
+        Assert.assertEquals(4.354381409706591, reproduction.getBestFit().get(0), tolerance);
         Assert.assertEquals(3.6366730042344537, reproduction.getMeanFit(), tolerance);
     }
 }

@@ -4,6 +4,7 @@
 package edu.virginia.cs.common;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -13,11 +14,46 @@ import java.util.List;
  */
 public final class ArrayNumberUtils {
 
+    public static List<Double> toDoubleList(final String[] valList) {
+        final List<Double> retval = new ArrayList<Double>();
+        for (final String s : valList) {
+            retval.add(Double.valueOf(s));
+        }
+        return retval;
+    }
+
+    public static <T extends Number> double sum(final T[] numberList) {
+        return sum(Arrays.asList(numberList));
+    }
+
+    public static double sum(final String[] valList) {
+        return sum(toDoubleList(valList));
+    }
+
     public static <T extends Number> double sum(final List<T> numberList) {
         double retval = 0;
         if (!numberList.isEmpty()) {
             for (final Integer i : new IntegerRange(numberList.size())) {
                 retval += numberList.get(i).doubleValue();
+            }
+        }
+        return retval;
+    }
+
+    public static double sumOfSquares(final String[] valList) {
+        return sumOfSquares(toDoubleList(valList));
+    }
+
+    public static <T extends Number> double sumOfSquares(final T[] numberList) {
+        return sumOfSquares(Arrays.asList(numberList));
+    }
+
+    public static <T extends Number> double sumOfSquares(final List<T> numberList) {
+        double retval = 0;
+        if (!numberList.isEmpty()) {
+            for (final Integer i : new IntegerRange(numberList.size())) {
+                final double v = numberList.get(i).doubleValue();
+                retval += v * v;
             }
         }
         return retval;

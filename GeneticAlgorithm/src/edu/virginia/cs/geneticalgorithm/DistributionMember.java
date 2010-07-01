@@ -3,6 +3,7 @@
  */
 package edu.virginia.cs.geneticalgorithm;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.virginia.cs.common.OrderedPair;
@@ -18,8 +19,15 @@ public final class DistributionMember extends OrderedPair<List<Double>, Genotype
      * @param s
      * @param i
      */
-    public DistributionMember(final List<Double> s, final Genotype i) {
-        super(s, i);
+    public DistributionMember(final Double v, final List<Double> s, final Genotype i) {
+        super(appendToList(v, s), i);
+    }
+
+    private static List<Double> appendToList(final Double v, final List<Double> l) {
+        final List<Double> retval = new ArrayList<Double>();
+        retval.add(v);
+        retval.addAll(l);
+        return retval;
     }
 
     /**
@@ -27,19 +35,17 @@ public final class DistributionMember extends OrderedPair<List<Double>, Genotype
      * @param toCopy
      */
     public DistributionMember(final DistributionMember toCopy) {
-        super(toCopy.getFitnessValues(), toCopy.getGenotype().clone());
+        super(appendToList(toCopy.getValue(), toCopy.getFitnessValues()), toCopy.getGenotype().clone());
     }
 
     public Double getValue() {
-        Double retval = Double.valueOf(0);
-        for (final Double d : getFirst()) {
-            retval += d;
-        }
-        return retval;
+        return getFirst().get(0);
     }
 
     public List<Double> getFitnessValues() {
-        return getFirst();
+        final List<Double> retval = new ArrayList<Double>(getFirst());
+        retval.remove(0);
+        return retval;
     }
 
     public Genotype getGenotype() {

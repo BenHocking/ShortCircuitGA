@@ -33,7 +33,7 @@ public final class NeuroJetGeneticAlgorithm {
 
     // TODO: Generalize the location of these File objects
     private final static File NJ = new File("/Users/bhocking/Documents/workspace/NeuroJet/build/NeuroJet");
-    private final static File WORKINGDIR = new File("/Users/bhocking/Documents/workspace/GA/scripts");
+    private final static File WORKINGDIR = new File("/Users/bhocking/Documents/workspace/ShortCircuitGA/scripts");
     private final static int GENOTYPE_SIZE = 21; // 0 - 20
     private final ScriptUpdater _updater;
     private final Fitness _fitnessFn;
@@ -166,10 +166,15 @@ public final class NeuroJetGeneticAlgorithm {
         for (int i = 0; i < num_generations; ++i) {
             nga.reproduce();
             System.out.println("Generation #" + (i + 1));
-            System.out.println("\tBest fit = " + nga.getReproduction().getBestFit());
+            System.out.print("\tBest fit = [");
+            final List<Double> bestFitList = nga.getReproduction().getBestFit();
+            for (int j = 1; j < bestFitList.size(); ++j) {
+                if (j > 1) System.out.print(", ");
+                System.out.print(bestFitList.get(j));
+            }
+            System.out.println("] => " + bestFitList.get(0));
             System.out.println("\tMean fit = " + nga.getReproduction().getMeanFit());
         }
         nga.doPCA();
     }
-
 }

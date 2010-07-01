@@ -19,7 +19,7 @@ public final class Reproduction {
 
     private final boolean _allowDuplicates;
     private final boolean _keepAllHistory;
-    private final List<Double> _bestFits = new ArrayList<Double>();
+    private final List<List<Double>> _bestFits = new ArrayList<List<Double>>();
     private final List<Double> _meanFits = new ArrayList<Double>();
     private final List<Distribution> _popHist = new ArrayList<Distribution>();
     public static int DEBUG_LEVEL = 1;
@@ -37,6 +37,7 @@ public final class Reproduction {
                                     final Crossover xFn) {
         double totalFit = 0;
         double bestFit = 0; // Best is maximal, and all fitness values need to be positive
+        List<Double> bestFitList = new ArrayList<Double>();
         final Distribution distribution = new Distribution();
         int ctr = 0;
         if (DEBUG_LEVEL == 1) System.out.print("Evaluating individual:");
@@ -46,13 +47,19 @@ public final class Reproduction {
             final List<Double> fitList = fitFn.fitnessValues(i);
             final double fit = fitFn.totalFitness(i);
             if (DEBUG_LEVEL > 1) System.out.println("\tfitness: " + fit);
-            distribution.add(new DistributionMember(fitList, i));
+            distribution.add(new DistributionMember(fit, fitList, i));
             totalFit += fit;
-            if (fit > bestFit) bestFit = fit;
+            if (fit > bestFit) {
+                bestFit = fit;
+                bestFitList = fitList;
+            }
         }
         if (DEBUG_LEVEL == 1) System.out.println(" ... done");
         // Calculate statistics
-        _bestFits.add(Double.valueOf(bestFit));
+        final List<Double> best = new ArrayList<Double>();
+        best.add(bestFit);
+        best.addAll(bestFitList);
+        _bestFits.add(best);
         _meanFits.add(Double.valueOf(totalFit / population.size()));
         final Collection<Genotype> retval = _allowDuplicates ? new ArrayList<Genotype>() : new HashSet<Genotype>();
         while (retval.size() < newPopSize) {
@@ -73,15 +80,15 @@ public final class Reproduction {
     /**
      * @return
      */
-    public double getBestFit() {
+    public List<Double> getBestFit() {
         return _bestFits.get(_bestFits.size() - 1);
     }
 
     /**
      * @return Copy of history of best fits
      */
-    public List<Double> getBestFits() {
-        return new ArrayList<Double>(_bestFits);
+    public List<List<Double>> getBestFits() {
+        return new ArrayList<List<Double>>(_bestFits);
     }
 
     /**

@@ -6,9 +6,6 @@ package edu.virginia.cs.geneticalgorithm;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.virginia.cs.common.ArrayNumberUtils.*;
-import edu.virginia.cs.common.IntegerRange;
-
 /**
  * TODO Add description
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
@@ -64,22 +61,16 @@ public final class Distribution extends ArrayList<DistributionMember> {
 
     public void normalize() {
         if (!hasValues()) return; // Not ready to normalize yet
-        final List<Double> representativeList = get(0).getFitnessValues();
-        final List<Double> sumList = new ArrayList<Double>(representativeList.size());
-        for (@SuppressWarnings("unused")
-        final Integer i : new IntegerRange(representativeList.size())) {
-            sumList.add(0.0);
-        }
+        double sum = 0.0;
         for (final DistributionMember m : this) {
-            accum(sumList, m.getFitnessValues());
+            sum += m.getValue();
         }
-        // Make sure it hasn't already been normalized
-        final double sum = sum(sumList);
-        if (Math.abs(sum - 1) > 0.0001) {
+        // Make sure it hasn't already been normalized (and that we don't divide by zero)
+        if (sum > 0 && Math.abs(sum - 1) > 0.0001) {
             final Distribution copy = new Distribution(this);
             clear();
             for (final DistributionMember m : copy) {
-                add(new DistributionMember(divide(m.getFitnessValues(), sum), m.getGenotype()));
+                add(new DistributionMember(m.getValue() / sum, m.getFitnessValues(), m.getGenotype()));
             }
         }
     }

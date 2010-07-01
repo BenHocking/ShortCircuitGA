@@ -58,14 +58,14 @@ public final class StandardGeneticFactoryTest {
         for (int i = 0; i < NUM_GENERATIONS; ++i) {
             population = reproduction.reproduce(population, _fitFn, factory.getSelectFunction(), factory.getCrossoverFunction());
         }
-        Assert.assertEquals(GENOTYPE_SIZE, reproduction.getBestFit(), tolerance);
+        Assert.assertEquals(GENOTYPE_SIZE, reproduction.getBestFit().get(0), tolerance);
         Assert.assertEquals(4.45, reproduction.getMeanFit(), tolerance);
         allowDuplicates = false;
         reproduction = new Reproduction(allowDuplicates, keepHistory);
         for (int i = 0; i < NUM_GENERATIONS; ++i) {
             population = reproduction.reproduce(population, _fitFn, factory.getSelectFunction(), factory.getCrossoverFunction());
         }
-        Assert.assertEquals(GENOTYPE_SIZE, reproduction.getBestFit(), tolerance);
+        Assert.assertEquals(GENOTYPE_SIZE, reproduction.getBestFit().get(0), tolerance);
         Assert.assertEquals(3.05, reproduction.getMeanFit(), tolerance);
     }
 }
