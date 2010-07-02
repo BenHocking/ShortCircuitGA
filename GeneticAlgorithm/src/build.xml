@@ -101,7 +101,7 @@
 		       haltonfailure="false">
 			<sysproperty key="basedir" value="${basedir}" />
 			<sysproperty key="java.awt.headless" value="true" />
-			<formatter type="plain" />
+			<formatter type="xml" />
 			<classpath refid="project.classpath" />
 			<batchtest todir="${test.report.dir}">
 				<fileset dir="${test.src.dir}">
