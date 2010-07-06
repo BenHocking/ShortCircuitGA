@@ -8,7 +8,7 @@ package edu.virginia.cs.geneticalgorithm;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 24, 2010
  */
-public interface Genotype extends Iterable<Gene> {
+public interface Genotype extends Iterable<Gene>, Comparable<Genotype> {
 
     /**
      * @param i

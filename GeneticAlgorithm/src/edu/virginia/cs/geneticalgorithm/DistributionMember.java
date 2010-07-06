@@ -13,7 +13,7 @@ import edu.virginia.cs.common.OrderedPair;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 24, 2010
  */
-public final class DistributionMember extends OrderedPair<List<Double>, Genotype> {
+public final class DistributionMember extends OrderedPair<List<Double>, Genotype> implements Comparable<DistributionMember> {
 
     /**
      * @param s
@@ -50,6 +50,44 @@ public final class DistributionMember extends OrderedPair<List<Double>, Genotype
 
     public Genotype getGenotype() {
         return getLast();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer();
+        sb.append("Fitness: ");
+        sb.append(getValue());
+        sb.append(", [");
+        final List<Double> fitVals = getFitnessValues();
+        for (int i = 0; i < fitVals.size(); ++i) {
+            sb.append(fitVals.get(i));
+            if (i < fitVals.size() - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append("], ");
+        sb.append(getGenotype());
+        return sb.toString();
+    }
+
+    /**
+     * Return an ordering of DistributionMembers with most fit items first. Note that this means that most fit members are "less"
+     * than less fit members, which might seem very non-intuitive.
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(final DistributionMember o) {
+        // This is the most important bit.
+        if (getValue() != o.getValue()) return (int) Math.signum(o.getValue() - getValue());
+        // The rest is arbitrary and just designed to keep non-idential DistributionMembers from being equal
+        final List<Double> fitVals = getFitnessValues();
+        final List<Double> otherVals = o.getFitnessValues();
+        for (int i = 0; i < fitVals.size(); ++i) {
+            if (fitVals.get(i) != otherVals.get(i)) return (int) Math.signum(otherVals.get(i) - fitVals.get(i));
+        }
+        final Genotype g = getGenotype();
+        final Genotype og = o.getGenotype();
+        return g.compareTo(og);
     }
 
 }

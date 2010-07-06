@@ -3,8 +3,8 @@ package edu.virginia.cs.geneticalgorithm;
 import java.util.Random;
 
 /**
- * 
- * TODO Add description
+ * Standard {@link Select} class that selects a member by chance proportionately to its {@link Fitness} relative to the total
+ * {@link Fitness} of the population.
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 25, 2010
  */
@@ -12,6 +12,10 @@ final class StandardSelect implements Select {
 
     private final Random _rng;
 
+    /**
+     * Constructor taking a {@link Random Random Number Generator}
+     * @param rng {@link Random Random Number Generator} used by {@link #select}
+     */
     public StandardSelect(final Random rng) {
         _rng = rng;
     }

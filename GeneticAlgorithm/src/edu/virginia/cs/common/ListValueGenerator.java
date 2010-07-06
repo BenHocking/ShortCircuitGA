@@ -15,9 +15,9 @@ public final class ListValueGenerator implements ValueGenerator {
     private final List<Object> _list;
 
     /**
-     * Constructor taking list of all possible return values. The order of these items determines how the x parameter to the
-     * {@link #generate(double)} method will be interpreted.
-     * @param list List of all possible return values.
+     * Constructor taking a {@link java.util.List List} of all possible return values. The order of these items determines how the x
+     * parameter to the {@link #generate(double)} method will be interpreted.
+     * @param list {@link java.util.List List} of all possible return values.
      */
     public ListValueGenerator(final List<Object> list) {
         _list = list;

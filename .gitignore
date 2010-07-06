@@ -1,6 +1,7 @@
 *.class
 *~
 .metadata
+scripts/full*
 scripts/[0-9]
 scripts/[0-9][0-9]
 scripts/[0-9][0-9][0-9]
@@ -9,3 +10,4 @@ scripts/[0-9][0-9][0-9][0-9][0-9]
 */pca_results.txt
 GeneticAlgorithm/jars/shortcircuitga.jar
 GeneticAlgorithm/src/report
+GeneticAlgorithm/bin

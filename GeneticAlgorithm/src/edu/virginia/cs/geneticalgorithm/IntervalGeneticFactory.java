@@ -20,14 +20,14 @@ public final class IntervalGeneticFactory implements GeneticFactory {
     private final Crossover _xOver;
 
     public IntervalGeneticFactory(final long seed) {
-        this(seed, 0.03, 0.6);
+        this(seed, 0.03, 0.6, 0.25);
     }
 
-    public IntervalGeneticFactory(final long seed, final double mutateProb, final double xOverProb) {
+    public IntervalGeneticFactory(final long seed, final double mutateProb, final double xOverProb, final double geneXOverProb) {
         _rng = new Random(seed);
         _select = new StandardSelect(_rng);
         _mutator = new StandardMutator(mutateProb, _rng);
-        _xOver = new StandardCrossover(_mutator, xOverProb, _rng);
+        _xOver = new UniformCrossover(_mutator, xOverProb, geneXOverProb, _rng);
     }
 
     /**

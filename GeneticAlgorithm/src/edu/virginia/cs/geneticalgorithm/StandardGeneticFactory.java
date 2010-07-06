@@ -27,7 +27,7 @@ public final class StandardGeneticFactory implements GeneticFactory {
         _rng = new Random(seed);
         _select = new StandardSelect(_rng);
         _mutator = new StandardMutator(mutateProb, _rng);
-        _xOver = new StandardCrossover(_mutator, xOverProb, _rng);
+        _xOver = new OnePointCrossover(_mutator, xOverProb, _rng);
     }
 
     /**

@@ -22,6 +22,7 @@ import edu.virginia.cs.geneticalgorithm.Genotype;
 import edu.virginia.cs.geneticalgorithm.IntervalGene;
 import edu.virginia.cs.geneticalgorithm.IntervalGeneticFactory;
 import edu.virginia.cs.geneticalgorithm.Reproduction;
+import edu.virginia.cs.geneticalgorithm.ShortCircuitFitness;
 import edu.virginia.cs.geneticalgorithm.StandardGenotype;
 
 /**
@@ -42,18 +43,34 @@ public final class NeuroJetGeneticAlgorithm {
 
     private List<Genotype> _population;
 
+    /**
+     * Runs a genetic algorithm designed to find settings applicable for running Trace Conditioning experiments using NeuroJet.
+     * 
+     * @param seed Random seed to use for running the algorithm
+     * @param popSize Number of individuals to use in the population.
+     */
     public NeuroJetGeneticAlgorithm(final int seed, final int popSize) {
         _updater = new ScriptUpdater();
         buildScriptUpdater();
-        final List<File> scriptFiles = Collections.singletonList(new File(WORKINGDIR, "trace_quick.nj"));
-        _fitnessFn = new NeuroJetQuickFitness(scriptFiles, _updater, NJ, WORKINGDIR);
+        final List<File> quickScriptFiles = Collections.singletonList(new File(WORKINGDIR, "trace_quick.nj"));
+        final Fitness quickFitnessFn = new NeuroJetQuickFitness(quickScriptFiles, _updater, NJ, WORKINGDIR);
+        final List<File> traceScriptFiles = Collections.singletonList(new File(WORKINGDIR, "trace_full.nj"));
+        final Fitness traceFitnessFn = new NeuroJetTraceFitness(traceScriptFiles, _updater, NJ, WORKINGDIR);
+        _fitnessFn = new ShortCircuitFitness(quickFitnessFn, 5e5, traceFitnessFn, 2);
+        ((ShortCircuitFitness) _fitnessFn).setPostScale(1e9);
         _factory = new IntervalGeneticFactory(seed);
         _population = _factory.createPopulation(popSize, GENOTYPE_SIZE);
         final boolean allowDuplicates = true;
         final boolean keepHistory = true;
         _reproduction = new Reproduction(allowDuplicates, keepHistory);
+        _reproduction.setNumElites(Math.round(popSize * 0.1f));
     }
 
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.Reproduction#reproduce(List, Fitness, edu.virginia.cs.geneticalgorithm.Select,
+     * edu.virginia.cs.geneticalgorithm.Crossover)
+     * 
+     */
     public void reproduce() {
         _population = _reproduction.reproduce(_population, _fitnessFn, _factory.getSelectFunction(),
                                               _factory.getCrossoverFunction());
@@ -61,12 +78,18 @@ public final class NeuroJetGeneticAlgorithm {
 
     /**
      * For access to historical information
-     * @return
+     * @return Reference to this genetic algorithms {@link edu.virginia.cs.geneticalgorithm.Reproduction Reproduction} object
      */
     public Reproduction getReproduction() {
         return _reproduction;
     }
 
+    /**
+     * Returns the current population ({@link java.util.List List}) of individuals (
+     * {@link edu.virginia.cs.geneticalgorithm.Genotype Genotype}).
+     * @return the current population ({@link java.util.List List}) of individuals (
+     * {@link edu.virginia.cs.geneticalgorithm.Genotype Genotype}).
+     */
     public List<Genotype> getPopulation() {
         return _population;
     }
@@ -156,12 +179,12 @@ public final class NeuroJetGeneticAlgorithm {
         }
     }
 
-    /*
-     * @param args
+    /**
+     * @param args Ignored
      */
     public static void main(final String[] args) {
         final int pop_size = 100;
-        final int num_generations = 50;
+        final int num_generations = 150;
         final NeuroJetGeneticAlgorithm nga = new NeuroJetGeneticAlgorithm(1, pop_size);
         for (int i = 0; i < num_generations; ++i) {
             nga.reproduce();

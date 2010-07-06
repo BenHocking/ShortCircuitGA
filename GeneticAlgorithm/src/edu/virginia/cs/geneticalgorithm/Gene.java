@@ -10,7 +10,7 @@ import java.util.Random;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 24, 2010
  */
-public interface Gene {
+public interface Gene extends Comparable<Gene> {
 
     /**
      * @return a Gene from one of the genes in getValues(), dependent on the value of this
@@ -19,8 +19,7 @@ public interface Gene {
 
     /**
      * @param rng Random number generator to use for generating Genes
-     * @return a Gene from one of the genes in getValues(), independent of the value of
-     * this
+     * @return a Gene from one of the genes in getValues(), independent of the value of this
      */
     Gene generate(Random rng);
 }

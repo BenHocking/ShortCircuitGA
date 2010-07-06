@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.virginia.cs.common.ArrayNumberUtils;
-import edu.virginia.cs.common.IntegerRange;
 import edu.virginia.cs.geneticalgorithm.Fitness;
 import edu.virginia.cs.geneticalgorithm.Genotype;
 import edu.virginia.cs.geneticalgorithm.StandardGenotype;
@@ -24,98 +22,74 @@ import edu.virginia.cs.geneticalgorithm.StandardGenotype;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 27, 2010
  */
-public final class NeuroJetQuickFitness implements Fitness {
+public final class NeuroJetTraceFitness implements Fitness {
 
     private final File _mainFile;
     private final List<File> _scriptFiles;
     private final ScriptUpdater _updater;
     private final File _neuroJet;
     private final File _workingDir;
-    private final NeuroJetQuickFitnessGenerator _trnGenerator = new NeuroJetQuickFitnessGenerator();
-    private final NeuroJetQuickFitnessGenerator _tstGenerator = new NeuroJetQuickFitnessGenerator();
     private static final int NUM_FIT_VALS = 5; // Run time + test ssd + test dev + train ssd + train dev
     private static Integer _counter = 0;
     private final Map<Genotype, List<Double>> _fitMap = new HashMap<Genotype, List<Double>>();
 
-    private final class NeuroJetQuickFitnessGenerator {
+    private int calcPtnNeuronNum(final int totalNeurons, final double desiredAct, final double mePct) {
+        return (int) Math.round(totalNeurons * desiredAct * mePct / 22.5);
+    }
 
-        private final static double MATCHING_SSD = 0.015; // The value we want the sampleStdDev to be
-        private double _sampleStdDev = Double.NaN;
-        private double _sqDevFromDesired = Double.NaN;
-        private double _desiredAct = Double.NaN;
+    private double generateTimeValue(final int when) {
+        // Puff normally starts at time step 651 and lasts to 750
+        // Responding in this time window demonstrates memory but not prediction
+        if (when >= 651) return 0.5;
+        // Ideal are responses in the 551 to 650 window
+        if (when >= 551) return 1.0;
+        // The 100 ms before that isn't so bad
+        if (when >= 451) return 0.8;
+        // The 200 ms before that isn't so good
+        if (when >= 251) return 0.5;
+        // The first few hundred ms is too early
+        return 0.0;
+    }
 
-        double getSampleStdDev() {
-            return _sampleStdDev;
-        }
-
-        double getSquaredDeviationFromDesired() {
-            return _sqDevFromDesired;
-        }
-
-        double getSampleStdDevFitness() {
-            final double divisor = (_sampleStdDev < MATCHING_SSD ? 100 * (MATCHING_SSD - _sampleStdDev)
-                                                                : (_sampleStdDev - MATCHING_SSD))
-                                   / (_desiredAct * _desiredAct);
-            return (divisor > 0) ? 0.01 / divisor : 1e4; // Almost impossible for divisor to be zero. Almost.
-        }
-
-        // Initially, we want this deviation to be the primary contributor
-        double getSquaredDeviationFromDesiredFitness() {
-            return 1000.0 / _sqDevFromDesired;
-        }
-
-        double overallFitness() {
-            final double x = getSampleStdDevFitness();
-            final double y = getSquaredDeviationFromDesiredFitness();
-            assert (y > x);
-            return x + y;
-        }
-
-        private void generateQuickFitness(final File activityFile, final double desiredAct, final double timeStep) {
-            try {
-                final BufferedReader actReader = new BufferedReader(new FileReader(activityFile));
-                _desiredAct = desiredAct;
-                String line;
-                // timeStep is in ms. This should be equivalent to 1/timestep measured in seconds
-                final double HzConvFactor = 1000.0 / timeStep;
-                double actFitness = 0;
-                int numSums = 0;
-                double totalSum = 0.0;
-                double totalSoS = 0.0;
-                while ((line = actReader.readLine()) != null) {
-                    final String[] activities = line.split("\\s");
-                    final int lastElement = activities.length; // Not inclusive
-                    totalSum += ArrayNumberUtils.sum(activities);
-                    totalSoS += ArrayNumberUtils.sumOfSquares(activities);
-                    numSums += lastElement;
-                    for (final Integer i : new IntegerRange(0, 100, lastElement)) {
-                        final int curLast = Math.min(i + 99, lastElement); // Not inclusive
-                        final int curNumElems = curLast - i;
-                        final double curActivity = HzConvFactor * ArrayNumberUtils.mean(activities, i, curLast);
-                        final double deviationFrac = (desiredAct - curActivity) / desiredAct;
-                        actFitness += deviationFrac * deviationFrac * curNumElems;
+    private double generateTraceFitness(final File bufferFile, final double desiredAct, final double timeStep, final double mePct) {
+        double retval = 0.0;
+        try {
+            final int me = calcPtnNeuronNum(2048, desiredAct, mePct);
+            final BufferedReader actReader = new BufferedReader(new FileReader(bufferFile));
+            String line;
+            // Tone neurons are from 1 to me
+            // Puff neurons are from me + 1 to 2 * me
+            final int firstBlinkNeuron = me + 1;
+            final int lastBlinkNeuron = 2 * me;
+            int numOn = 0;
+            while ((line = actReader.readLine()) != null) {
+                final String[] lineData = line.split("\\s");
+                final boolean isOn = (Integer.parseInt(lineData[2]) != 0);
+                if (isOn) {
+                    ++numOn;
+                    final int nPos = Integer.parseInt(lineData[1]);
+                    if (nPos >= firstBlinkNeuron && nPos <= lastBlinkNeuron) {
+                        final int timePos = Integer.parseInt(lineData[0]);
+                        retval += generateTimeValue(timePos);
                     }
                 }
-                actReader.close();
-                if (numSums > 1 && !Double.isNaN(actFitness) && !Double.isInfinite(actFitness)) {
-                    // Calculate sample standard deviation
-                    _sampleStdDev = Math.sqrt((numSums * totalSoS - totalSum * totalSum) / (numSums * (numSums - 1)));
-                    // Calculate average squared deviation
-                    assert (actFitness > 0);
-                    _sqDevFromDesired = actFitness /= numSums;
-                }
             }
-            catch (final IOException e) {
-                System.out.println(e);
+            actReader.close();
+            if (numOn > 1) {
+                retval /= numOn;
             }
         }
+        catch (final IOException e) {
+            System.out.println(e);
+        }
+        return retval;
     }
 
     // Made package just to avoid warnings about dead code
     static final boolean DELETE_WORKING_FILES = true;
     static final boolean DEBUG = false;
 
-    public NeuroJetQuickFitness(final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet,
+    public NeuroJetTraceFitness(final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet,
                                 final File workingDir) {
         if (scriptFiles == null || scriptFiles.size() == 0)
             throw new IllegalArgumentException("Argument scriptFiles cannot be null or empty");
@@ -128,7 +102,7 @@ public final class NeuroJetQuickFitness implements Fitness {
         _workingDir = workingDir != null ? workingDir : _mainFile.getParentFile();
     }
 
-    public NeuroJetQuickFitness(final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet) {
+    public NeuroJetTraceFitness(final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet) {
         this(scriptFiles, updater, neuroJet, null);
     }
 
@@ -145,7 +119,7 @@ public final class NeuroJetQuickFitness implements Fitness {
         File scriptFile = _mainFile;
         File tempDir;
         synchronized (_counter) {
-            tempDir = new File(_workingDir, String.valueOf(++_counter));
+            tempDir = new File(_workingDir, "full_" + String.valueOf(++_counter));
         }
         // Remove any existing files
         final File[] prevFiles = tempDir.listFiles();
@@ -179,13 +153,14 @@ public final class NeuroJetQuickFitness implements Fitness {
             builder.directory(tempDir);
             final Process p = builder.start();
             final long start = System.currentTimeMillis();
-            if (DEBUG) {
-                final BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                String s;
-                while ((s = stdInput.readLine()) != null) {
+            final BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String s;
+            while ((s = stdInput.readLine()) != null) {
+                if (DEBUG) {
                     System.out.println(s);
                 }
             }
+            p.waitFor();
             final BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             final StringBuilder err = new StringBuilder();
             String sErr;
@@ -195,23 +170,18 @@ public final class NeuroJetQuickFitness implements Fitness {
             if (err.length() > 0) {
                 System.out.println("Errors:\n" + err.toString());
             }
-            p.waitFor();
             retval.add(Double.valueOf(System.currentTimeMillis() - start + 1));
             // Read the resulting activity files
             final double desiredAct = _updater.getDesiredAct(genotype);
+            final double mePct = _updater.getMePct(genotype);
             final double timeStep = _updater.getTimeStep(genotype);
-            final File trnAct = new File(tempDir, "trnWithinAct.dat");
-            if (!trnAct.exists()) {
+            final File tstBuff = new File(tempDir, "tstBuff.dat");
+            if (!tstBuff.exists()) {
                 // TODO: Improve upon this hack
                 Thread.sleep(1000); // Make sure we catch up with O/S
             }
-            _trnGenerator.generateQuickFitness(trnAct, desiredAct, timeStep);
-            retval.add(_trnGenerator.getSampleStdDev());
-            retval.add(_trnGenerator.getSquaredDeviationFromDesired());
-            final File tstAct = new File(tempDir, "tstWithinAct.dat");
-            _tstGenerator.generateQuickFitness(tstAct, desiredAct, timeStep);
-            retval.add(_tstGenerator.getSampleStdDev());
-            retval.add(_tstGenerator.getSquaredDeviationFromDesired());
+            final double fitness = generateTraceFitness(tstBuff, desiredAct, timeStep, mePct);
+            retval.add(fitness);
         }
         catch (final IOException e) {
             throw new RuntimeException(e);
@@ -234,6 +204,6 @@ public final class NeuroJetQuickFitness implements Fitness {
     @Override
     public double totalFitness(final Genotype individual) {
         final List<Double> fitVals = fitnessValues(individual);
-        return 1 / fitVals.get(0) + _trnGenerator.overallFitness() + _tstGenerator.overallFitness();
+        return 1 / fitVals.get(0) + fitVals.get(1);
     }
 }

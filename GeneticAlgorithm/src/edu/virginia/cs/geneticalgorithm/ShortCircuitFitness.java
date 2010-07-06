@@ -23,7 +23,9 @@ public final class ShortCircuitFitness extends AbstractFitness {
     private final Fitness _postFit;
     private final int _postFitLen;
     private final boolean _useTotalFitness;
+    private double _postScale = 1.0; // Amount to scale post fitness by
     private final Map<Genotype, List<Double>> _fitMap = new HashMap<Genotype, List<Double>>();
+    final boolean _useThresholdAsLimit = true;
 
     /**
      * 
@@ -75,6 +77,24 @@ public final class ShortCircuitFitness extends AbstractFitness {
         _useTotalFitness = true;
     }
 
+    private boolean passedThreshold(final List<Double> fitVals, final Genotype individual) {
+        boolean passedThreshold = true;
+        if (_useTotalFitness) {
+            passedThreshold = (_preFit.totalFitness(individual) > _preThreshold.get(0));
+        }
+        else {
+            if (fitVals.size() > _preThreshold.size())
+                throw new RuntimeException("Number of fitness values from first fitness function exceeds size of threshold test.");
+            for (int i = 0; i < fitVals.size(); ++i) {
+                if (fitVals.get(i) < _preThreshold.get(i)) {
+                    passedThreshold = false;
+                    break;
+                }
+            }
+        }
+        return passedThreshold;
+    }
+
     /**
      * @see edu.virginia.cs.geneticalgorithm.Fitness#fitnessValues(edu.virginia.cs.geneticalgorithm.Genotype)
      */
@@ -83,21 +103,7 @@ public final class ShortCircuitFitness extends AbstractFitness {
         List<Double> retval = _fitMap.get(individual);
         if (retval != null) return retval;
         retval = _preFit.fitnessValues(individual);
-        boolean passedThreshold = true;
-        if (_useTotalFitness) {
-            passedThreshold = (_preFit.totalFitness(individual) > _preThreshold.get(0));
-        }
-        else {
-            if (retval.size() > _preThreshold.size())
-                throw new RuntimeException("Number of fitness values from first fitness function exceeds size of threshold test.");
-            for (int i = 0; i < retval.size(); ++i) {
-                if (retval.get(i) < _preThreshold.get(i)) {
-                    passedThreshold = false;
-                    break;
-                }
-            }
-        }
-        if (passedThreshold) {
+        if (passedThreshold(retval, individual)) {
             // Evaluate the post-fitness function
             retval.addAll(_postFit.fitnessValues(individual));
         }
@@ -109,4 +115,31 @@ public final class ShortCircuitFitness extends AbstractFitness {
         _fitMap.put(individual.clone(), retval);
         return retval;
     }
+
+    public void setPostScale(final double postScale) {
+        _postScale = postScale;
+    }
+
+    public double getPostScale() {
+        return _postScale;
+    }
+
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.Fitness#totalFitness(edu.virginia.cs.geneticalgorithm.Genotype)
+     */
+    @Override
+    public double totalFitness(final Genotype individual) {
+        // Makes sure fitness is calculated (and possibly gets the values required for checking threshold)
+        final List<Double> fitVals = fitnessValues(individual);
+        double retval = _preFit.totalFitness(individual);
+        if (passedThreshold(fitVals, individual)) {
+            // TODO Document
+            if (_useThresholdAsLimit) {
+                retval = _preThreshold.get(0);
+            }
+            retval += _postScale * _postFit.totalFitness(individual);
+        }
+        return retval;
+    }
+
 }

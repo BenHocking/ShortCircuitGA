@@ -86,7 +86,6 @@
 @CopyData(-to DTSFiltB -from "^Fn(^(halfWidth)+^(deltaT),^(dendFilterWidth),exp[-^(halfWidth)/5*[^(tFn)-^(halfWidth)]])" -type mat -T)
 @AppendData(-from 2 DTSFiltA DTSFiltB -to DTSFiltT -type mat)
 @CopyData(-to DTSFilt -from DTSFiltT -type mat -T)
-@SaveData(-from DTSFilt -to DTSFilt_:^(dendFilterWidth):.dat)
 @CopyData(-to WtFilt -from "^Fn(^(deltaT),1,1)" -type mat)
 
 @SetVar(
@@ -191,24 +190,16 @@
 
 @Test(-name testTraceSeq -time ^SequenceLength(-from testTraceSeq) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
 @PrintVar(AveTestAct)
-@SaveData(-from TestingBuffer -to tstBuff0.dat)
 %(i 1 ^(numTrainTrials)) {
   @ResetFiring()
   @Test(-name InitPtn -time ^SequenceLength(-from InitPtn) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
   @Train(-name trainTraceSeq -trials 1 -nocomp -norecord 7 TrainingThresholds TrainingBusLines TrainingIntBusLines TrainingKWeights TrainingInhibitions TrainingFBInternrnExc TrainingFFInternrnExc)
-  ?If(^(i) = 1) {
-    @SaveData(-from TrainingBuffer -to firstTrnBuff.dat)
-  }
-  ?If(^(i) = ^(numTrainTrials)) {
-    @SaveData(-from TrainingBuffer -to trnBuff.dat)
-  }
   @DeleteData(TrainingBuffer)
   @PrintVar(AveTrainAct)
   @SaveData(-from TrainingActivity -to trnWithinAct.dat -append)
   @Test(-name testTraceSeq -time ^SequenceLength(-from testTraceSeq) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
   @PrintVar(AveTestAct)
   @SaveData(-from TestingActivity -to tstWithinAct.dat -append)
-#  @SaveData(-from TestingBuffer -to tstBuff:^(i):.dat)
   @DeleteData(TestingBuffer)
 }
 @DeleteData(TrainingActivity)

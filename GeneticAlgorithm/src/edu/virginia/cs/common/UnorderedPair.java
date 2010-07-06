@@ -13,18 +13,23 @@ import java.util.Collection;
 /**
  * Pair where the order doesn't matter
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
+ * @param <S> Class of both items in the UnorderedPair
  * @since Apr 24, 2010
  */
 public final class UnorderedPair<S> extends Pair<S, S> {
 
     /**
-     * @param s
-     * @param t
+     * Constructor
+     * @param s First item in the UnorderedPair
+     * @param t Second item in the UnorderedPair
      */
     public UnorderedPair(final S s, final S t) {
         super(s, t);
     }
 
+    /**
+     * @return UnorderedPair as a {@link java.util.Collection Collection} of class S
+     */
     public Collection<S> asCollection() {
         final Collection<S> retval = new ArrayList<S>();
         retval.add(getFirst());

@@ -52,10 +52,28 @@ public final class StandardGene implements Gene {
     }
 
     /**
+     * Translates this into an integer value
+     * @return
+     */
+    private int getValue() {
+        return (this == ZERO) ? 0 : 1;
+    }
+
+    /**
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
         return _descriptor;
+    }
+
+    /**
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(final Gene g) {
+        if (!(g instanceof StandardGene)) throw new RuntimeException("Genes must be of the same type");
+        final StandardGene sg = (StandardGene) g;
+        return getValue() - sg.getValue();
     }
 }

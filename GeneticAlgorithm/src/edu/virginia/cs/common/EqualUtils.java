@@ -15,51 +15,70 @@ import java.util.Iterator;
 public final class EqualUtils {
 
     /**
-     * booleans.
+     * Equality test for booleans.
+     * @param a First argument
+     * @param b Second argument
+     * @return Whether the two arguments are equal
      */
     public static boolean eq(final boolean a, final boolean b) {
         return a == b;
     }
 
     /**
-     * chars.
+     * Equality test for chars.
+     * @param a First argument
+     * @param b Second argument
+     * @return Whether the two arguments are equal
      */
     public static boolean eq(final char a, final char b) {
         return a == b;
     }
 
     /**
-     * ints.
+     * Equality test for integers.
+     * @param a First argument
+     * @param b Second argument
+     * @return Whether the two arguments are equal
      */
     public static boolean eq(final int a, final int b) {
         return a == b;
     }
 
     /**
-     * longs.
+     * Equality test for longs.
+     * @param a First argument
+     * @param b Second argument
+     * @return Whether the two arguments are equal
      */
     public static boolean eq(final long a, final long b) {
         return a == b;
     }
 
     /**
-     * floats.
+     * Equality test for floats.
+     * @param a First argument
+     * @param b Second argument
+     * @return Whether the two arguments are equal
      */
     public static boolean eq(final float a, final float b) {
         return a == b || Float.floatToIntBits(a) == Float.floatToIntBits(b);
     }
 
     /**
-     * doubles.
+     * Equality test for doubles.
+     * @param a First argument
+     * @param b Second argument
+     * @return Whether the two arguments are equal
      */
     public static boolean eq(final double a, final double b) {
         return a == b || Double.doubleToLongBits(a) == Double.doubleToLongBits(b);
     }
 
     /**
-     * <code>aObject</code> is a possibly-null object field, and possibly an array.
-     * 
-     * If <code>aObject</code> is an array, then each element may be a primitive or a possibly-null object.
+     * Equality test for {@link java.lang.Object Objects}
+     * @param a a possibly-null object field, and possibly an array.
+     * @param b a possibly-null object field, and possibly an array.
+     * @return Whether the two arguments are equal
      */
     public static boolean eq(final Object a, final Object b) {
         if (a == null) return b == null;

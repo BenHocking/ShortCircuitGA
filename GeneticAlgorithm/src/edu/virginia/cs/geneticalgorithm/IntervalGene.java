@@ -61,4 +61,14 @@ public final class IntervalGene implements Gene {
     public boolean equals(final Object obj) {
         return obj != null && obj.getClass().equals(getClass()) && _value == ((IntervalGene) obj)._value;
     }
+
+    /**
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(final Gene g) {
+        if (!(g instanceof IntervalGene)) throw new RuntimeException("Genes must be of the same type");
+        final IntervalGene ig = (IntervalGene) g;
+        return (int) Math.signum(_value - ig._value);
+    }
 }

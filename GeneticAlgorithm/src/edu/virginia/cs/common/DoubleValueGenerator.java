@@ -13,6 +13,11 @@ public final class DoubleValueGenerator implements ValueGenerator {
     private final double _min;
     private final double _max;
 
+    /**
+     * Constructor specifying the lower and upper bounds for the double to return
+     * @param min Lower bound
+     * @param max Upper bound
+     */
     public DoubleValueGenerator(final double min, final double max) {
         _min = Math.min(min, max);
         _max = Math.max(min, max);

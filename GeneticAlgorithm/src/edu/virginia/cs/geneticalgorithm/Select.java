@@ -4,7 +4,7 @@
 package edu.virginia.cs.geneticalgorithm;
 
 /**
- * TODO Add description
+ * 
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 25, 2010
  */

@@ -6,7 +6,7 @@ package edu.virginia.cs.geneticalgorithm;
 import edu.virginia.cs.common.UnorderedPair;
 
 /**
- * TODO Add description
+ * Analagous to crossovers in chromosomes
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 24, 2010
  */

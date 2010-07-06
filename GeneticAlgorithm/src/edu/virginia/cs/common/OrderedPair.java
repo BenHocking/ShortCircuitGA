@@ -13,13 +13,16 @@ import java.util.Collection;
 /**
  * Wrapper around a pair of objects where the first object represents something different than the second object
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
+ * @param <S> Class of first item in the OrderedPair
+ * @param <T> Class of second item in the OrderedPair
  * @since Apr 24, 2010
  */
 public class OrderedPair<S, T> extends Pair<S, T> {
 
     /**
-     * @param s
-     * @param t
+     * Constructor
+     * @param s First item in the OrderedPair
+     * @param t Second item in the OrderedPair
      */
     public OrderedPair(final S s, final T t) {
         super(s, t);
@@ -33,6 +36,12 @@ public class OrderedPair<S, T> extends Pair<S, T> {
         return getLast() != null ? getLast().getClass() : null;
     }
 
+    /**
+     * Represents the OrderedPair as a {@link java.util.Collection Collection}
+     * @param <U> Class to return
+     * @param clazz Class to return
+     * @return OrderedPair as a {@link java.util.Collection Collection}
+     */
     @SuppressWarnings("unchecked")
     public <U> Collection<U> asCollection(final Class<U> clazz) {
         if (!(eq(getFirstClass(), clazz) && eq(getLastClass(), clazz))) {

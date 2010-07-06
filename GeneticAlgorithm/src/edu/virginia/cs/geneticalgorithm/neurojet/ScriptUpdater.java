@@ -36,6 +36,8 @@ public final class ScriptUpdater {
     private final Map<String, Pattern> _supportingMap = new HashMap<String, Pattern>();
     private ValueGenerator _desiredActGenerator = null; // So we'll know if this somehow never got set
     private int _desiredActPos = -1;
+    private ValueGenerator _mePctGenerator = null; // So we'll know if this somehow never got set
+    private int _mePctPos = -1;
     private ValueGenerator _timeStepGenerator = null; // So we'll know if this somehow never got set
     private int _timeStepPos = -1;
 
@@ -81,10 +83,18 @@ public final class ScriptUpdater {
         else if (genePosition == _timeStepPos) {
             _timeStepGenerator = generator;
         }
+        else if (genePosition == _mePctPos) {
+            _mePctGenerator = generator;
+        }
     }
 
     public void addDesiredActMapping(final int genePosition, final String varName, final double lowerBound, final double upperBound) {
         _desiredActPos = genePosition;
+        addDoubleMapping(genePosition, varName, lowerBound, upperBound);
+    }
+
+    public void addMePctMapping(final int genePosition, final String varName, final double lowerBound, final double upperBound) {
+        _mePctPos = genePosition;
         addDoubleMapping(genePosition, varName, lowerBound, upperBound);
     }
 
@@ -116,6 +126,12 @@ public final class ScriptUpdater {
     public double getDesiredAct(final StandardGenotype genotype) {
         if (_desiredActGenerator == null) return 2; // Assume 2 Hz as the desired activity rate
         final String retvalStr = _desiredActGenerator.generate(((IntervalGene) genotype.get(_desiredActPos)).getValue());
+        return Double.parseDouble(retvalStr);
+    }
+
+    public double getMePct(final StandardGenotype genotype) {
+        if (_mePctGenerator == null) return 0.3; // Assume 0.3 as the fractional percentage
+        final String retvalStr = _mePctGenerator.generate(((IntervalGene) genotype.get(_mePctPos)).getValue());
         return Double.parseDouble(retvalStr);
     }
 

@@ -6,6 +6,8 @@ package edu.virginia.cs.geneticalgorithm;
 import java.util.ArrayList;
 
 import java.util.Random;
+
+import edu.virginia.cs.common.ArrayGenericUtils;
 import static edu.virginia.cs.common.HashUtils.*;
 import static edu.virginia.cs.common.EqualUtils.*;
 
@@ -77,6 +79,16 @@ public final class StandardGenotype extends ArrayList<Gene> implements Genotype 
     @Override
     public int hashCode() {
         return hash(SEED, this);
+    }
+
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.Genotype#compareTo(edu.virginia.cs.geneticalgorithm.Genotype)
+     */
+    @Override
+    public int compareTo(final Genotype g) {
+        if (!(g instanceof StandardGenotype)) throw new RuntimeException("Genotypes must be of the same type");
+        final StandardGenotype sg = (StandardGenotype) g;
+        return ArrayGenericUtils.compare(this, sg);
     }
 
 }
