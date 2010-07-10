@@ -115,6 +115,16 @@ public final class NeuroJetQuickFitness implements Fitness {
     static final boolean DELETE_WORKING_FILES = true;
     static final boolean DEBUG = false;
 
+    /**
+     * Constructor
+     * @param scriptFiles {@link java.util.List List} of script files that NeuroJet needs to run the experiment. The first file in
+     * the list is the one actually run, with the other files presumably a dependency of it.
+     * @param updater {@link ScriptUpdater} that contains the parameter values to map to the
+     * {@link edu.virginia.cs.geneticalgorithm.Genotype Genotype}.
+     * @param neuroJet Location of the NeuroJet executable
+     * @param workingDir Directory that subdirectories will be created off (if null, this uses the location of the first file in the
+     * scriptFiles {@link java.util.List List}).
+     */
     public NeuroJetQuickFitness(final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet,
                                 final File workingDir) {
         if (scriptFiles == null || scriptFiles.size() == 0)
@@ -128,13 +138,19 @@ public final class NeuroJetQuickFitness implements Fitness {
         _workingDir = workingDir != null ? workingDir : _mainFile.getParentFile();
     }
 
+    /**
+     * Constructor
+     * @param scriptFiles {@link java.util.List List} of script files that NeuroJet needs to run the experiment. The first file in
+     * the list is the one actually run (and determines where the working directory will be), with the other files presumably a
+     * dependency of it.
+     * @param updater {@link ScriptUpdater} that contains the parameter values to map to the
+     * {@link edu.virginia.cs.geneticalgorithm.Genotype Genotype}.
+     * @param neuroJet Location of the NeuroJet executable
+     */
     public NeuroJetQuickFitness(final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet) {
         this(scriptFiles, updater, neuroJet, null);
     }
 
-    /**
-     * @see edu.virginia.cs.geneticalgorithm.Fitness#fitness(edu.virginia.cs.geneticalgorithm.Genotype)
-     */
     @Override
     public List<Double> fitnessValues(final Genotype individual) {
         if (!(individual instanceof StandardGenotype)) throw new RuntimeException("individual must be of type StandardGenotype");
