@@ -25,7 +25,7 @@ public final class Reproduction {
     private final List<Double> _meanFits = new ArrayList<Double>();
     private final List<Distribution> _popHist = new ArrayList<Distribution>();
     private int _numElites = 0;
-    public static int DEBUG_LEVEL = 1;
+    static int DEBUG_LEVEL = 1;
 
     /**
      * Constructor specifying whether to allow duplicates and whether to keep all history (requires more memory)
@@ -38,16 +38,26 @@ public final class Reproduction {
     }
 
     /**
-     * @param population The population that will be reproducing
+     * Uses an existing population to find the next generation of the population.
+     * @param population Current generation ({@link java.util.List List} of {@link Genotype Genotypes}).
      * @param fitFn {@link Fitness} function used to determine which members reproduce and how well
-     * @param selFn
-     * @param xFn
+     * @param selFn {@link Select} function used for selecting individuals to reproduce
+     * @param xFn {@link Crossover} function used for creating children from parent {@link Genotype Genotypes}
      * @return The new generation
      */
     public List<Genotype> reproduce(final List<Genotype> population, final Fitness fitFn, final Select selFn, final Crossover xFn) {
         return reproduce(population, population.size(), fitFn, selFn, xFn);
     }
 
+    /**
+     * Uses an existing population to find the next generation of the population.
+     * @param population Current generation ({@link java.util.List List} of {@link Genotype Genotypes}).
+     * @param newPopSize Population size of the new population (allows the population to shrink or grow).
+     * @param fitFn {@link Fitness} function used to determine which members reproduce and how well
+     * @param selFn {@link Select} function used for selecting individuals to reproduce
+     * @param xFn {@link Crossover} function used for creating children from parent {@link Genotype Genotypes}
+     * @return The new generation
+     */
     public List<Genotype> reproduce(final List<Genotype> population, final int newPopSize, final Fitness fitFn, final Select selFn,
                                     final Crossover xFn) {
         double totalFit = 0;
@@ -97,10 +107,18 @@ public final class Reproduction {
         return _allowDuplicates ? (List<Genotype>) retval : new ArrayList<Genotype>(retval);
     }
 
+    /**
+     * Set the number of individuals to preserve (clone) from one generation to the next.
+     * @param numElites Number of individuals to preserve (clone) from one generation to the next.
+     */
     public void setNumElites(final int numElites) {
         _numElites = numElites;
     }
 
+    /**
+     * Set the number of individuals to preserve (clone) from one generation to the next.
+     * @return Number of individuals to preserve (clone) from one generation to the next.
+     */
     public int getNumElites() {
         return _numElites;
     }

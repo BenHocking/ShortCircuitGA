@@ -19,6 +19,11 @@ public final class IntervalGene implements Gene {
     private final double _value;
     private final double _sigma;
 
+    /**
+     * Constructor
+     * @param value Initial value of the {@link Gene}
+     * @param sigma Standard deviation to use when mutating the {@link Gene}
+     */
     public IntervalGene(final double value, final double sigma) {
         _value = value;
         _sigma = sigma;
@@ -42,6 +47,9 @@ public final class IntervalGene implements Gene {
         return new IntervalGene(newVal, _sigma);
     }
 
+    /**
+     * @return Double value represented by this gene.
+     */
     public double getValue() {
         return MathUtils.imposeBounds(0.0, _value, 1.0);
     }

@@ -6,13 +6,14 @@ package edu.virginia.cs.geneticalgorithm;
 import java.util.Random;
 
 /**
- * TODO Add description
+ * Interface for classes representing genes in a {@link Genotype}
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 24, 2010
  */
 public interface Gene extends Comparable<Gene> {
 
     /**
+     * @param rng Random number generator used to perform the next mutation
      * @return a Gene from one of the genes in getValues(), dependent on the value of this
      */
     Gene mutate(Random rng);

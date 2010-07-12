@@ -10,5 +10,9 @@ package edu.virginia.cs.geneticalgorithm;
  */
 public interface GeneInterpreter {
 
+    /**
+     * @param genotype Individual {@link Genotype} to generate a value for
+     * @return Value corresponding to the requested {@link Genotype}
+     */
     public String generate(final Genotype genotype);
 }

@@ -7,19 +7,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO Add description
+ * Population of {@link Genotype Genotypes} with their corresponding {@link Fitness} information.
+ * @see DistributionMember
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 24, 2010
  */
 public final class Distribution extends ArrayList<DistributionMember> {
 
+    /**
+     * Default constructor
+     */
     public Distribution() {
         super();
     }
 
     /**
      * Copy constructor with deep copy
-     * @param distribution
+     * @param distribution Distribution to copy
      */
     public Distribution(final Distribution distribution) {
         super();
@@ -28,10 +32,17 @@ public final class Distribution extends ArrayList<DistributionMember> {
         }
     }
 
+    /**
+     * For finding the last member of a Distribution.
+     * @return Last member of the Distribution
+     */
     public DistributionMember getLast() {
         return get(size() - 1);
     }
 
+    /**
+     * Remove all but one of a group of DistributionMembers with the same {@link Genotype}.
+     */
     public void removeDuplicates() {
         final List<Boolean> duplicates = new ArrayList<Boolean>(size());
         for (int i = 0; i < size(); ++i) {
@@ -52,6 +63,10 @@ public final class Distribution extends ArrayList<DistributionMember> {
         }
     }
 
+    /**
+     * Figures out whether any fitness values have been calculated.
+     * @return Whether any fitness values have been calculated.
+     */
     public boolean hasValues() {
         for (final DistributionMember m : this) {
             if (m.getValue() == null) return false;
@@ -59,6 +74,9 @@ public final class Distribution extends ArrayList<DistributionMember> {
         return true;
     }
 
+    /**
+     * Adjusts the fitness values such that they add to one.
+     */
     public void normalize() {
         if (!hasValues()) return; // Not ready to normalize yet
         double sum = 0.0;

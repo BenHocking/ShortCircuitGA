@@ -21,7 +21,7 @@ final class OnePointCrossover implements Crossover {
 
     /**
      * @see edu.virginia.cs.geneticalgorithm.Crossover#crossover(edu.virginia.cs.geneticalgorithm.Genotype,
-     * edu.virginia.cs.gCopyOfOnePointCrossovereneticalgorithm.Genotype)
+     * edu.virginia.cs.geneticalgorithm.Genotype)
      */
     @Override
     public UnorderedPair<Genotype> crossover(final Genotype mother, final Genotype father) {

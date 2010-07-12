@@ -3,8 +3,7 @@ package edu.virginia.cs.geneticalgorithm;
 import java.util.Random;
 
 /**
- * 
- * TODO Add description
+ * Standard {@link Mutator} class.
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 25, 2010
  */
@@ -15,8 +14,8 @@ public final class StandardMutator implements Mutator {
 
     /**
      * Constructor that fully specifies a typical {@link Mutator} object
-     * @param mutateRate
-     * @param rng
+     * @param mutateRate Probability (0 to 1) that a {@link Gene} will mutate
+     * @param rng Random number generator used with probabilites
      */
     public StandardMutator(final double mutateRate, final Random rng) {
         _rng = rng;
@@ -24,16 +23,16 @@ public final class StandardMutator implements Mutator {
     }
 
     /**
-     * 
-     * @param mutateRate
+     * Sets the mutation probability for this functor
+     * @param mutateRate Probability (0 to 1) that a {@link Gene} will mutate
      */
     public void setMutateRate(final double mutateRate) {
         _mutateRate = mutateRate;
     }
 
     /**
-     * 
-     * @return
+     * Gets the mutation probability for this functor
+     * @return Mutation probability (0 to 1)
      */
     public double getMutateRate() {
         return _mutateRate;

@@ -9,15 +9,17 @@ import java.util.List;
 import edu.virginia.cs.common.OrderedPair;
 
 /**
- * TODO Add description
+ * A wrapper for a {@link Genotype} with its {@link Fitness} values and some helper functions.
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 24, 2010
  */
 public final class DistributionMember extends OrderedPair<List<Double>, Genotype> implements Comparable<DistributionMember> {
 
     /**
-     * @param s
-     * @param i
+     * Constructor
+     * @param v Overall {@link Fitness} of {@link Genotype} i.
+     * @param s Multi-objective {@link Fitness} values.
+     * @param i {@link Genotype} for which the {@link Fitness} values apply
      */
     public DistributionMember(final Double v, final List<Double> s, final Genotype i) {
         super(appendToList(v, s), i);
@@ -32,22 +34,31 @@ public final class DistributionMember extends OrderedPair<List<Double>, Genotype
 
     /**
      * Copy constructor. Warning: requires {@link Genotype} to implement clone correctly
-     * @param toCopy
+     * @param toCopy DistributionMember to copy from
      */
     public DistributionMember(final DistributionMember toCopy) {
         super(appendToList(toCopy.getValue(), toCopy.getFitnessValues()), toCopy.getGenotype().clone());
     }
 
+    /**
+     * @return Overall {@link Fitness}
+     */
     public Double getValue() {
         return getFirst().get(0);
     }
 
+    /**
+     * @return Multi-objective {@link Fitness} values.
+     */
     public List<Double> getFitnessValues() {
         final List<Double> retval = new ArrayList<Double>(getFirst());
         retval.remove(0);
         return retval;
     }
 
+    /**
+     * @return {@link Genotype} for which the {@link Fitness} values apply
+     */
     public Genotype getGenotype() {
         return getLast();
     }
@@ -79,7 +90,7 @@ public final class DistributionMember extends OrderedPair<List<Double>, Genotype
     public int compareTo(final DistributionMember o) {
         // This is the most important bit.
         if (getValue() != o.getValue()) return (int) Math.signum(o.getValue() - getValue());
-        // The rest is arbitrary and just designed to keep non-idential DistributionMembers from being equal
+        // The rest is arbitrary and just designed to keep non-identical DistributionMembers from being equal
         final List<Double> fitVals = getFitnessValues();
         final List<Double> otherVals = o.getFitnessValues();
         for (int i = 0; i < fitVals.size(); ++i) {

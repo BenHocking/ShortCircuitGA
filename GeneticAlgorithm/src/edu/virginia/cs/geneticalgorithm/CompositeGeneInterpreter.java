@@ -17,6 +17,12 @@ public class CompositeGeneInterpreter implements GeneInterpreter {
     private final GeneInterpreter _upper;
     private final boolean _integerOnly;
 
+    /**
+     * @param genePos Which {@link Gene} in a {@link Genotype} this interpreter corresponds to
+     * @param lower {@link GeneInterpreter} that defines this interpreter's lower bound
+     * @param upper {@link GeneInterpreter} that defines this interpreter's upper bound
+     * @param integerOnly Whether this interpreter should return integer values only or not
+     */
     public CompositeGeneInterpreter(final int genePos, final GeneInterpreter lower, final GeneInterpreter upper,
                                     final boolean integerOnly) {
         _genePos = genePos;
