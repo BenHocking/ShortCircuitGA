@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * TODO Add description
+ * Typical {@link GeneticFactory} dealing with {@link StandardGenotype StandardGenotypes} and using the {@link OnePointCrossover}.
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 25, 2010
  */
@@ -19,10 +19,20 @@ public final class StandardGeneticFactory implements GeneticFactory {
     private final Mutator _mutator;
     private final Crossover _xOver;
 
+    /**
+     * Constructor using default settings
+     * @param seed Random seed to use for generating genetic features.
+     */
     public StandardGeneticFactory(final long seed) {
         this(seed, 0.03, 0.6);
     }
 
+    /**
+     * Constructor with additional parameters
+     * @param seed Random seed to use for generating genetic features.
+     * @param mutateProb Probability (0 to 1) for each {@link Gene} to mutate
+     * @param xOverProb Probability (0 to 1) that there will be any {@link Crossover Crossovers}
+     */
     public StandardGeneticFactory(final long seed, final double mutateProb, final double xOverProb) {
         _rng = new Random(seed);
         _select = new StandardSelect(_rng);

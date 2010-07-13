@@ -124,36 +124,35 @@ public final class Reproduction {
     }
 
     /**
-     * @return
+     * @return Best fitness for the current generation
      */
     public List<Double> getBestFit() {
         return _bestFits.get(_bestFits.size() - 1);
     }
 
     /**
-     * @return Copy of history of best fits
+     * @return Copy of history of best fitness for each generation
      */
     public List<List<Double>> getBestFits() {
         return new ArrayList<List<Double>>(_bestFits);
     }
 
     /**
-     * 
-     * @return
+     * @return The entire population history, including {@link Fitness} and {@link Genotype} information
      */
     public List<Distribution> getHistory() {
         return _popHist;
     }
 
     /**
-     * @return
+     * @return Mean fitness of the current generation
      */
     public double getMeanFit() {
         return _meanFits.get(_meanFits.size() - 1);
     }
 
     /**
-     * @return Copy of history of mean fits
+     * @return Copy of history of mean fitness for each generation
      */
     public List<Double> getMeanFits() {
         return new ArrayList<Double>(_meanFits);

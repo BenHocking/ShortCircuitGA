@@ -14,12 +14,15 @@ import org.junit.Test;
 import edu.virginia.cs.common.ArrayGenericUtils;
 
 /**
- * TODO Add description
+ * Test harness for {@link ArrayGenericUtils} class.
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Jul 3, 2010
  */
 public class ArrrayGenericUtilsTest {
 
+    /**
+     * Verifies that null lists are compared in the correct way
+     */
     @Test
     public void testNullLists() {
         final List<Double> nullList = null;
@@ -29,6 +32,9 @@ public class ArrrayGenericUtilsTest {
         assertTrue(ArrayGenericUtils.compare(nonNullList, nullList) > 0);
     }
 
+    /**
+     * Verifies that lists of the same size compare correctly
+     */
     @Test
     public void testSameSizeLists() {
         final List<Double> lessList = new ArrayList<Double>();
@@ -42,6 +48,9 @@ public class ArrrayGenericUtilsTest {
         assertTrue(ArrayGenericUtils.compare(greaterList, lessList) > 0);
     }
 
+    /**
+     * Verifies that lists of different sizes compare correctly
+     */
     @Test
     public void testDifferentSizeLists() {
         final List<Double> lessList = new ArrayList<Double>();

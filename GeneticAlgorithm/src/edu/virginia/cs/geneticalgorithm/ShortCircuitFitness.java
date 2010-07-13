@@ -28,21 +28,23 @@ public final class ShortCircuitFitness extends AbstractFitness {
     final boolean _useThresholdAsLimit = true;
 
     /**
-     * 
-     * @param preFit
-     * @param preThreshold
-     * @param postFit
+     * Constructor
+     * @param preFit {@link Fitness} function that requires less time to run than postFit and can often act as a reasonable proxy
+     * @param preThreshold {@link java.util.List List} of threshold values for multi-objective fitness which must all be passed for
+     * the postFit {@link Fitness} function to be evaluated
+     * @param postFit {@link Fitness} function that is run if the threshold is met
      */
     public ShortCircuitFitness(final Fitness preFit, final List<Double> preThreshold, final Fitness postFit) {
         this(preFit, preThreshold, postFit, 1);
     }
 
     /**
-     * 
-     * @param preFit
-     * @param preThreshold
-     * @param postFit
-     * @param postFitLen
+     * Constructor
+     * @param preFit {@link Fitness} function that requires less time to run than postFit and can often act as a reasonable proxy
+     * @param preThreshold {@link java.util.List List} of threshold values for multi-objective fitness which must all be passed for
+     * the postFit {@link Fitness} function to be evaluated
+     * @param postFit {@link Fitness} function that is run if the threshold is met
+     * @param postFitLen Number of fitness values returned by the postFit {@link Fitness} function
      */
     public ShortCircuitFitness(final Fitness preFit, final List<Double> preThreshold, final Fitness postFit, final int postFitLen) {
         _preFit = preFit;
@@ -53,21 +55,23 @@ public final class ShortCircuitFitness extends AbstractFitness {
     }
 
     /**
-     * 
-     * @param preFit
-     * @param preThreshold
-     * @param postFit
+     * Constructor
+     * @param preFit {@link Fitness} function that requires less time to run than postFit and can often act as a reasonable proxy
+     * @param preThreshold Threshold value which the total fitness must exceed for the postFit {@link Fitness} function to be
+     * evaluated
+     * @param postFit {@link Fitness} function that is run if the threshold is met
      */
     public ShortCircuitFitness(final Fitness preFit, final double preThreshold, final Fitness postFit) {
         this(preFit, preThreshold, postFit, 1);
     }
 
     /**
-     * 
-     * @param preFit
-     * @param preThreshold
-     * @param postFit
-     * @param postFitLen
+     * Constructor
+     * @param preFit {@link Fitness} function that requires less time to run than postFit and can often act as a reasonable proxy
+     * @param preThreshold Threshold value which the total fitness must exceed for the postFit {@link Fitness} function to be
+     * evaluated
+     * @param postFit {@link Fitness} function that is run if the threshold is met
+     * @param postFitLen Number of fitness values returned by the postFit {@link Fitness} function
      */
     public ShortCircuitFitness(final Fitness preFit, final double preThreshold, final Fitness postFit, final int postFitLen) {
         _preFit = preFit;
@@ -116,10 +120,20 @@ public final class ShortCircuitFitness extends AbstractFitness {
         return retval;
     }
 
+    /**
+     * Sets the amount to scale the postFit {@link Fitness} function by. This can be used to ensure that the results of the fitness
+     * function are more important than its proxy.
+     * @param postScale Amount to scale the postFit {@link Fitness} function by
+     */
     public void setPostScale(final double postScale) {
         _postScale = postScale;
     }
 
+    /**
+     * Returns the amount to scale the postFit {@link Fitness} function by. This can be used to ensure that the results of the
+     * fitness function are more important than its proxy.
+     * @return Amount to scale the postFit {@link Fitness} function by
+     */
     public double getPostScale() {
         return _postScale;
     }

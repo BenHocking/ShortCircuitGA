@@ -5,14 +5,12 @@ package edu.virginia.cs.test;
 
 import junit.framework.Assert;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import edu.virginia.cs.common.UnorderedPair;
 
 /**
- * TODO Add description
+ * Test harness of the {@link UnorderedPair} class.
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 27, 2010
  */
@@ -25,19 +23,8 @@ public final class UnorderedPairTest {
     final static UnorderedPair<Integer> opair2 = new UnorderedPair<Integer>(new Integer(3), new Integer(2));
 
     /**
-     * @throws java.lang.Exception
+     * Tests that pairs with a different (or same) order of same items are equal, but that others are not.
      */
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @After
-    public void tearDown() throws Exception {
-    }
-
     @Test
     public void testEquals() {
         Assert.assertTrue(pair1.equals(pair2));
@@ -46,6 +33,9 @@ public final class UnorderedPairTest {
         Assert.assertTrue(!pair1.equals(opair2));
     }
 
+    /**
+     * Tests that pairs that should be equal also have the same hash code.
+     */
     @Test
     public void testHash() {
         Assert.assertEquals(pair1.hashCode(), pair2.hashCode());

@@ -15,14 +15,16 @@ public final class SimpleGeneInterpreter implements GeneInterpreter {
     private final int _genePos;
     private final ValueGenerator _generator;
 
+    /**
+     * Constructor
+     * @param genePos Which {@link Gene} in the {@link Genotype} this interpreter is for
+     * @param vg {@link ValueGenerator} to use for interpreting the specified {@link Gene}
+     */
     public SimpleGeneInterpreter(final int genePos, final ValueGenerator vg) {
         _genePos = genePos;
         _generator = vg;
     }
 
-    /**
-     * @see edu.virginia.cs.geneticalgorithm.GeneInterpreter#generate(edu.virginia.cs.geneticalgorithm.Genotype)
-     */
     @Override
     public String generate(final Genotype genotype) {
         final Gene g = genotype.getGene(_genePos);

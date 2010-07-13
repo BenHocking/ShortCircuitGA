@@ -13,12 +13,17 @@ import org.junit.Test;
 import edu.virginia.cs.common.IntegerRange;
 
 /**
- * Test harness for IntegerRange class
+ * Test harness for {@link IntegerRange} class.
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 16, 2010
  */
 public class IntegerRangeTest {
 
+    /**
+     * Tests IntegerRange constructor with single parameter (upper bound if greater than zero, or lower bound if less than zero).
+     * Other bound should be 0, with step size 1 if single parameter is upper bound and step size -1 if single parameter is lower
+     * bound. If parameter is zero, then the range is empty.
+     */
     @Test
     public void testSingleValue() {
         final List<Integer> values = new ArrayList<Integer>();
@@ -29,8 +34,25 @@ public class IntegerRangeTest {
         for (int i = 0; i < values.size(); ++i) {
             assertEquals("values[" + i + "]", Integer.valueOf(i), values.get(i));
         }
+        values.clear();
+        for (final Integer i : new IntegerRange(-3)) {
+            values.add(i);
+        }
+        assertEquals("Range size", 3, values.size());
+        for (int i = 0; i < values.size(); ++i) {
+            assertEquals("values[" + i + "]", Integer.valueOf(-i), values.get(i));
+        }
+        values.clear();
+        for (final Integer i : new IntegerRange(0)) {
+            values.add(i);
+        }
+        assertEquals("Range size", 0, values.size());
     }
 
+    /**
+     * Tests IntegerRange constructor with two bounds (lower and upper bound). Step size should be 1 if the lower bound comes first,
+     * and -1 if the lower bound (smaller value) comes second. If the two values are equal, then the range should be empty.
+     */
     @Test
     public void testDoubleValue() {
         final List<Integer> values = new ArrayList<Integer>();
@@ -64,6 +86,9 @@ public class IntegerRangeTest {
         assertEquals("Range size", 0, values.size());
     }
 
+    /**
+     * Tests IntegerRange with all lower bound, step size, and upper bound.
+     */
     @Test
     public void testTrebleValue() {
         final List<Integer> values = new ArrayList<Integer>();

@@ -26,7 +26,13 @@ public final class StandardGene implements Gene {
         return obj != null && obj.getClass().equals(getClass()) && hashCode() == obj.hashCode();
     }
 
+    /**
+     * One version of the Gene
+     */
     public static final StandardGene ZERO = new StandardGene("0");
+    /**
+     * The other version of the Gene
+     */
     public static final StandardGene ONE = new StandardGene("1");
 
     private final String _descriptor;
@@ -43,9 +49,6 @@ public final class StandardGene implements Gene {
         return rng.nextBoolean() ? ONE : ZERO;
     }
 
-    /**
-     * @see edu.virginia.cs.geneticalgorithm.Gene#mutate()
-     */
     @Override
     public Gene mutate(final Random rng) {
         return (this == ZERO) ? ONE : ZERO;

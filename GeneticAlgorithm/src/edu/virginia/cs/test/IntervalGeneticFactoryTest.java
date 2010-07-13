@@ -19,7 +19,7 @@ import edu.virginia.cs.geneticalgorithm.IntervalGeneticFactory;
 import edu.virginia.cs.geneticalgorithm.Reproduction;
 
 /**
- * TODO Add description
+ * Test of the {@link IntervalGeneticFactory} class.
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 26, 2010
  */
@@ -32,9 +32,6 @@ public final class IntervalGeneticFactoryTest {
 
     private class TrivialIntervalFitness extends AbstractFitness {
 
-        /**
-         * @see edu.virginia.cs.geneticalgorithm.Fitness#fitness(edu.virginia.cs.geneticalgorithm.Genotype)
-         */
         @Override
         public List<Double> fitnessValues(final Genotype individual) {
             double retval = 0;
@@ -46,6 +43,9 @@ public final class IntervalGeneticFactoryTest {
 
     }
 
+    /**
+     * Tests all of the components of the GeneticFactory in an integrative manner.
+     */
     @Test
     public void mainTest() {
         final double tolerance = 1E-8;

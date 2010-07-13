@@ -12,12 +12,18 @@ import static edu.virginia.cs.common.HashUtils.*;
 import static edu.virginia.cs.common.EqualUtils.*;
 
 /**
- * TODO Add description
+ * {@link Genotype} that is just a {@link java.util.List List} of {@link Gene Genes}.
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 25, 2010
  */
 public final class StandardGenotype extends ArrayList<Gene> implements Genotype {
 
+    /**
+     * Constructor
+     * @param numGenes Number of {@link Gene Genes} in the genotype.
+     * @param generator {@link Gene} used to generate more of its same {@link java.lang.Class Class}
+     * @param rng Random number generator used for generating initial {@link Gene Genes}
+     */
     public StandardGenotype(final int numGenes, final Gene generator, final Random rng) {
         for (int i = 0; i < numGenes; ++i) {
             add(generator.generate(rng));
@@ -32,7 +38,8 @@ public final class StandardGenotype extends ArrayList<Gene> implements Genotype 
     }
 
     /**
-     * @param parameterizedGenotype
+     * Copy constructor
+     * @param c StandardGenotype to copy
      */
     public StandardGenotype(final StandardGenotype c) {
         super(c);

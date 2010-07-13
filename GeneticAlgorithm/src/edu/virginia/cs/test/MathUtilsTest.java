@@ -12,12 +12,16 @@ import org.junit.Test;
 import static edu.virginia.cs.common.MathUtils.*;
 
 /**
- * TODO Add description
+ * Test of the {@link edu.virginia.cs.common.MathUtils MathUtils} class.
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 30, 2010
  */
 public class MathUtilsTest {
 
+    /**
+     * Test of {@link edu.virginia.cs.common.MathUtils#imposeBounds(double, double, double) MathUtils.imposeBounds(double, double,
+     * double)}
+     */
     @Test
     public void imposeBoundsTest() {
         final double min = Math.E;
@@ -34,6 +38,11 @@ public class MathUtilsTest {
         Assert.assertEquals(min, imposeBounds(max, 2 * max, min), 0.0);
     }
 
+    /**
+     * Test of {@link edu.virginia.cs.common.MathUtils#scale(double, double, double) MathUtils.scale(double, double, double)} and
+     * {@link edu.virginia.cs.common.MathUtils#scale(double, double, double, boolean) MathUtils.scale(double, double, double,
+     * boolean)}
+     */
     @Test
     public void scaleTest() {
         final double min = Math.E;
@@ -47,8 +56,15 @@ public class MathUtilsTest {
         final int maxInt = 10;
         // This one goes to 11
         Assert.assertEquals(11, scale(minInt, 1.1, maxInt), 0.0);
+        // As does this one
+        Assert.assertEquals(11, scale(minInt, 1.1, maxInt, false), 0.0);
+        // This one stops at 10
+        Assert.assertEquals(10, scale(minInt, 1.1, maxInt, true), 0.0);
     }
 
+    /**
+     * Test of {@link edu.virginia.cs.common.MathUtils#scaleInt(int, double, int) MathUtils.scaleInt(int, double, int)}
+     */
     @Test
     public void scaleIntTest() {
         final int min = 1;
