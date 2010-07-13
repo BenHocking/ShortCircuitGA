@@ -18,7 +18,7 @@ import edu.virginia.cs.common.ArrayGenericUtils;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Jul 3, 2010
  */
-public class ArrrayGenericUtilsTest {
+public class ArrayGenericUtilsTest {
 
     /**
      * Verifies that null lists are compared in the correct way
