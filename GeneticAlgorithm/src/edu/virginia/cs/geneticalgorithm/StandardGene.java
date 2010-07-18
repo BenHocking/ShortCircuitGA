@@ -3,8 +3,7 @@ package edu.virginia.cs.geneticalgorithm;
 import java.util.Random;
 
 /**
- * 
- * TODO Add description
+ * {@link Gene} representing the standard 0/1 bit values.
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 25, 2010
  */

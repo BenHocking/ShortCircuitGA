@@ -26,7 +26,8 @@ import edu.virginia.cs.geneticalgorithm.SimpleGeneInterpreter;
 import edu.virginia.cs.geneticalgorithm.StandardGenotype;
 
 /**
- * TODO Add description
+ * Updates a script or set of scripts containing markers such as insertAhere (where "A" is the variable name) with values that can
+ * vary depending on a {@link edu.virginia.cs.geneticalgorithm.Genotype Genotype}
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 2, 2010
  */

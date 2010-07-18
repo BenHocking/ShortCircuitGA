@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.virginia.cs.common.Pause;
 import edu.virginia.cs.geneticalgorithm.Fitness;
 import edu.virginia.cs.geneticalgorithm.Genotype;
 import edu.virginia.cs.geneticalgorithm.StandardGenotype;
@@ -192,9 +193,9 @@ public final class NeuroJetTraceFitness implements Fitness {
             final double mePct = _updater.getMePct(genotype);
             final double timeStep = _updater.getTimeStep(genotype);
             final File tstBuff = new File(tempDir, "tstBuff.dat");
-            if (!tstBuff.exists()) {
-                // TODO: Improve upon this hack
-                Thread.sleep(1000); // Make sure we catch up with O/S
+            final boolean fileExists = Pause.untilExists(tstBuff, 2000);
+            if (!fileExists) {
+                throw new IOException("Couldn't find file '" + tstBuff.getPath() + "'");
             }
             final double fitness = generateTraceFitness(tstBuff, desiredAct, timeStep, mePct);
             retval.add(fitness);

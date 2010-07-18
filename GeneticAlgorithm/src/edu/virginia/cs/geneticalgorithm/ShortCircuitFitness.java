@@ -147,7 +147,9 @@ public final class ShortCircuitFitness extends AbstractFitness {
         final List<Double> fitVals = fitnessValues(individual);
         double retval = _preFit.totalFitness(individual);
         if (passedThreshold(fitVals, individual)) {
-            // TODO Document
+            // In many cases, we want the threshold of the proxy to also be its maximum attainable value. That way, when we run the
+            // post-fitness function (because the threshold has been reached), we don't end up giving the proxy value (which is
+            // meant to substitute for the post-fitness function after all) too much weight.
             if (_useThresholdAsLimit) {
                 retval = _preThreshold.get(0);
             }

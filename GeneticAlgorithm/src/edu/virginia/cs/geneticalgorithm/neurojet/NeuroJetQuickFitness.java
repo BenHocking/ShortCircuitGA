@@ -15,6 +15,7 @@ import java.util.Map;
 
 import edu.virginia.cs.common.ArrayNumberUtils;
 import edu.virginia.cs.common.IntegerRange;
+import edu.virginia.cs.common.Pause;
 import edu.virginia.cs.geneticalgorithm.Fitness;
 import edu.virginia.cs.geneticalgorithm.Genotype;
 import edu.virginia.cs.geneticalgorithm.StandardGenotype;
@@ -73,6 +74,10 @@ public final class NeuroJetQuickFitness implements Fitness {
 
         private void generateQuickFitness(final File activityFile, final double desiredAct, final double timeStep) {
             try {
+                final boolean fileFound = Pause.untilExists(activityFile, 2000);
+                if (!fileFound) {
+                    throw new IOException("Couldn't find file '" + activityFile.getPath() + "'");
+                }
                 final BufferedReader actReader = new BufferedReader(new FileReader(activityFile));
                 _desiredAct = desiredAct;
                 String line;
@@ -217,10 +222,6 @@ public final class NeuroJetQuickFitness implements Fitness {
             final double desiredAct = _updater.getDesiredAct(genotype);
             final double timeStep = _updater.getTimeStep(genotype);
             final File trnAct = new File(tempDir, "trnWithinAct.dat");
-            if (!trnAct.exists()) {
-                // TODO: Improve upon this hack
-                Thread.sleep(1000); // Make sure we catch up with O/S
-            }
             _trnGenerator.generateQuickFitness(trnAct, desiredAct, timeStep);
             retval.add(_trnGenerator.getSampleStdDev());
             retval.add(_trnGenerator.getSquaredDeviationFromDesired());
