@@ -7,9 +7,9 @@ import java.util.ArrayList;
 
 import java.util.Random;
 
-import edu.virginia.cs.common.ArrayGenericUtils;
-import static edu.virginia.cs.common.HashUtils.*;
-import static edu.virginia.cs.common.EqualUtils.*;
+import edu.virginia.cs.common.utils.ArrayGenericUtils;
+import static edu.virginia.cs.common.utils.EqualUtils.*;
+import static edu.virginia.cs.common.utils.HashUtils.*;
 
 /**
  * {@link Genotype} that is just a {@link java.util.List List} of {@link Gene Genes}.

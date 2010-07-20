@@ -5,7 +5,7 @@ package edu.virginia.cs.geneticalgorithm;
 
 import java.util.Random;
 
-import edu.virginia.cs.common.UnorderedPair;
+import edu.virginia.cs.common.utils.UnorderedPair;
 
 /**
  * Crossover function for when position in the {@link Genotype} is significant. The first part of one Genotype will be matched with

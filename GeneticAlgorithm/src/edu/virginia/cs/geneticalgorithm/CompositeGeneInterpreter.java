@@ -3,7 +3,7 @@
  */
 package edu.virginia.cs.geneticalgorithm;
 
-import edu.virginia.cs.common.MathUtils;
+import edu.virginia.cs.common.utils.MathUtils;
 
 /**
  * GeneInterpeter that depends on other GeneInterpeters to determine its lower and upper bounds

@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  * Mapping between a arbitrary variable (represented by an Object which will typically be either a String or a Pattern) and a pair
- * of {@link edu.virginia.cs.common.ValueGenerator ValueGenerator} (which determines how a value between 0 and 1 gets mapped to
+ * of {@link edu.virginia.cs.common.utils.ValueGenerator ValueGenerator} (which determines how a value between 0 and 1 gets mapped to
  * another Object) and an Integer which determines which position in a {@link edu.virginia.cs.geneticalgorithm.StandardGenotype
  * StandardGenotye} is used to generate the value.
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>

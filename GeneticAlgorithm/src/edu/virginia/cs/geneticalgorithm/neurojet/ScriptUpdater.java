@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.virginia.cs.common.DoubleValueGenerator;
-import edu.virginia.cs.common.IntegerValueGenerator;
-import edu.virginia.cs.common.ValueGenerator;
+import edu.virginia.cs.common.utils.DoubleValueGenerator;
+import edu.virginia.cs.common.utils.IntegerValueGenerator;
+import edu.virginia.cs.common.utils.ValueGenerator;
 import edu.virginia.cs.geneticalgorithm.CompositeGeneInterpreter;
 import edu.virginia.cs.geneticalgorithm.ConstantGeneInterpreter;
 import edu.virginia.cs.geneticalgorithm.GeneInterpreter;

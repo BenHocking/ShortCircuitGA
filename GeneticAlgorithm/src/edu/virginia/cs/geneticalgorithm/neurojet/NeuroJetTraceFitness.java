@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.virginia.cs.common.Pause;
+import edu.virginia.cs.common.utils.Pause;
 import edu.virginia.cs.geneticalgorithm.Fitness;
 import edu.virginia.cs.geneticalgorithm.Genotype;
 import edu.virginia.cs.geneticalgorithm.StandardGenotype;

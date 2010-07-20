@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
  */
-package edu.virginia.cs.common;
+package edu.virginia.cs.common.utils;
 
 import java.util.Iterator;
 import java.lang.Comparable;

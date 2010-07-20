@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
  */
-package edu.virginia.cs.common;
+package edu.virginia.cs.common.utils;
 
 /**
  * Interface for classes that convert a value between 0 and 1 to some other value

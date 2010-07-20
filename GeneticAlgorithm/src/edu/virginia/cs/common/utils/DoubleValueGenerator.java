@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
  */
-package edu.virginia.cs.common;
+package edu.virginia.cs.common.utils;
 
 /**
- * {@link edu.virginia.cs.common.ValueGenerator ValueGenerator} that generates a value between an upper and lower double value
+ * {@link edu.virginia.cs.common.utils.ValueGenerator ValueGenerator} that generates a value between an upper and lower double value
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 2, 2010
  */
@@ -24,7 +24,7 @@ public final class DoubleValueGenerator implements ValueGenerator {
     }
 
     /**
-     * @see edu.virginia.cs.common.ValueGenerator#generate(double)
+     * @see edu.virginia.cs.common.utils.ValueGenerator#generate(double)
      */
     @Override
     public String generate(final double x) {

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
  */
-package edu.virginia.cs.common;
+package edu.virginia.cs.common.utils;
 
 /**
  * Wrapper around a pair of objects

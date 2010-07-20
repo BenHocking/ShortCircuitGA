@@ -3,7 +3,7 @@
  */
 package edu.virginia.cs.geneticalgorithm;
 
-import edu.virginia.cs.common.ValueGenerator;
+import edu.virginia.cs.common.utils.ValueGenerator;
 
 /**
  * GeneInterpeter that uses a ValueGenerator and a gene position to generate a value

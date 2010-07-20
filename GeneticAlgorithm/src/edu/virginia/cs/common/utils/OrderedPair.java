@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
  */
-package edu.virginia.cs.common;
+package edu.virginia.cs.common.utils;
 
-import static edu.virginia.cs.common.EqualUtils.eq;
-import static edu.virginia.cs.common.HashUtils.SEED;
-import static edu.virginia.cs.common.HashUtils.hash;
+import static edu.virginia.cs.common.utils.EqualUtils.eq;
+import static edu.virginia.cs.common.utils.HashUtils.SEED;
+import static edu.virginia.cs.common.utils.HashUtils.hash;
 
 import java.util.ArrayList;
 import java.util.Collection;

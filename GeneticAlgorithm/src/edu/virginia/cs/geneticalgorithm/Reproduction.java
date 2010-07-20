@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import edu.virginia.cs.common.UnorderedPair;
+import edu.virginia.cs.common.utils.UnorderedPair;
 
 /**
  * Class governing how a population of individuals in a genetic algorithm reproduce. It requires the specification of a

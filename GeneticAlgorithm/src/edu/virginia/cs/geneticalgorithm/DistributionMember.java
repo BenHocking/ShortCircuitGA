@@ -6,7 +6,7 @@ package edu.virginia.cs.geneticalgorithm;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.virginia.cs.common.OrderedPair;
+import edu.virginia.cs.common.utils.OrderedPair;
 
 /**
  * A wrapper for a {@link Genotype} with its {@link Fitness} values and some helper functions.

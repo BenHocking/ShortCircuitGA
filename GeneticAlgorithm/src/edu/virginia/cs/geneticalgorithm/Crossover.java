@@ -3,7 +3,7 @@
  */
 package edu.virginia.cs.geneticalgorithm;
 
-import edu.virginia.cs.common.UnorderedPair;
+import edu.virginia.cs.common.utils.UnorderedPair;
 
 /**
  * Analogous to crossovers in chromosomes

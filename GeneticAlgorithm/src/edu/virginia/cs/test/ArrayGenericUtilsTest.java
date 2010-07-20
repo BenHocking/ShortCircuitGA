@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import edu.virginia.cs.common.ArrayGenericUtils;
+import edu.virginia.cs.common.utils.ArrayGenericUtils;
 
 /**
  * Test harness for {@link ArrayGenericUtils} class.

@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import edu.virginia.cs.common.IntegerRange;
+import edu.virginia.cs.common.utils.IntegerRange;
 
 /**
  * Test harness for {@link IntegerRange} class.

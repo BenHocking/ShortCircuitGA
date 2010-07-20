@@ -9,17 +9,18 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
-import static edu.virginia.cs.common.MathUtils.*;
+
+import static edu.virginia.cs.common.utils.MathUtils.*;
 
 /**
- * Test of the {@link edu.virginia.cs.common.MathUtils MathUtils} class.
+ * Test of the {@link edu.virginia.cs.common.utils.MathUtils MathUtils} class.
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 30, 2010
  */
 public class MathUtilsTest {
 
     /**
-     * Test of {@link edu.virginia.cs.common.MathUtils#imposeBounds(double, double, double) MathUtils.imposeBounds(double, double,
+     * Test of {@link edu.virginia.cs.common.utils.MathUtils#imposeBounds(double, double, double) MathUtils.imposeBounds(double, double,
      * double)}
      */
     @Test
@@ -39,8 +40,8 @@ public class MathUtilsTest {
     }
 
     /**
-     * Test of {@link edu.virginia.cs.common.MathUtils#scale(double, double, double) MathUtils.scale(double, double, double)} and
-     * {@link edu.virginia.cs.common.MathUtils#scale(double, double, double, boolean) MathUtils.scale(double, double, double,
+     * Test of {@link edu.virginia.cs.common.utils.MathUtils#scale(double, double, double) MathUtils.scale(double, double, double)} and
+     * {@link edu.virginia.cs.common.utils.MathUtils#scale(double, double, double, boolean) MathUtils.scale(double, double, double,
      * boolean)}
      */
     @Test
@@ -63,7 +64,7 @@ public class MathUtilsTest {
     }
 
     /**
-     * Test of {@link edu.virginia.cs.common.MathUtils#scaleInt(int, double, int) MathUtils.scaleInt(int, double, int)}
+     * Test of {@link edu.virginia.cs.common.utils.MathUtils#scaleInt(int, double, int) MathUtils.scaleInt(int, double, int)}
      */
     @Test
     public void scaleIntTest() {

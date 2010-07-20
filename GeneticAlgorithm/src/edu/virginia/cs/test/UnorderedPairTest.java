@@ -7,7 +7,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.virginia.cs.common.UnorderedPair;
+import edu.virginia.cs.common.utils.UnorderedPair;
 
 /**
  * Test harness of the {@link UnorderedPair} class.

@@ -5,8 +5,8 @@ package edu.virginia.cs.geneticalgorithm;
 
 import java.util.Random;
 
-import edu.virginia.cs.common.HashUtils;
-import edu.virginia.cs.common.MathUtils;
+import edu.virginia.cs.common.utils.HashUtils;
+import edu.virginia.cs.common.utils.MathUtils;
 
 /**
  * Gene initially constrained to [0,1). The value is allowed to grow outside these bounds internally as a buffer against going back

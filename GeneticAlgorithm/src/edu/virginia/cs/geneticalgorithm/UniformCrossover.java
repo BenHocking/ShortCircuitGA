@@ -5,7 +5,7 @@ package edu.virginia.cs.geneticalgorithm;
 
 import java.util.Random;
 
-import edu.virginia.cs.common.UnorderedPair;
+import edu.virginia.cs.common.utils.UnorderedPair;
 
 /**
  * Crossover function for when position in the {@link Genotype} is irrelevant. Each {@link Gene} in the Genotype will be crossed
