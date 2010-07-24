@@ -56,7 +56,7 @@ public final class NeuroJetGeneticAlgorithm {
         final Fitness quickFitnessFn = new NeuroJetQuickFitness(quickScriptFiles, _updater, NJ, WORKINGDIR);
         final List<File> traceScriptFiles = Collections.singletonList(new File(WORKINGDIR, "trace_full.nj"));
         final Fitness traceFitnessFn = new NeuroJetTraceFitness(traceScriptFiles, _updater, NJ, WORKINGDIR);
-        _fitnessFn = new ShortCircuitFitness(quickFitnessFn, 5e5, traceFitnessFn, 2);
+        _fitnessFn = new ShortCircuitFitness(quickFitnessFn, 5e5, traceFitnessFn, 3);
         ((ShortCircuitFitness) _fitnessFn).setPostScale(1e9);
         _factory = new IntervalGeneticFactory(seed);
         _population = _factory.createPopulation(popSize, GENOTYPE_SIZE);

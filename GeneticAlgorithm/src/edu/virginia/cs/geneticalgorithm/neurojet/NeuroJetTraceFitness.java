@@ -30,7 +30,7 @@ public final class NeuroJetTraceFitness implements Fitness {
     private final ScriptUpdater _updater;
     private final File _neuroJet;
     private final File _workingDir;
-    private static final int NUM_FIT_VALS = 5; // Run time + test ssd + test dev + train ssd + train dev
+    private static final int NUM_FIT_VALS = 3; // Run time + trace score + directory ID
     private static Integer _counter = 0;
     private final Map<Genotype, List<Double>> _fitMap = new HashMap<Genotype, List<Double>>();
 
@@ -134,10 +134,11 @@ public final class NeuroJetTraceFitness implements Fitness {
         final StandardGenotype genotype = (StandardGenotype) individual;
         // Each fitness calculation happens in its own directory, allowing this function to be run in parallel
         File scriptFile = _mainFile;
-        File tempDir;
+        Integer dirID;
         synchronized (_counter) {
-            tempDir = new File(_workingDir, "full_" + String.valueOf(++_counter));
+            dirID = ++_counter;
         }
+        final File tempDir = new File(_workingDir, "full_" + String.valueOf(dirID));
         // Remove any existing files
         final File[] prevFiles = tempDir.listFiles();
         if (prevFiles != null) {
@@ -199,6 +200,7 @@ public final class NeuroJetTraceFitness implements Fitness {
             }
             final double fitness = generateTraceFitness(tstBuff, desiredAct, timeStep, mePct);
             retval.add(fitness);
+            retval.add(Double.valueOf(dirID));
         }
         catch (final IOException e) {
             throw new RuntimeException(e);
@@ -210,7 +212,7 @@ public final class NeuroJetTraceFitness implements Fitness {
             throw new RuntimeException(e);
         }
         // Create copy in case the individual is changed after the fitness has been calculated
-        _fitMap.put(individual.clone(), retval);
+        _fitMap.put(individual.clone(), new ArrayList<Double>(retval));
         assert (retval.size() == NUM_FIT_VALS);
         return retval;
     }

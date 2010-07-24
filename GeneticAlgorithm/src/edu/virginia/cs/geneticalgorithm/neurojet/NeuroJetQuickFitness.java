@@ -34,7 +34,7 @@ public final class NeuroJetQuickFitness implements Fitness {
     private final File _workingDir;
     private final NeuroJetQuickFitnessGenerator _trnGenerator = new NeuroJetQuickFitnessGenerator();
     private final NeuroJetQuickFitnessGenerator _tstGenerator = new NeuroJetQuickFitnessGenerator();
-    private static final int NUM_FIT_VALS = 5; // Run time + test ssd + test dev + train ssd + train dev
+    private static final int NUM_FIT_VALS = 6; // Run time + test ssd + test dev + train ssd + train dev + directory id
     private static Integer _counter = 0;
     private final Map<Genotype, List<Double>> _fitMap = new HashMap<Genotype, List<Double>>();
 
@@ -164,10 +164,11 @@ public final class NeuroJetQuickFitness implements Fitness {
         final StandardGenotype genotype = (StandardGenotype) individual;
         // Each fitness calculation happens in its own directory, allowing this function to be run in parallel
         File scriptFile = _mainFile;
-        File tempDir;
+        Integer dirID;
         synchronized (_counter) {
-            tempDir = new File(_workingDir, String.valueOf(++_counter));
+            dirID = ++_counter;
         }
+        final File tempDir = new File(_workingDir, String.valueOf(dirID));
         // Remove any existing files
         final File[] prevFiles = tempDir.listFiles();
         if (prevFiles != null) {
@@ -229,6 +230,7 @@ public final class NeuroJetQuickFitness implements Fitness {
             _tstGenerator.generateQuickFitness(tstAct, desiredAct, timeStep);
             retval.add(_tstGenerator.getSampleStdDev());
             retval.add(_tstGenerator.getSquaredDeviationFromDesired());
+            retval.add(Double.valueOf(dirID));
         }
         catch (final IOException e) {
             throw new RuntimeException(e);
