@@ -178,8 +178,26 @@ public final class ArrayNumberUtils {
     }
 
     /**
+     * Multiplies elements in a {@link java.util.List List} by a constant value and returns the result in a {@link java.util.List
+     * List} of the same size.
+     * @param dblList {@link java.lang.Double Double} {@link java.util.List List}
+     * @param factor Multiplier
+     * @return Resultant {@link java.util.List List}
+     */
+    public static List<Double> multiply(final List<Double> dblList, final double factor) {
+        if (dblList == null) return null;
+        final List<Double> retval = new ArrayList<Double>(dblList.size());
+        if (!dblList.isEmpty()) {
+            for (final Integer i : new IntegerRange(dblList.size())) {
+                retval.add(dblList.get(i) * factor);
+            }
+        }
+        return retval;
+    }
+
+    /**
      * Calculates the mean of an array of Strings
-     * @param values Array of Strings to find the mean of
+     * @param values Array of {@link java.lang.String Strings} to find the mean of
      * @param first First element (inclusive) in the array to include in the mean
      * @param last Last element (inclusive) in the array to include in the mean
      * @return Mean value of the selected range of elements
@@ -191,6 +209,38 @@ public final class ArrayNumberUtils {
         if (trueLast >= first) {
             for (final Integer i : new IntegerRange(first, trueLast)) {
                 sum += Double.parseDouble(values[i]);
+            }
+        }
+        return sum / (trueLast - first + 1);
+    }
+
+    /**
+     * Calculates the mean of an {@link java.util.List List} of {@link java.lang.Double Doubles}
+     * @param dblList {@link java.util.List List} of {@link java.lang.Double Doubles} to find the mean of
+     * @return Mean value of the provided {@link java.util.List List}
+     */
+    public static double mean(final List<Double> dblList) {
+        if (dblList == null || dblList.size() == 0) return Double.NaN;
+        double sum = 0.0;
+        for (final Double d : dblList) {
+            sum += d;
+        }
+        return sum / dblList.size();
+    }
+
+    /**
+     * Calculates the mean of an {@link java.util.List List} of {@link java.lang.Double Doubles}
+     * @param dblList {@link java.util.List List} of {@link java.lang.Double Doubles} to find the mean of
+     * @param first First element (inclusive) in the list to include in the mean
+     * @param last Last element (inclusive) in the list to include in the mean
+     * @return Mean value of the selected range of elements
+     */
+    public static double mean(final List<Double> dblList, final int first, final int last) {
+        double sum = 0.0;
+        final int trueLast = Math.min(last + 1, dblList.size());
+        if (trueLast >= first) {
+            for (final Integer i : new IntegerRange(first, trueLast)) {
+                sum += dblList.get(i);
             }
         }
         return sum / (trueLast - first + 1);

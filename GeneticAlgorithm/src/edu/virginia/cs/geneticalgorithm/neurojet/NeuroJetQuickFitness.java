@@ -5,7 +5,6 @@ package edu.virginia.cs.geneticalgorithm.neurojet;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -15,10 +14,10 @@ import java.util.Map;
 
 import edu.virginia.cs.common.utils.ArrayNumberUtils;
 import edu.virginia.cs.common.utils.IntegerRange;
-import edu.virginia.cs.common.utils.Pause;
 import edu.virginia.cs.geneticalgorithm.Fitness;
 import edu.virginia.cs.geneticalgorithm.Genotype;
 import edu.virginia.cs.geneticalgorithm.StandardGenotype;
+import edu.virginia.cs.neurojet.model.NeuroJetActivity;
 
 /**
  * Calculates a short-circuit fitness to determine whether this is a reasonable choice of parameter settings
@@ -72,46 +71,32 @@ public final class NeuroJetQuickFitness implements Fitness {
             return x + y;
         }
 
-        private void generateQuickFitness(final File activityFile, final double desiredAct, final double timeStep) {
-            try {
-                final boolean fileFound = Pause.untilExists(activityFile, 2000);
-                if (!fileFound) {
-                    throw new IOException("Couldn't find file '" + activityFile.getPath() + "'");
-                }
-                final BufferedReader actReader = new BufferedReader(new FileReader(activityFile));
-                _desiredAct = desiredAct;
-                String line;
-                // timeStep is in ms. This should be equivalent to 1/timestep measured in seconds
-                final double HzConvFactor = 1000.0 / timeStep;
-                double actFitness = 0;
-                int numSums = 0;
-                double totalSum = 0.0;
-                double totalSoS = 0.0;
-                while ((line = actReader.readLine()) != null) {
-                    final String[] activities = line.split("\\s");
-                    final int lastElement = activities.length; // Not inclusive
-                    totalSum += ArrayNumberUtils.sum(activities);
-                    totalSoS += ArrayNumberUtils.sumOfSquares(activities);
-                    numSums += lastElement;
-                    for (final Integer i : new IntegerRange(0, 100, lastElement)) {
-                        final int curLast = Math.min(i + 99, lastElement); // Not inclusive
-                        final int curNumElems = curLast - i;
-                        final double curActivity = HzConvFactor * ArrayNumberUtils.mean(activities, i, curLast);
-                        final double deviationFrac = (desiredAct - curActivity) / desiredAct;
-                        actFitness += deviationFrac * deviationFrac * curNumElems;
-                    }
-                }
-                actReader.close();
-                if (numSums > 1 && !Double.isNaN(actFitness) && !Double.isInfinite(actFitness)) {
-                    // Calculate sample standard deviation
-                    _sampleStdDev = Math.sqrt((numSums * totalSoS - totalSum * totalSum) / (numSums * (numSums - 1)));
-                    // Calculate average squared deviation
-                    assert (actFitness > 0);
-                    _sqDevFromDesired = actFitness /= numSums;
+        private void generateQuickFitness(final NeuroJetActivity activityFile, final double desiredAct, final double timeStep) {
+            final List<List<Double>> activity = activityFile.getActivity();
+            _desiredAct = desiredAct;
+            double actFitness = 0;
+            int numSums = 0;
+            double totalSum = 0.0;
+            double totalSoS = 0.0;
+            for (final List<Double> withinTrial : activity) {
+                final int lastElement = withinTrial.size(); // Not inclusive
+                totalSum += ArrayNumberUtils.sum(withinTrial);
+                totalSoS += ArrayNumberUtils.sumOfSquares(withinTrial);
+                numSums += lastElement;
+                for (final Integer i : new IntegerRange(0, 100, lastElement)) {
+                    final int curLast = Math.min(i + 99, lastElement); // Not inclusive
+                    final int curNumElems = curLast - i;
+                    final double curActivity = ArrayNumberUtils.mean(withinTrial, i, curLast);
+                    final double deviationFrac = (desiredAct - curActivity) / desiredAct;
+                    actFitness += deviationFrac * deviationFrac * curNumElems;
                 }
             }
-            catch (final IOException e) {
-                System.out.println(e);
+            if (numSums > 1 && !Double.isNaN(actFitness) && !Double.isInfinite(actFitness)) {
+                // Calculate sample standard deviation
+                _sampleStdDev = Math.sqrt((numSums * totalSoS - totalSum * totalSum) / (numSums * (numSums - 1)));
+                // Calculate average squared deviation
+                assert (actFitness > 0);
+                _sqDevFromDesired = actFitness /= numSums;
             }
         }
     }
@@ -222,11 +207,11 @@ public final class NeuroJetQuickFitness implements Fitness {
             // Read the resulting activity files
             final double desiredAct = _updater.getDesiredAct(genotype);
             final double timeStep = _updater.getTimeStep(genotype);
-            final File trnAct = new File(tempDir, "trnWithinAct.dat");
+            final NeuroJetActivity trnAct = new NeuroJetActivity(tempDir, "trnWithinAct.dat", timeStep);
             _trnGenerator.generateQuickFitness(trnAct, desiredAct, timeStep);
             retval.add(_trnGenerator.getSampleStdDev());
             retval.add(_trnGenerator.getSquaredDeviationFromDesired());
-            final File tstAct = new File(tempDir, "tstWithinAct.dat");
+            final NeuroJetActivity tstAct = new NeuroJetActivity(tempDir, "tstWithinAct.dat", timeStep);
             _tstGenerator.generateQuickFitness(tstAct, desiredAct, timeStep);
             retval.add(_tstGenerator.getSampleStdDev());
             retval.add(_tstGenerator.getSquaredDeviationFromDesired());
