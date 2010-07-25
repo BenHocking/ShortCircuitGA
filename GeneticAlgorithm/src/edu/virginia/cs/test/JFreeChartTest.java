@@ -9,11 +9,13 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.vecmath.Point2d;
 import javax.vecmath.Point2i;
 
 import org.junit.Test;
 
 import edu.virginia.cs.common.gui.ScatterPlot;
+import edu.virginia.cs.common.gui.TimePlot;
 import edu.virginia.cs.common.utils.Trigger;
 
 /**
@@ -24,6 +26,7 @@ import edu.virginia.cs.common.utils.Trigger;
 public class JFreeChartTest {
 
     private TriggeredScatterPlot _scatterPlot = null;
+    private TriggeredTimePlot _timePlot = null;
 
     private static class TriggeredScatterPlot extends ScatterPlot implements Trigger {
 
@@ -54,13 +57,56 @@ public class JFreeChartTest {
 
     }
 
+    private static class TriggeredTimePlot extends TimePlot implements Trigger {
+
+        private final CountDownLatch _latch = new CountDownLatch(1);
+
+        private TriggeredTimePlot(final List<Point2d> data) throws HeadlessException {
+            super("Activity plot", data, "ms", "Activity (Hz)");
+        }
+
+        @Override
+        public void setVisible(final boolean v) {
+            super.setVisible(v);
+            if (!v) {
+                _latch.countDown();
+            }
+        }
+
+        @Override
+        public boolean waitForTrigger(final int maxWait) {
+            try {
+                _latch.await(maxWait, TimeUnit.MILLISECONDS);
+            }
+            catch (final InterruptedException e) {
+                /* do nothing */
+            }
+            return !isVisible();
+        }
+
+    }
+
     /**
      * Test to make sure that ScatterPlot can show up. TODO Needs to be improved.
      */
     @Test
     public void mainTest() {
         spyDemo();
-        _scatterPlot.waitForTrigger(60000);
+        timeDemo();
+        final int msToWait = 60000;
+        _scatterPlot.waitForTrigger(msToWait);
+        _timePlot.waitForTrigger(msToWait);
+    }
+
+    private void timeDemo() {
+        final List<Point2d> data = new ArrayList<Point2d>();
+        data.add(new Point2d(1.0, 2.5));
+        data.add(new Point2d(2.0, 2.25));
+        data.add(new Point2d(3.0, 2.75));
+        data.add(new Point2d(4.0, 2.35));
+        data.add(new Point2d(5.0, 2.85));
+        _timePlot = new TriggeredTimePlot(data);
+        _timePlot.setVisible(true);
     }
 
     private void spyDemo() {

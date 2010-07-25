@@ -57,7 +57,7 @@ public class ScatterPlot extends JFrame {
         }
         final DefaultTableXYDataset dataset = new DefaultTableXYDataset();
         dataset.addSeries(series);
-        return createSpyPanel(dataset, title, xAxisLabel, yAxisLabel);
+        return createScatterPlotPanel(dataset, title, xAxisLabel, yAxisLabel);
     }
 
     /**
@@ -68,8 +68,8 @@ public class ScatterPlot extends JFrame {
      * @param yAxisLabel Y-axis label
      * @return JPanel with scatter plot on it
      */
-    public static JPanel createSpyPanel(final XYDataset dataset, final String title, final String xAxisLabel,
-                                        final String yAxisLabel) {
+    public static JPanel createScatterPlotPanel(final XYDataset dataset, final String title, final String xAxisLabel,
+                                                final String yAxisLabel) {
         final JFreeChart chart = ChartFactory.createScatterPlot(title, xAxisLabel, yAxisLabel, dataset, PlotOrientation.VERTICAL,
                                                                 false, false, false);
         final ChartPanel panel = new ChartPanel(chart);
