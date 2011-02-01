@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.common.utils;
 
@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Utilities for element wise operations on arrays of Number objects
- * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
+ * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 6, 2010
  */
 public final class ArrayNumberUtils {
@@ -266,5 +266,26 @@ public final class ArrayNumberUtils {
             }
         }
         return retval;
+    }
+
+    /**
+     * Calculates the sample standard deviation of a list of list of doubles
+     * @param dblList List of list of doubles to calculate sample standard deviation for
+     * @return Sample standard deviation
+     */
+    public static double sampleStdDev(final List<List<Double>> dblList) {
+        int numSums = 0;
+        double totalSum = 0.0;
+        double totalSoS = 0.0;
+        for (final List<Double> withinTrial : dblList) {
+            totalSum += ArrayNumberUtils.sum(withinTrial);
+            totalSoS += ArrayNumberUtils.sumOfSquares(withinTrial);
+            numSums += withinTrial.size();
+        }
+        if (numSums > 1 && !Double.isNaN(totalSum)) {
+            // Calculate sample standard deviation
+            return Math.sqrt((numSums * totalSoS - totalSum * totalSum) / (numSums * (numSums - 1)));
+        }
+        return Double.NaN;
     }
 }

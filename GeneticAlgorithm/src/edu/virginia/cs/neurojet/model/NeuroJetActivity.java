@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.neurojet.model;
 
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.virginia.cs.common.utils.ArrayNumberUtils;
+import static edu.virginia.cs.common.utils.ArrayNumberUtils.*;
 import edu.virginia.cs.common.utils.Pause;
 
 /**
@@ -22,6 +22,8 @@ public class NeuroJetActivity extends File {
 
     private List<List<Double>> _activityList = null;
     private final double _timeStep;
+    private final File _signal;
+    private int _waitTime = 2000;
 
     /**
      * @param pathname Path to Activity file
@@ -29,6 +31,7 @@ public class NeuroJetActivity extends File {
      */
     public NeuroJetActivity(final String pathname, final double timeStep) {
         super(pathname);
+        _signal = new File(pathname + ".ready");
         _timeStep = timeStep;
     }
 
@@ -39,6 +42,7 @@ public class NeuroJetActivity extends File {
      */
     public NeuroJetActivity(final File parent, final String child, final double timeStep) {
         super(parent, child);
+        _signal = new File(parent, child + ".ready");
         _timeStep = timeStep;
     }
 
@@ -51,7 +55,7 @@ public class NeuroJetActivity extends File {
         final List<List<Double>> activity = getActivity();
         final List<Double> retval = new ArrayList<Double>();
         for (final List<Double> dblList : activity) {
-            retval.add(ArrayNumberUtils.mean(dblList));
+            retval.add(mean(dblList));
         }
         return retval;
     }
@@ -85,16 +89,16 @@ public class NeuroJetActivity extends File {
             // timeStep is in ms. This should be equivalent to 1 / (_timestep measured in seconds), or 1 / (_timestep / 1000)
             final double hzConvFactor = 1000.0 / _timeStep;
             try {
-                final boolean fileFound = Pause.untilExists(this, 2000);
+                final boolean fileFound = Pause.untilExists(_signal, _waitTime);
                 if (!fileFound) {
-                    throw new IOException("Couldn't find file '" + this.getPath() + "'");
+                    throw new IOException("Couldn't find file '" + _signal.getPath() + "'");
                 }
                 final BufferedReader actReader = new BufferedReader(new FileReader(this));
                 _activityList = new ArrayList<List<Double>>();
                 String line;
                 while ((line = actReader.readLine()) != null) {
                     final String[] activities = line.split("\\s");
-                    _activityList.add(ArrayNumberUtils.multiply(ArrayNumberUtils.toDoubleList(activities), hzConvFactor));
+                    _activityList.add(multiply(toDoubleList(activities), hzConvFactor));
                 }
                 actReader.close();
             }
@@ -103,5 +107,67 @@ public class NeuroJetActivity extends File {
             }
         }
         return _activityList;
+    }
+
+    /**
+     * Calculates the average activity over a specific interval
+     * @param intervalBegin First time step to include in interval
+     * @param intervalEnd Last time step to include in interval
+     * @return Activity averaged over a specific interval
+     */
+    public double averageActivity(final int intervalBegin, final int intervalEnd) {
+        final List<List<Double>> activity = getActivity();
+        double retval = 0.0;
+        for (final List<Double> withinTrial : activity) {
+            final int lastElement = withinTrial.size(); // 1-based
+            // Array is 0-based, but time steps are 1-based
+            final int curLast = Math.min(intervalEnd /* + 1 - 1 */, lastElement); // Not inclusive
+            retval += mean(withinTrial, intervalBegin - 1, curLast);
+        }
+        return retval / activity.size();
+    }
+
+    /**
+     * Calculates the average activity
+     * @return Averaged activity
+     */
+    public double averageActivity() {
+        return averageActivity(1, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Calculates the squared deviation from desired activity over a specific interval
+     * @param intervalBegin First time step to include in interval
+     * @param intervalEnd Last time step to include in interval
+     * @param desiredAct Desired activity
+     * @return Squared deviation of activity over a specific interval
+     */
+    public double squaredDeviation(final int intervalBegin, final int intervalEnd, final double desiredAct) {
+        final double deviation = averageActivity(intervalBegin, intervalEnd) - desiredAct;
+        return deviation * deviation;
+    }
+
+    /**
+     * Calculates the squared deviation from desired activity
+     * @param desiredAct Desired activity
+     * @return Squared deviation of activity
+     */
+    public double squaredDeviation(final double desiredAct) {
+        return squaredDeviation(1, Integer.MAX_VALUE, desiredAct);
+    }
+
+    /**
+     * @return Sample standard deviation of the activity
+     */
+    public double sampleStandardDeviation() {
+        return sampleStdDev(getActivity());
+    }
+
+    /**
+     * Sets the amount of time to wait in milliseconds
+     * @param waitTime Amount of time to wait for activity file to be read
+     */
+    public void setWaitTime(final int waitTime) {
+        _waitTime = waitTime;
     }
 }

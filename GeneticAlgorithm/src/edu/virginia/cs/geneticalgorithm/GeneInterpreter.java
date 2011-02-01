@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
@@ -15,4 +15,12 @@ public interface GeneInterpreter {
      * @return Value corresponding to the requested {@link Genotype}
      */
     public String generate(final Genotype genotype);
+
+    /**
+     * Generates a {@link Gene} capable of generating the requested value
+     * @param string Value to base Gene on
+     * @param genotype Genotype to use to decode (used by complicated GeneInterpreters)
+     * @return Generated Gene
+     */
+    public Gene invert(final String string, final Genotype genotype);
 }

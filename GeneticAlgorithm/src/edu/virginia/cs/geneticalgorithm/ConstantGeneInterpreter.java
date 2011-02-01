@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
@@ -11,6 +11,7 @@ package edu.virginia.cs.geneticalgorithm;
 public class ConstantGeneInterpreter implements GeneInterpreter {
 
     private final String _constant;
+    private Gene _defaultGene = new IntervalGene(0.5);
 
     /**
      * Constructor taking a {@link java.lang.String String} argument, which might or might not be parsable as a number.
@@ -29,10 +30,27 @@ public class ConstantGeneInterpreter implements GeneInterpreter {
     }
 
     /**
+     * Sets the gene to return when invert is invoked
+     * @param g Gene to return when invert is invoked
+     * @see ConstantGeneInterpreter#invert(String, Genotype)
+     */
+    public void setDefaultGene(final Gene g) {
+        _defaultGene = g;
+    }
+
+    /**
      * @see edu.virginia.cs.geneticalgorithm.GeneInterpreter#generate(edu.virginia.cs.geneticalgorithm.Genotype)
      */
     @Override
     public String generate(final Genotype genotype) {
         return _constant;
+    }
+
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.GeneInterpreter#invert(java.lang.String, Genotype)
+     */
+    @Override
+    public Gene invert(final String string, final Genotype genotype) {
+        return _defaultGene;
     }
 }

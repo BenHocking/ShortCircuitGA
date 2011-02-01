@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm.neurojet;
 
@@ -9,25 +9,29 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import javax.vecmath.GMatrix;
 
 import edu.tufts.cs.geometry.PCA;
 import edu.tufts.cs.geometry.PCA.PrincipalComponent;
+import edu.virginia.cs.geneticalgorithm.DecayingIntervalMutator;
 import edu.virginia.cs.geneticalgorithm.Distribution;
 import edu.virginia.cs.geneticalgorithm.DistributionMember;
-import edu.virginia.cs.geneticalgorithm.Fitness;
+import edu.virginia.cs.geneticalgorithm.FitnessFactory;
 import edu.virginia.cs.geneticalgorithm.GeneticFactory;
 import edu.virginia.cs.geneticalgorithm.Genotype;
 import edu.virginia.cs.geneticalgorithm.IntervalGene;
 import edu.virginia.cs.geneticalgorithm.IntervalGeneticFactory;
+import edu.virginia.cs.geneticalgorithm.Mutator;
+import edu.virginia.cs.geneticalgorithm.ProxyFitnessFactory;
 import edu.virginia.cs.geneticalgorithm.Reproduction;
-import edu.virginia.cs.geneticalgorithm.ShortCircuitFitness;
+import edu.virginia.cs.geneticalgorithm.ShortCircuitFitnessFactory;
 import edu.virginia.cs.geneticalgorithm.StandardGenotype;
 
 /**
  * Driver for genetic algorithm exploring NeuroJet space
- * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
+ * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 16, 2010
  */
 public final class NeuroJetGeneticAlgorithm {
@@ -36,8 +40,9 @@ public final class NeuroJetGeneticAlgorithm {
     private final static File NJ = new File("/Users/bhocking/Documents/workspace/NeuroJet/build/NeuroJet");
     private final static File WORKINGDIR = new File("/Users/bhocking/Documents/workspace/ShortCircuitGA/scripts");
     private final static int GENOTYPE_SIZE = 21; // 0 - 20
+    private final static double POST_SCALE_FACTOR = 4e7;
     private final ScriptUpdater _updater;
-    private final Fitness _fitnessFn;
+    private final FitnessFactory _fitnessFactory;
     private final GeneticFactory _factory;
     private final Reproduction _reproduction;
 
@@ -52,27 +57,35 @@ public final class NeuroJetGeneticAlgorithm {
     public NeuroJetGeneticAlgorithm(final int seed, final int popSize) {
         _updater = new ScriptUpdater();
         buildScriptUpdater();
-        final List<File> quickScriptFiles = Collections.singletonList(new File(WORKINGDIR, "trace_quick.nj"));
-        final Fitness quickFitnessFn = new NeuroJetQuickFitness(quickScriptFiles, _updater, NJ, WORKINGDIR);
         final List<File> traceScriptFiles = Collections.singletonList(new File(WORKINGDIR, "trace_full.nj"));
-        final Fitness traceFitnessFn = new NeuroJetTraceFitness(traceScriptFiles, _updater, NJ, WORKINGDIR);
-        _fitnessFn = new ShortCircuitFitness(quickFitnessFn, 5e5, traceFitnessFn, 3);
-        ((ShortCircuitFitness) _fitnessFn).setPostScale(1e9);
-        _factory = new IntervalGeneticFactory(seed);
+        final NeuroJetTraceFitnessFactory traceFitnessFactory = new NeuroJetTraceFitnessFactory(traceScriptFiles, _updater, NJ,
+                                                                                                WORKINGDIR);
+        final ProxyFitnessFactory quickFitnessFactory = new NeuroJetQuickFitnessFactory(traceFitnessFactory);
+        _fitnessFactory = new ShortCircuitFitnessFactory(quickFitnessFactory, Collections.singletonList(5e5),
+                                                         NeuroJetTraceFitness.NUM_FIT_VALS);
+        ((ShortCircuitFitnessFactory) _fitnessFactory).setPostScale(POST_SCALE_FACTOR);
+        final double xOverProb = 0.6;
+        final double geneXOverProb = 0.25;
+        final double mutateProb = 0.03;
+        final double probDecay = -0.0002; // Negative value meaning the mutate probability actually increases (slightly)
+        final double mutateSigma = 0.2;
+        final double sigmaDecay = 0.00005; // Sigma decays by about 5% (0.9995^100) every generation
+        final Mutator mutator = new DecayingIntervalMutator(mutateProb, probDecay, mutateSigma, sigmaDecay, new Random(seed));
+        _factory = new IntervalGeneticFactory(seed, xOverProb, geneXOverProb, mutator);
         _population = _factory.createPopulation(popSize, GENOTYPE_SIZE);
-        final boolean allowDuplicates = true;
+        final boolean allowDuplicates = false;
         final boolean keepHistory = true;
         _reproduction = new Reproduction(allowDuplicates, keepHistory);
         _reproduction.setNumElites(Math.round(popSize * 0.1f));
     }
 
     /**
-     * @see edu.virginia.cs.geneticalgorithm.Reproduction#reproduce(List, Fitness, edu.virginia.cs.geneticalgorithm.Select,
+     * @see edu.virginia.cs.geneticalgorithm.Reproduction#reproduce(List, FitnessFactory, edu.virginia.cs.geneticalgorithm.Select,
      * edu.virginia.cs.geneticalgorithm.Crossover)
      * 
      */
     public void reproduce() {
-        _population = _reproduction.reproduce(_population, _fitnessFn, _factory.getSelectFunction(),
+        _population = _reproduction.reproduce(_population, _fitnessFactory, _factory.getSelectFunction(),
                                               _factory.getCrossoverFunction());
     }
 
@@ -100,7 +113,7 @@ public final class NeuroJetGeneticAlgorithm {
         _updater.addIntegerMapping(2, "D", 3, 15); // dendFilterWidth
         _updater.addIntegerMapping(3, "E", 1, 5); // minAxDelay
         _updater.addIntegerMapping(4, "F", "E", 7); // maxAxDelay
-        _updater.addDesiredActMapping(5, "G", 0.5, 2.5); // Desired activity (Hz)
+        _updater.addDesiredActMapping(5, "G", 1, 5); // Desired activity (Hz)
         _updater.addDoubleMapping(6, "H", 0, 1); // Synaptic failure
         _updater.addDoubleMapping(7, "I", 90, 190); // Off-rate time constant
         _updater.addDoubleMapping(8, "J", 2, 19); // On-rate time constant

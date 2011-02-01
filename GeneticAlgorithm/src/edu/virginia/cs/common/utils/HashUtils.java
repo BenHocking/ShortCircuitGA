@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.common.utils;
 
@@ -10,7 +10,7 @@ import java.util.Collection;
  * Original version of this code came from http://www.javapractices.com/topic/TopicAction.do?Id=28
  * 
  * Collected methods which allow easy implementation of <code>hashCode</code>.
- * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
+ * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 24, 2010
  */
 public final class HashUtils {

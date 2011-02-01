@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.test;
 
@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import edu.virginia.cs.geneticalgorithm.AbstractFitness;
 import edu.virginia.cs.geneticalgorithm.Fitness;
+import edu.virginia.cs.geneticalgorithm.FitnessFactory;
 import edu.virginia.cs.geneticalgorithm.Gene;
 import edu.virginia.cs.geneticalgorithm.GeneticFactory;
 import edu.virginia.cs.geneticalgorithm.Genotype;
@@ -25,20 +26,38 @@ import edu.virginia.cs.geneticalgorithm.Reproduction;
  */
 public final class IntervalGeneticFactoryTest {
 
-    private final Fitness _fitFn = new TrivialIntervalFitness();
+    private final FitnessFactory _fitFnFactory = new TrivialIntervalFitnessFactory();
     private static int POP_SIZE = 20;
     private static int GENOTYPE_SIZE = 5;
     private static int NUM_GENERATIONS = 20;
 
-    private class TrivialIntervalFitness extends AbstractFitness {
+    private class TrivialIntervalFitnessFactory implements FitnessFactory {
 
-        @Override
-        public List<Double> fitnessValues(final Genotype individual) {
-            double retval = 0;
-            for (final Gene g : individual) {
-                retval += ((IntervalGene) g).getValue();
+        private class TrivialIntervalFitness extends AbstractFitness {
+
+            Genotype _genotype;
+
+            TrivialIntervalFitness(final Genotype genotype) {
+                _genotype = genotype;
             }
-            return Collections.singletonList(retval);
+
+            @Override
+            public List<Double> fitnessValues() {
+                double retval = 0;
+                for (final Gene g : _genotype) {
+                    retval += ((IntervalGene) g).getValue();
+                }
+                return Collections.singletonList(retval);
+            }
+
+        }
+
+        /**
+         * @see edu.virginia.cs.geneticalgorithm.FitnessFactory#createFitness(edu.virginia.cs.geneticalgorithm.Genotype)
+         */
+        @Override
+        public Fitness createFitness(final Genotype individual) {
+            return new TrivialIntervalFitness(individual);
         }
 
     }
@@ -56,7 +75,8 @@ public final class IntervalGeneticFactoryTest {
         final boolean keepHistory = false;
         Reproduction reproduction = new Reproduction(allowDuplicates, keepHistory);
         for (int i = 0; i < NUM_GENERATIONS; ++i) {
-            population = reproduction.reproduce(population, _fitFn, factory.getSelectFunction(), factory.getCrossoverFunction());
+            population = reproduction.reproduce(population, _fitFnFactory, factory.getSelectFunction(),
+                                                factory.getCrossoverFunction());
         }
         Assert.assertEquals(3.793964434630042, reproduction.getBestFits().get(0).get(0), tolerance);
         // As POP_SIZE -> inf, you would expect reproduction.getMeanFits().get(0) -> GENOTYPE_SIZE / 2 (i.e., 2.5)
@@ -66,7 +86,8 @@ public final class IntervalGeneticFactoryTest {
         allowDuplicates = false;
         reproduction = new Reproduction(allowDuplicates, keepHistory);
         for (int i = 0; i < NUM_GENERATIONS; ++i) {
-            population = reproduction.reproduce(population, _fitFn, factory.getSelectFunction(), factory.getCrossoverFunction());
+            population = reproduction.reproduce(population, _fitFnFactory, factory.getSelectFunction(),
+                                                factory.getCrossoverFunction());
         }
         Assert.assertEquals(4.608942434287397, reproduction.getBestFit().get(0), tolerance);
         Assert.assertEquals(4.129829357849781, reproduction.getMeanFit(), tolerance);

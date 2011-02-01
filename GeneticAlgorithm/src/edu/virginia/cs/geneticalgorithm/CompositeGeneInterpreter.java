@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
@@ -49,4 +49,18 @@ public class CompositeGeneInterpreter implements GeneInterpreter {
         return String.valueOf(MathUtils.scale(lb, ig.getValue(), ub));
     }
 
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.GeneInterpreter#invert(java.lang.String, Genotype)
+     */
+    @Override
+    public Gene invert(final String s, final Genotype genotype) {
+        if (_integerOnly) {
+            final Integer lb = Integer.parseInt(_lower.generate(genotype));
+            final Integer ub = Integer.parseInt(_upper.generate(genotype));
+            return new IntervalGene(MathUtils.scaleIntInverse(lb, Integer.valueOf(s), ub));
+        }
+        final Double lb = Double.parseDouble(_lower.generate(genotype));
+        final Double ub = Double.parseDouble(_upper.generate(genotype));
+        return new IntervalGene(MathUtils.scaleInverse(lb, Double.valueOf(s), ub));
+    }
 }

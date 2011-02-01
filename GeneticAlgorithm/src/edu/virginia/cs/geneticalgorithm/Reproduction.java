@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import edu.virginia.cs.common.utils.UnorderedPair;
 
@@ -26,6 +27,15 @@ public final class Reproduction {
     private final List<Distribution> _popHist = new ArrayList<Distribution>();
     private int _numElites = 0;
     static int DEBUG_LEVEL = 1;
+    private static Semaphore _monitor = new Semaphore(1);
+
+    /**
+     * Sets the number of concurrent processes to allow from this class
+     * @param numProcesses Number of concurrent processes to allow from this class
+     */
+    public static void SetNumProcesses(final int numProcesses) {
+        _monitor = new Semaphore(numProcesses);
+    }
 
     /**
      * Constructor specifying whether to allow duplicates and whether to keep all history (requires more memory)
@@ -40,46 +50,58 @@ public final class Reproduction {
     /**
      * Uses an existing population to find the next generation of the population.
      * @param population Current generation ({@link java.util.List List} of {@link Genotype Genotypes}).
-     * @param fitFn {@link Fitness} function used to determine which members reproduce and how well
+     * @param fitFactory {@link FitnessFactory} factory used to determine which members reproduce and how well
      * @param selFn {@link Select} function used for selecting individuals to reproduce
      * @param xFn {@link Crossover} function used for creating children from parent {@link Genotype Genotypes}
      * @return The new generation
      */
-    public List<Genotype> reproduce(final List<Genotype> population, final Fitness fitFn, final Select selFn, final Crossover xFn) {
-        return reproduce(population, population.size(), fitFn, selFn, xFn);
+    public List<Genotype> reproduce(final List<Genotype> population, final FitnessFactory fitFactory, final Select selFn,
+                                    final Crossover xFn) {
+        return reproduce(population, population.size(), fitFactory, selFn, xFn);
     }
 
     /**
      * Uses an existing population to find the next generation of the population.
      * @param population Current generation ({@link java.util.List List} of {@link Genotype Genotypes}).
      * @param newPopSize Population size of the new population (allows the population to shrink or grow).
-     * @param fitFn {@link Fitness} function used to determine which members reproduce and how well
+     * @param fitFactory {@link Fitness} function used to determine which members reproduce and how well
      * @param selFn {@link Select} function used for selecting individuals to reproduce
      * @param xFn {@link Crossover} function used for creating children from parent {@link Genotype Genotypes}
      * @return The new generation
      */
-    public List<Genotype> reproduce(final List<Genotype> population, final int newPopSize, final Fitness fitFn, final Select selFn,
-                                    final Crossover xFn) {
+    public List<Genotype> reproduce(final List<Genotype> population, final int newPopSize, final FitnessFactory fitFactory,
+                                    final Select selFn, final Crossover xFn) {
         double totalFit = 0;
         double bestFit = 0; // Best is maximal, and all fitness values need to be positive
         List<Double> bestFitList = new ArrayList<Double>();
         final Distribution distribution = new Distribution();
         int ctr = 0;
+        String bestDesc = "";
         if (DEBUG_LEVEL == 1) System.out.print("Evaluating individual:");
         for (final Genotype i : population) {
             if (DEBUG_LEVEL > 1) System.out.println("Finding fitness of individual #" + ++ctr);
             if (DEBUG_LEVEL == 1) System.out.print(" " + ++ctr);
-            final List<Double> fitList = fitFn.fitnessValues(i);
-            final double fit = fitFn.totalFitness(i);
+            try {
+                _monitor.acquire();
+            }
+            catch (final InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            final Fitness fitFn = fitFactory.createFitness(i);
+            final List<Double> fitList = fitFn.fitnessValues();
+            final double fit = fitFn.totalFitness();
+            _monitor.release();
             if (DEBUG_LEVEL > 1) System.out.println("\tfitness: " + fit);
             distribution.add(new DistributionMember(fit, fitList, i));
             totalFit += fit;
             if (fit > bestFit) {
                 bestFit = fit;
                 bestFitList = fitList;
+                bestDesc = fitFn.toString();
             }
         }
         if (DEBUG_LEVEL == 1) System.out.println(" ... done");
+        if (DEBUG_LEVEL == 1) System.out.println("\tBest = " + bestDesc);
         // Calculate statistics
         final List<Double> best = new ArrayList<Double>();
         best.add(bestFit);

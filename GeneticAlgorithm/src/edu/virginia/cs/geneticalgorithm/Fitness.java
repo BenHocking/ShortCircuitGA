@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
@@ -14,15 +14,13 @@ import java.util.List;
 public interface Fitness {
 
     /**
-     * @param individual {@link Genotype} to return the multi-objective fitness values for.
      * @return Multi-objective fitness values
      */
-    public List<Double> fitnessValues(final Genotype individual);
+    public List<Double> fitnessValues();
 
     /**
      * Converts a multi-objective fitness into a single fitness value.
-     * @param individual {@link Genotype} to return the multi-objective fitness values for.
      * @return Overall Fitness
      */
-    public double totalFitness(final Genotype individual);
+    public double totalFitness();
 }

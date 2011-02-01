@@ -1,5 +1,5 @@
 @CreateVar(
-  numTrainTrials 300
+  numTrainTrials 200
   dwellTime 144       # ms
   OffRate InsertIHere # ms
   OnRate InsertJHere           # ms
@@ -77,6 +77,9 @@
 ?If(strcmp[^(setLambda),Insert:P:Here]=0) {
   @SetVar(setLambda 0.5) # ms
 }
+?If(strcmp[^(mePct),Insert:X:Here]=0) {
+  @SetVar(mePct 0.3) # ms
+}
 
 @PrintVar(InternrnExcDecayRate filePostfix InternrnAxonalDelay)
 
@@ -99,8 +102,11 @@
   FBInternrnAxonalDelay ^Num2Int(^Calc(round[^(InternrnAxonalDelay)/^(deltaT)]))
   FFInternrnAxonalDelay 1 # to allow it to be quasi in-sync
   InternrnExcDecay ^Calc(1-exp[-^(deltaT)/^(InternrnExcDecayRate)])
-#  ResetPattern InitPtn
+  ResetPattern zeros
 )
+
+@MakeRandSequence(-name zeros -len 1 -p 0)
+
 @SetVar(
   ExtExc ^Calc(^(ni) * ^(Activity))
 )
@@ -110,7 +116,8 @@
 ?If(exists[SynFailRate]) { @SetVar(SynFailRate ^(mySFR)) }
 
 @CreateVar(
-  me ^Calc(round[^(ni) * ^(ActivityHz) * ^(mePct) / 22.5]) # 22.5 is arbitrary
+# mePct varies from 0.2 to 0.5
+  me ^Calc(round[^(ni) * ^(mePct) / 10]) # 10 is arbitrary
 )
 
 ?If(exists[PyrToInternrnWtAdjDecay]) {
@@ -161,7 +168,7 @@
 @CreateNetwork(-mindelay ^(minAxDelay) -maxdelay ^(maxAxDelay) -dist uniform -low ^Calc(0.9 * ^(wStart)) -high ^Calc(1.1 * ^(wStart)))
 
 @DeleteData(InitPtn)
-@MakeRandSequence(-name InitPtn -Nend ^(ni) -len ^(Period) -p ^(Activity))
+@MakeRandSequence(-name InitPtn -Nend ^(ni) -len ^(Period) -p ^Calc(^(mePct)*^(Activity)/^(MidPoint)))
 
 @MakeSequence(-name blank -len ^(tonelen) -non 0 -Nstart 1)
 
@@ -181,17 +188,38 @@
 
 @Test(-name testTraceSeq -time ^SequenceLength(-from testTraceSeq) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
 @PrintVar(AveTestAct)
+@CreateVar(tempTest 0)
 %(i 1 ^(numTrainTrials)) {
   @ResetFiring()
   @Test(-name InitPtn -time ^SequenceLength(-from InitPtn) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
   @Train(-name trainTraceSeq -trials 1 -nocomp -norecord 7 TrainingThresholds TrainingBusLines TrainingIntBusLines TrainingKWeights TrainingInhibitions TrainingFBInternrnExc TrainingFFInternrnExc)
-  @DeleteData(TrainingBuffer)
   @PrintVar(AveTrainAct)
-  @Test(-name testTraceSeq -time ^SequenceLength(-from testTraceSeq) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
-  @PrintVar(AveTestAct)
-  ?If(^(i) = ^(numTrainTrials)) {
-    @SaveData(-from TestingBuffer -to tstBuff.dat)
+  ?If(^(i) = 1) {
+    @SaveData(-from TrainingActivity -to trnWithinAct.dat)
+    @SaveData(-from me -to trnWithinAct.dat.ready)
   }
-  @DeleteData(TestingBuffer)
+  @DeleteData(TrainingBuffer)
+  @SetVar(tempTest 0)
+  ?If(^(i) = 1) {
+    @SetVar(tempTest 1)
+  }  
+  ?If(^(i) = ^(numTrainTrials)) {
+    @SetVar(tempTest 1)
+  }  
+  ?If(^(tempTest) = 1) {
+    @ResetFiring()
+    @Test(-name InitPtn -time ^SequenceLength(-from InitPtn) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
+    @Test(-name testTraceSeq -time ^SequenceLength(-from testTraceSeq) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
+    @PrintVar(AveTestAct)
+    ?If(^(i) = 1) {
+      @SaveData(-from TestingActivity -to tstWithinAct.dat)
+      @SaveData(-from me -to tstWithinAct.dat.ready)
+    }
+    ?If(^(i) = ^(numTrainTrials)) {
+      @SaveData(-from TestingBuffer -to tstBuff.dat)
+      @SaveData(-from me -to tstBuff.dat.ready)
+    }
+    @DeleteData(TestingBuffer)
+  }
 }
 @DeleteData(TrainingActivity)

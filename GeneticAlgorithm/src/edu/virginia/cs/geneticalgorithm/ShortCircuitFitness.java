@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Composite {@link Fitness} class that only evaluates the second fitness function if the first fitness function returns result(s)
@@ -16,15 +14,13 @@ import java.util.Map;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Jun 12, 2010
  */
-public final class ShortCircuitFitness extends AbstractFitness {
+public class ShortCircuitFitness extends AbstractFitness {
 
-    private final Fitness _preFit;
+    private final ProxyFitness _preFit;
     private final List<Double> _preThreshold;
     private final Fitness _postFit;
     private final int _postFitLen;
-    private final boolean _useTotalFitness;
     private double _postScale = 1.0; // Amount to scale post fitness by
-    private final Map<Genotype, List<Double>> _fitMap = new HashMap<Genotype, List<Double>>();
     final boolean _useThresholdAsLimit = true;
 
     /**
@@ -34,7 +30,7 @@ public final class ShortCircuitFitness extends AbstractFitness {
      * the postFit {@link Fitness} function to be evaluated
      * @param postFit {@link Fitness} function that is run if the threshold is met
      */
-    public ShortCircuitFitness(final Fitness preFit, final List<Double> preThreshold, final Fitness postFit) {
+    public ShortCircuitFitness(final ProxyFitness preFit, final List<Double> preThreshold, final Fitness postFit) {
         this(preFit, preThreshold, postFit, 1);
     }
 
@@ -46,47 +42,21 @@ public final class ShortCircuitFitness extends AbstractFitness {
      * @param postFit {@link Fitness} function that is run if the threshold is met
      * @param postFitLen Number of fitness values returned by the postFit {@link Fitness} function
      */
-    public ShortCircuitFitness(final Fitness preFit, final List<Double> preThreshold, final Fitness postFit, final int postFitLen) {
+    public ShortCircuitFitness(final ProxyFitness preFit, final List<Double> preThreshold, final Fitness postFit,
+                               final int postFitLen) {
         _preFit = preFit;
         _preThreshold = preThreshold;
         _postFit = postFit;
         _postFitLen = postFitLen;
-        _useTotalFitness = false;
     }
 
-    /**
-     * Constructor
-     * @param preFit {@link Fitness} function that requires less time to run than postFit and can often act as a reasonable proxy
-     * @param preThreshold Threshold value which the total fitness must exceed for the postFit {@link Fitness} function to be
-     * evaluated
-     * @param postFit {@link Fitness} function that is run if the threshold is met
-     */
-    public ShortCircuitFitness(final Fitness preFit, final double preThreshold, final Fitness postFit) {
-        this(preFit, preThreshold, postFit, 1);
-    }
-
-    /**
-     * Constructor
-     * @param preFit {@link Fitness} function that requires less time to run than postFit and can often act as a reasonable proxy
-     * @param preThreshold Threshold value which the total fitness must exceed for the postFit {@link Fitness} function to be
-     * evaluated
-     * @param postFit {@link Fitness} function that is run if the threshold is met
-     * @param postFitLen Number of fitness values returned by the postFit {@link Fitness} function
-     */
-    public ShortCircuitFitness(final Fitness preFit, final double preThreshold, final Fitness postFit, final int postFitLen) {
-        _preFit = preFit;
-        _preThreshold = Collections.singletonList(preThreshold);
-        _postFit = postFit;
-        _postFitLen = postFitLen;
-        _useTotalFitness = true;
-    }
-
-    private boolean passedThreshold(final List<Double> fitVals, final Genotype individual) {
+    private boolean passedThreshold() {
         boolean passedThreshold = true;
-        if (_useTotalFitness) {
-            passedThreshold = (_preFit.totalFitness(individual) > _preThreshold.get(0));
+        if (_preThreshold.size() == 1) { // Only comparing against total fitness
+            passedThreshold = (_preFit.totalFitness() > _preThreshold.get(0));
         }
         else {
+            final List<Double> fitVals = _preFit.fitnessValues();
             if (fitVals.size() > _preThreshold.size())
                 throw new RuntimeException("Number of fitness values from first fitness function exceeds size of threshold test.");
             for (int i = 0; i < fitVals.size(); ++i) {
@@ -100,23 +70,22 @@ public final class ShortCircuitFitness extends AbstractFitness {
     }
 
     /**
-     * @see edu.virginia.cs.geneticalgorithm.Fitness#fitnessValues(edu.virginia.cs.geneticalgorithm.Genotype)
+     * @see edu.virginia.cs.geneticalgorithm.Fitness#fitnessValues()
      */
     @Override
-    public List<Double> fitnessValues(final Genotype individual) {
-        List<Double> retval = _fitMap.get(individual);
-        if (retval != null) return retval;
-        retval = _preFit.fitnessValues(individual);
-        if (passedThreshold(retval, individual)) {
+    public List<Double> fitnessValues() {
+        final List<Double> retval = _preFit.fitnessValues();
+        if (passedThreshold()) {
             // Evaluate the post-fitness function
-            retval.addAll(_postFit.fitnessValues(individual));
+            retval.addAll(_postFit.fitnessValues());
         }
         else {
+            if (_postFit instanceof HaltableFitness) {
+                ((HaltableFitness) _postFit).halt();
+            }
             // Assign zero for the post-fitness function values
             retval.addAll(Collections.nCopies(_postFitLen, 0.0));
         }
-        // Create copy in case genotype is changed after the fitness has been calculated
-        _fitMap.put(individual.clone(), retval);
         return retval;
     }
 
@@ -139,23 +108,27 @@ public final class ShortCircuitFitness extends AbstractFitness {
     }
 
     /**
-     * @see edu.virginia.cs.geneticalgorithm.Fitness#totalFitness(edu.virginia.cs.geneticalgorithm.Genotype)
+     * @see edu.virginia.cs.geneticalgorithm.Fitness#totalFitness()
      */
     @Override
-    public double totalFitness(final Genotype individual) {
+    public double totalFitness() {
         // Makes sure fitness is calculated (and possibly gets the values required for checking threshold)
-        final List<Double> fitVals = fitnessValues(individual);
-        double retval = _preFit.totalFitness(individual);
-        if (passedThreshold(fitVals, individual)) {
+        double retval = _preFit.totalFitness();
+        if (passedThreshold()) {
             // In many cases, we want the threshold of the proxy to also be its maximum attainable value. That way, when we run the
             // post-fitness function (because the threshold has been reached), we don't end up giving the proxy value (which is
             // meant to substitute for the post-fitness function after all) too much weight.
             if (_useThresholdAsLimit) {
                 retval = _preThreshold.get(0);
             }
-            retval += _postScale * _postFit.totalFitness(individual);
+            retval += _postScale * _postFit.totalFitness();
         }
         return retval;
     }
 
+    @Override
+    public String toString() {
+        return "{hash = " + hashCode() + "\n\tpre = " + _preFit.toString() + "\n\tthreshold = " + _preThreshold.toString()
+               + "\n\tpost = " + _postFit.toString() + "}";
+    }
 }

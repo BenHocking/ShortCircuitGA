@@ -1,14 +1,16 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.common.utils;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * Class allowing easy iterating over a range of integers.
- * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
+ * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 4, 2010
  */
 public final class IntegerRange implements Iterable<Integer>, Iterator<Integer> {
@@ -71,6 +73,17 @@ public final class IntegerRange implements Iterable<Integer>, Iterator<Integer> 
         if (!hasNext()) throw new NoSuchElementException("next called out of range");
         final Integer retval = _currentlyAt;
         _currentlyAt += _step;
+        return retval;
+    }
+
+    /**
+     * @return this range as a Set
+     */
+    public Set<Integer> asSet() {
+        final Set<Integer> retval = new HashSet<Integer>();
+        for (final Integer i : this) {
+            retval.add(i);
+        }
         return retval;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.common.utils;
 
@@ -9,7 +9,7 @@ import java.util.Iterator;
 
 /**
  * Based very closely on HashUtils, as any class modifying equals should modify hashCode (and vice-versa)
- * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
+ * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 24, 2010
  */
 public final class EqualUtils {

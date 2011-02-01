@@ -1,105 +1,28 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm.neurojet;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import edu.virginia.cs.common.utils.ArrayNumberUtils;
-import edu.virginia.cs.common.utils.IntegerRange;
 import edu.virginia.cs.geneticalgorithm.Fitness;
-import edu.virginia.cs.geneticalgorithm.Genotype;
-import edu.virginia.cs.geneticalgorithm.StandardGenotype;
+import edu.virginia.cs.geneticalgorithm.ProxyFitness;
 import edu.virginia.cs.neurojet.model.NeuroJetActivity;
 
 /**
  * Calculates a short-circuit fitness to determine whether this is a reasonable choice of parameter settings
- * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
+ * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 27, 2010
  */
-public final class NeuroJetQuickFitness implements Fitness {
+public final class NeuroJetQuickFitness implements ProxyFitness {
 
-    private final File _mainFile;
-    private final List<File> _scriptFiles;
-    private final ScriptUpdater _updater;
-    private final File _neuroJet;
-    private final File _workingDir;
+    private final NeuroJetTraceFitness _traceFitness;
     private final NeuroJetQuickFitnessGenerator _trnGenerator = new NeuroJetQuickFitnessGenerator();
     private final NeuroJetQuickFitnessGenerator _tstGenerator = new NeuroJetQuickFitnessGenerator();
-    private static final int NUM_FIT_VALS = 6; // Run time + test ssd + test dev + train ssd + train dev + directory id
-    private static Integer _counter = 0;
-    private final Map<Genotype, List<Double>> _fitMap = new HashMap<Genotype, List<Double>>();
-
-    private final class NeuroJetQuickFitnessGenerator {
-
-        private final static double MATCHING_SSD = 0.015; // The value we want the sampleStdDev to be
-        private double _sampleStdDev = Double.NaN;
-        private double _sqDevFromDesired = Double.NaN;
-        private double _desiredAct = Double.NaN;
-
-        double getSampleStdDev() {
-            return _sampleStdDev;
-        }
-
-        double getSquaredDeviationFromDesired() {
-            return _sqDevFromDesired;
-        }
-
-        double getSampleStdDevFitness() {
-            final double divisor = (_sampleStdDev < MATCHING_SSD ? 100 * (MATCHING_SSD - _sampleStdDev)
-                                                                : (_sampleStdDev - MATCHING_SSD))
-                                   / (_desiredAct * _desiredAct);
-            return (divisor > 0) ? 0.01 / divisor : 1e4; // Almost impossible for divisor to be zero. Almost.
-        }
-
-        // Initially, we want this deviation to be the primary contributor
-        double getSquaredDeviationFromDesiredFitness() {
-            return 1000.0 / _sqDevFromDesired;
-        }
-
-        double overallFitness() {
-            final double x = getSampleStdDevFitness();
-            final double y = getSquaredDeviationFromDesiredFitness();
-            assert (y > x);
-            return x + y;
-        }
-
-        private void generateQuickFitness(final NeuroJetActivity activityFile, final double desiredAct, final double timeStep) {
-            final List<List<Double>> activity = activityFile.getActivity();
-            _desiredAct = desiredAct;
-            double actFitness = 0;
-            int numSums = 0;
-            double totalSum = 0.0;
-            double totalSoS = 0.0;
-            for (final List<Double> withinTrial : activity) {
-                final int lastElement = withinTrial.size(); // Not inclusive
-                totalSum += ArrayNumberUtils.sum(withinTrial);
-                totalSoS += ArrayNumberUtils.sumOfSquares(withinTrial);
-                numSums += lastElement;
-                for (final Integer i : new IntegerRange(0, 100, lastElement)) {
-                    final int curLast = Math.min(i + 99, lastElement); // Not inclusive
-                    final int curNumElems = curLast - i;
-                    final double curActivity = ArrayNumberUtils.mean(withinTrial, i, curLast);
-                    final double deviationFrac = (desiredAct - curActivity) / desiredAct;
-                    actFitness += deviationFrac * deviationFrac * curNumElems;
-                }
-            }
-            if (numSums > 1 && !Double.isNaN(actFitness) && !Double.isInfinite(actFitness)) {
-                // Calculate sample standard deviation
-                _sampleStdDev = Math.sqrt((numSums * totalSoS - totalSum * totalSum) / (numSums * (numSums - 1)));
-                // Calculate average squared deviation
-                assert (actFitness > 0);
-                _sqDevFromDesired = actFitness /= numSums;
-            }
-        }
-    }
+    private final List<Double> _fitnessValues = new ArrayList<Double>();
+    private static final int NUM_FIT_VALS = 5; // Run time + test ssd + test dev + train ssd + train dev
 
     // Made package just to avoid warnings about dead code
     static final boolean DELETE_WORKING_FILES = true;
@@ -107,137 +30,62 @@ public final class NeuroJetQuickFitness implements Fitness {
 
     /**
      * Constructor
-     * @param scriptFiles {@link java.util.List List} of script files that NeuroJet needs to run the experiment. The first file in
-     * the list is the one actually run, with the other files presumably a dependency of it.
-     * @param updater {@link ScriptUpdater} that contains the parameter values to map to the
-     * {@link edu.virginia.cs.geneticalgorithm.Genotype Genotype}.
-     * @param neuroJet Location of the NeuroJet executable
-     * @param workingDir Directory that subdirectories will be created off (if null, this uses the location of the first file in the
-     * scriptFiles {@link java.util.List List}).
+     * @param fitness Fitness function that this is a proxy for
      */
-    public NeuroJetQuickFitness(final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet,
-                                final File workingDir) {
-        if (scriptFiles == null || scriptFiles.size() == 0)
-            throw new IllegalArgumentException("Argument scriptFiles cannot be null or empty");
-        if (neuroJet == null || !neuroJet.canExecute())
-            throw new IllegalArgumentException("Argument neuroJet must refer to an executable");
-        _mainFile = scriptFiles.get(0);
-        _scriptFiles = scriptFiles;
-        _updater = updater;
-        _neuroJet = neuroJet;
-        _workingDir = workingDir != null ? workingDir : _mainFile.getParentFile();
-    }
-
-    /**
-     * Constructor
-     * @param scriptFiles {@link java.util.List List} of script files that NeuroJet needs to run the experiment. The first file in
-     * the list is the one actually run (and determines where the working directory will be), with the other files presumably a
-     * dependency of it.
-     * @param updater {@link ScriptUpdater} that contains the parameter values to map to the
-     * {@link edu.virginia.cs.geneticalgorithm.Genotype Genotype}.
-     * @param neuroJet Location of the NeuroJet executable
-     */
-    public NeuroJetQuickFitness(final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet) {
-        this(scriptFiles, updater, neuroJet, null);
+    public NeuroJetQuickFitness(final Fitness fitness) {
+        _traceFitness = (NeuroJetTraceFitness) fitness;
     }
 
     @Override
-    public List<Double> fitnessValues(final Genotype individual) {
-        if (!(individual instanceof StandardGenotype)) throw new RuntimeException("individual must be of type StandardGenotype");
-        List<Double> retval = _fitMap.get(individual);
-        if (retval != null) return retval;
-        final StandardGenotype genotype = (StandardGenotype) individual;
-        // Each fitness calculation happens in its own directory, allowing this function to be run in parallel
-        File scriptFile = _mainFile;
-        Integer dirID;
-        synchronized (_counter) {
-            dirID = ++_counter;
-        }
-        final File tempDir = new File(_workingDir, String.valueOf(dirID));
+    public List<Double> fitnessValues() {
+        final long beginTime = System.currentTimeMillis();
+        _traceFitness.runSimulationIfNeeded(); // starts the real fitness function running
         // Remove any existing files
-        final File[] prevFiles = tempDir.listFiles();
-        if (prevFiles != null) {
-            for (final File f : prevFiles) {
-                f.delete();
-            }
-        }
-        if (DELETE_WORKING_FILES) {
-            tempDir.deleteOnExit();
-        }
-        for (final File f : _scriptFiles) {
-            final File script = new File(tempDir, f.getName());
-            if (f.equals(_mainFile)) {
-                scriptFile = script;
-            }
-            try {
-                _updater.createScriptFromTemplate(script, f, genotype);
-            }
-            catch (final IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        retval = new ArrayList<Double>();
-        try {
-            // Launch NeuroJet
-            final List<String> command = new ArrayList<String>();
-            command.add(_neuroJet.getCanonicalPath());
-            command.add(scriptFile.getCanonicalPath());
-            final ProcessBuilder builder = new ProcessBuilder(command);
-            builder.directory(tempDir);
-            final Process p = builder.start();
-            final long start = System.currentTimeMillis();
-            if (DEBUG) {
-                final BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                String s;
-                while ((s = stdInput.readLine()) != null) {
-                    System.out.println(s);
-                }
-            }
-            final BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-            final StringBuilder err = new StringBuilder();
-            String sErr;
-            while ((sErr = stdError.readLine()) != null) {
-                err.append(sErr);
-            }
-            if (err.length() > 0) {
-                System.out.println("Errors:\n" + err.toString());
-            }
-            p.waitFor();
-            retval.add(Double.valueOf(System.currentTimeMillis() - start + 1));
+        if (_fitnessValues.isEmpty()) {
             // Read the resulting activity files
-            final double desiredAct = _updater.getDesiredAct(genotype);
-            final double timeStep = _updater.getTimeStep(genotype);
+            final double desiredAct = _traceFitness.getDesiredAct();
+            final double timeStep = _traceFitness.getTimeStep();
+            final File tempDir = _traceFitness.getTempDir();
             final NeuroJetActivity trnAct = new NeuroJetActivity(tempDir, "trnWithinAct.dat", timeStep);
-            _trnGenerator.generateQuickFitness(trnAct, desiredAct, timeStep);
-            retval.add(_trnGenerator.getSampleStdDev());
-            retval.add(_trnGenerator.getSquaredDeviationFromDesired());
+            trnAct.setWaitTime(60000 * 5); // Wait up to five minutes for tstWithinAct.dat to be ready
+            _trnGenerator.generateQuickFitness(trnAct, desiredAct);
+            _fitnessValues.add(Double.valueOf(System.currentTimeMillis() - beginTime + 1));
+            _fitnessValues.add(_trnGenerator.getSampleStdDev());
+            _fitnessValues.add(_trnGenerator.getSquaredDeviationFromDesired());
             final NeuroJetActivity tstAct = new NeuroJetActivity(tempDir, "tstWithinAct.dat", timeStep);
-            _tstGenerator.generateQuickFitness(tstAct, desiredAct, timeStep);
-            retval.add(_tstGenerator.getSampleStdDev());
-            retval.add(_tstGenerator.getSquaredDeviationFromDesired());
-            retval.add(Double.valueOf(dirID));
+            tstAct.setWaitTime(60000 * 1); // Wait up to one minute for tstWithinAct.dat to be ready (after tstWithinAct.dat is
+                                           // ready)
+            _tstGenerator.generateQuickFitness(tstAct, desiredAct);
+            _fitnessValues.add(_tstGenerator.getSampleStdDev());
+            _fitnessValues.add(_tstGenerator.getSquaredDeviationFromDesired());
+            assert (_fitnessValues.size() == NUM_FIT_VALS);
         }
-        catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
-        catch (final InterruptedException e) {
-            // We might want to handle this more gracefully. For example, if the process were interrupted by a bad connection
-            // (imagine we're running this remotely), we might want to just try again. If the process were interrupted by the user,
-            // however, such an approach would get old fast.
-            throw new RuntimeException(e);
-        }
-        // Create copy in case the individual is changed after the fitness has been calculated
-        _fitMap.put(individual.clone(), retval);
-        assert (retval.size() == NUM_FIT_VALS);
-        return retval;
+        return _fitnessValues;
     }
 
     /**
-     * @see edu.virginia.cs.geneticalgorithm.Fitness#totalFitness(edu.virginia.cs.geneticalgorithm.Genotype)
+     * @see edu.virginia.cs.geneticalgorithm.Fitness#totalFitness()
      */
     @Override
-    public double totalFitness(final Genotype individual) {
-        final List<Double> fitVals = fitnessValues(individual);
-        return 1 / fitVals.get(0) + _trnGenerator.overallFitness() + _tstGenerator.overallFitness();
+    public double totalFitness() {
+        final List<Double> fitVals = fitnessValues();
+        return 1 / fitVals.get(0) + _trnGenerator.overallFitness(fitVals.get(1), fitVals.get(2))
+               + _tstGenerator.overallFitness(fitVals.get(3), fitVals.get(4));
+    }
+
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.ProxyFitness#generatesPostFitness()
+     */
+    @Override
+    public boolean generatesPostFitness() {
+        return true;
+    }
+
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.ProxyFitness#getPostFitness()
+     */
+    @Override
+    public Fitness getPostFitness() {
+        return _traceFitness;
     }
 }

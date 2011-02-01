@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
@@ -13,12 +13,13 @@ import java.util.List;
 public abstract class AbstractFitness implements Fitness {
 
     /**
-     * @see edu.virginia.cs.geneticalgorithm.Fitness#totalFitness(edu.virginia.cs.geneticalgorithm.Genotype)
+     * Total fitness is just the sum of the fitness components
+     * @see edu.virginia.cs.geneticalgorithm.Fitness#totalFitness()
      */
     @Override
-    public double totalFitness(final Genotype individual) {
-        final List<Double> fitList = fitnessValues(individual);
+    public double totalFitness() {
         double retval = 0.0;
+        final List<Double> fitList = fitnessValues();
         for (final Double d : fitList) {
             retval += d;
         }

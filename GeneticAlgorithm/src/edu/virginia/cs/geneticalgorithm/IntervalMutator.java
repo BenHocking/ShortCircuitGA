@@ -7,19 +7,22 @@ import java.util.Random;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 25, 2010
  */
-public final class StandardMutator implements Mutator {
+public final class IntervalMutator implements Mutator {
 
-    private final Random _rng;
     private double _mutateRate;
+    private double _mutateSigma;
+    private final Random _rng;
 
     /**
-     * Constructor that fully specifies a typical {@link Mutator} object
+     * Constructor that fully specifies a typical {@link Mutator} object for an interval gene
      * @param mutateRate Probability (0 to 1) that a {@link Gene} will mutate
+     * @param mutateSigma standard deviation to use when mutating interval genes
      * @param rng Random number generator used with probabilities
      */
-    public StandardMutator(final double mutateRate, final Random rng) {
-        _rng = rng;
+    public IntervalMutator(final double mutateRate, final double mutateSigma, final Random rng) {
         _mutateRate = mutateRate;
+        _mutateSigma = mutateSigma;
+        _rng = rng;
     }
 
     /**
@@ -39,6 +42,13 @@ public final class StandardMutator implements Mutator {
     }
 
     /**
+     * @param mutateSigma standard deviation to use when mutating interval genes
+     */
+    public void setMutateSigma(final double mutateSigma) {
+        _mutateSigma = mutateSigma;
+    }
+
+    /**
      * @see edu.virginia.cs.geneticalgorithm.Mutator#mutate(edu.virginia.cs.geneticalgorithm.Genotype)
      */
     @Override
@@ -46,7 +56,14 @@ public final class StandardMutator implements Mutator {
         final Genotype retval = toMutate.clone();
         for (int i = 0; i < toMutate.getNumGenes(); ++i) {
             if (_rng.nextDouble() < _mutateRate) {
-                retval.setGene(i, retval.getGene(i).mutate(_rng));
+                final Gene g = retval.getGene(i);
+                if (g instanceof IntervalGene) {
+                    final IntervalGene ig = (IntervalGene) retval.getGene(i);
+                    retval.setGene(i, ig.mutate(_rng, _mutateSigma));
+                }
+                else {
+                    retval.setGene(i, g.mutate(_rng));
+                }
             }
         }
         return retval;

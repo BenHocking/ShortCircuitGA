@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
@@ -38,6 +38,11 @@ public final class StandardGeneticFactory implements GeneticFactory {
         _select = new StandardSelect(_rng);
         _mutator = new StandardMutator(mutateProb, _rng);
         _xOver = new OnePointCrossover(_mutator, xOverProb, _rng);
+    }
+
+    @Override
+    public void setMutator(final Mutator mutator) {
+        _xOver.setMutator(mutator);
     }
 
     /**

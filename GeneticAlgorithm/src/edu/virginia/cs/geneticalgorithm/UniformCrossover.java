@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
@@ -15,7 +15,7 @@ import edu.virginia.cs.common.utils.UnorderedPair;
  */
 public final class UniformCrossover implements Crossover {
 
-    private final Mutator _mutator;
+    private Mutator _mutator;
     private final double _xOverProb;
     private final double _geneXOverProb;
     private final Random _rng;
@@ -48,6 +48,11 @@ public final class UniformCrossover implements Crossover {
             }
         }
         return new UnorderedPair<Genotype>(_mutator.mutate(kid1), _mutator.mutate(kid2));
+    }
+
+    @Override
+    public void setMutator(final Mutator mutator) {
+        _mutator = mutator;
     }
 
 }

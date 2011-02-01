@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
@@ -31,6 +31,14 @@ public final class SimpleGeneInterpreter implements GeneInterpreter {
         if (!(g instanceof IntervalGene)) throw new IllegalArgumentException("Gene being matched against is not an IntervalGene");
         final IntervalGene ig = (IntervalGene) g;
         return _generator.generate(ig.getValue());
+    }
+
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.GeneInterpreter#invert(java.lang.String, Genotype)
+     */
+    @Override
+    public Gene invert(final String s, final Genotype genotype) {
+        return new IntervalGene(_generator.invert(s));
     }
 
 }

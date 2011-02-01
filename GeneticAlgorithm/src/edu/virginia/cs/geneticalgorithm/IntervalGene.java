@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
@@ -30,6 +30,14 @@ public final class IntervalGene implements Gene {
     }
 
     /**
+     * Constructor for non-mutating Gene
+     * @param value Value of the {@link Gene}
+     */
+    public IntervalGene(final double value) {
+        this(value, 0);
+    }
+
+    /**
      * @see edu.virginia.cs.geneticalgorithm.Gene#generate(java.util.Random)
      */
     @Override
@@ -45,6 +53,18 @@ public final class IntervalGene implements Gene {
         final double rawGaussian = rng.nextGaussian();
         final double newVal = _value + rawGaussian * _sigma;
         return new IntervalGene(newVal, _sigma);
+    }
+
+    /**
+     * @param rng Random number generator used to perform the next mutation
+     * @param sigma Standard deviation to use when mutating the {@link Gene}
+     * @return Mutated gene
+     * @see edu.virginia.cs.geneticalgorithm.Gene#mutate(java.util.Random)
+     */
+    public Gene mutate(final Random rng, final double sigma) {
+        final double rawGaussian = rng.nextGaussian();
+        final double newVal = _value + rawGaussian * sigma;
+        return new IntervalGene(newVal, sigma);
     }
 
     /**

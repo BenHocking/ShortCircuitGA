@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm.neurojet;
 
@@ -21,6 +21,7 @@ import edu.virginia.cs.geneticalgorithm.CompositeGeneInterpreter;
 import edu.virginia.cs.geneticalgorithm.ConstantGeneInterpreter;
 import edu.virginia.cs.geneticalgorithm.GeneInterpreter;
 import edu.virginia.cs.geneticalgorithm.GeneInterpreterMap;
+import edu.virginia.cs.geneticalgorithm.Genotype;
 import edu.virginia.cs.geneticalgorithm.IntervalGene;
 import edu.virginia.cs.geneticalgorithm.SimpleGeneInterpreter;
 import edu.virginia.cs.geneticalgorithm.StandardGenotype;
@@ -44,6 +45,20 @@ public final class ScriptUpdater {
 
     private Pattern generatePattern(final String varName) {
         return Pattern.compile("insert" + varName + "here", Pattern.CANON_EQ | Pattern.CASE_INSENSITIVE);
+    }
+
+    /**
+     * @param genotype Genotype to normalize
+     * @return Canonical genotype that would result in the same phenotype as the provided genotype
+     */
+    public Genotype normalizeGenotype(final StandardGenotype genotype) {
+        final StandardGenotype normalized = new StandardGenotype();
+        for (final Pattern p : _mapping.keySet()) {
+            final GeneInterpreter interpeter = _mapping.get(p);
+            final String s = interpeter.generate(genotype);
+            normalized.add(interpeter.invert(s, genotype));
+        }
+        return normalized;
     }
 
     /**

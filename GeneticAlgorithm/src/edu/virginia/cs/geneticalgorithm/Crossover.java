@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
@@ -19,4 +19,9 @@ public interface Crossover {
      * @return Children {@link Genotype Genotypes} as a result of the crossover.
      */
     UnorderedPair<Genotype> crossover(Genotype mother, Genotype father);
+
+    /**
+     * @param mutator Class to use when mutating individuals after crossover
+     */
+    void setMutator(Mutator mutator);
 }

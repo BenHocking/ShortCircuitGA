@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
@@ -29,4 +29,9 @@ public interface GeneticFactory {
      * @return Population of {@link Genotype Genotypes}
      */
     public List<Genotype> createPopulation(final int numIndividuals, final int genotypeLength);
+
+    /**
+     * @param mutator Mutator to use when reproducing
+     */
+    public void setMutator(Mutator mutator);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.geneticalgorithm;
 
@@ -36,10 +36,29 @@ public final class IntervalGeneticFactory implements GeneticFactory {
      * from 0.5-1 are essentially the same as 1-x (where x is the value given).
      */
     public IntervalGeneticFactory(final long seed, final double mutateProb, final double xOverProb, final double geneXOverProb) {
+        this(seed, xOverProb, geneXOverProb, new StandardMutator(mutateProb, new Random(seed)));
+    }
+
+    /**
+     * Constructor with additional parameters
+     * @param seed Random seed to use for generating genetic features.
+     * @param xOverProb Probability (0 to 1) that there will be any {@link Crossover Crossovers}
+     * @param geneXOverProb If there are any {@link Crossover Crossovers}, probability for each {@link Gene} to cross over. Values
+     * from 0.5-1 are essentially the same as 1-x (where x is the value given).
+     * @param mutator Mutator to use when reproducing
+     */
+    public IntervalGeneticFactory(final long seed, final double xOverProb, final double geneXOverProb, final Mutator mutator) {
         _rng = new Random(seed);
         _select = new StandardSelect(_rng);
-        _mutator = new StandardMutator(mutateProb, _rng);
+        _mutator = mutator;
         _xOver = new UniformCrossover(_mutator, xOverProb, geneXOverProb, _rng);
+    }
+
+    /**
+     * @param mutator Mutator to use when reproducing
+     */
+    public void setMutator(final Mutator mutator) {
+        _xOver.setMutator(mutator);
     }
 
     /**
@@ -59,15 +78,26 @@ public final class IntervalGeneticFactory implements GeneticFactory {
     }
 
     /**
+     * @param numIndividuals Number of individuals in the population
+     * @param genotypeLength Number of {@link Gene Genes} in each {@link Genotype}
+     * @param sigma standard deviation to use when mutating interval genes
+     * @return Population of {@link Genotype Genotypes}
      * @see edu.virginia.cs.geneticalgorithm.GeneticFactory#createPopulation(int, int)
      */
-    @Override
-    public List<Genotype> createPopulation(final int numIndividuals, final int genotypeLength) {
+    public List<Genotype> createPopulation(final int numIndividuals, final int genotypeLength, final double sigma) {
         final List<Genotype> population = new ArrayList<Genotype>();
-        final Gene basis = new IntervalGene(0.5, 0.2);
+        final Gene basis = new IntervalGene(0.5, sigma);
         for (int i = 0; i < numIndividuals; ++i) {
             population.add(new StandardGenotype(genotypeLength, basis, _rng));
         }
         return population;
+    }
+
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.GeneticFactory#createPopulation(int, int)
+     */
+    @Override
+    public List<Genotype> createPopulation(final int numIndividuals, final int genotypeLength) {
+        return createPopulation(numIndividuals, genotypeLength, 0.2);
     }
 }

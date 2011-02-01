@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2010 Ashlie Benjamin Hocking. All Rights reserved.
+ * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
 package edu.virginia.cs.common.utils;
 
 /**
  * Wrapper around common math utilities
- * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
+ * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 27, 2010
  */
 public final class MathUtils {
@@ -48,11 +48,27 @@ public final class MathUtils {
      * @return scaled result between min and max (even if x is outside 0..1 boundary)
      * @see #scaleInt(int, double, int)
      * @see #scale(double, double, double)
+     * @see #scaleInverse(double, double, double)
      * @see #imposeBounds(double, double, double)
      */
     public static double scale(final double min, final double x, final double max, final boolean enforceBounds) {
         if (!enforceBounds) return scale(min, x, max);
         return scale(min, imposeBounds(0, x, 1), max);
+    }
+
+    /**
+     * Maps a double on the range from min to max to the range from 0 to 1
+     * 
+     * @param min minimum value of x
+     * @param x value between min and max
+     * @param max maximum value to x
+     * @return value mapped to 0..1
+     * @see #scaleInt(int, double, int)
+     * @see #scale(double, double, double)
+     * @see #imposeBounds(double, double, double)
+     */
+    public static double scaleInverse(final double min, final double x, final double max) {
+        return (x - min) / (max - min);
     }
 
     /**
@@ -62,11 +78,26 @@ public final class MathUtils {
      * @param x result of a function that ranges from 0 to 1
      * @param max maximum value to return
      * @return scaled result between min and max (even if x is less than 0 or greater than 1)
+     * @see #scaleIntInverse(int, int, int)
      * @see #scale(double, double, double)
      * @see #scale(double, double, double, boolean)
      */
     public static int scaleInt(final int min, final double x, final int max) {
         final int retval = (int) (Math.floor(x * (max - min + 1)) + min);
         return retval < max ? (retval > min ? retval : min) : max;
+    }
+
+    /**
+     * Scales range from min to max instead of from 0 to 1
+     * 
+     * @param min minimum value of x
+     * @param x value between min and max
+     * @param max maximum value of x
+     * @return value mapped to 0..1
+     * @see #scaleInt(int, double, int)
+     */
+    public static double scaleIntInverse(final int min, final int x, final int max) {
+        final double intervalHalfWidth = 0.5 / (max - min + 1);
+        return intervalHalfWidth + (x - min) / (max - min + 1);
     }
 }
