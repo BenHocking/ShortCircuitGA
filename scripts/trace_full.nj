@@ -1,5 +1,6 @@
 @CreateVar(
-  numTrainTrials 200
+#  numTrainTrials 200
+  numTrainTrials 100
   dwellTime 144       # ms
   OffRate InsertIHere # ms
   OnRate InsertJHere           # ms
@@ -119,6 +120,9 @@
 # mePct varies from 0.2 to 0.5
   me ^Calc(round[^(ni) * ^(mePct) / 10]) # 10 is arbitrary
 )
+@SaveData(-from me -to me.dat)
+@SaveData(-from mePct -to mePct.dat)
+@SaveData(-from ActivityHz -to ActivityHz.dat)
 
 ?If(exists[PyrToInternrnWtAdjDecay]) {
   @SetVar(PyrToInternrnWtAdjDecay ^Calc(exp[-^(deltaT)/^(PyrToInternrnWtAdjDecayRate)]))
@@ -216,6 +220,8 @@
       @SaveData(-from me -to tstWithinAct.dat.ready)
     }
     ?If(^(i) = ^(numTrainTrials)) {
+      @SaveData(-from TestingActivity -to tstWithinAct_final.dat)
+      @SaveData(-from me -to tstWithinAct_final.dat.ready)
       @SaveData(-from TestingBuffer -to tstBuff.dat)
       @SaveData(-from me -to tstBuff.dat.ready)
     }

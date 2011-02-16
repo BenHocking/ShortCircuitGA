@@ -12,7 +12,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.virginia.cs.common.utils.IntegerRange;
 import edu.virginia.cs.common.utils.Pause;
+import edu.virginia.cs.common.utils.SetUtils;
 
 /**
  * TODO Add description
@@ -44,6 +46,14 @@ public class NeuroJetNeuronBuffer extends File {
         super(parent, child);
         _signal = new File(parent, child + ".ready");
         _waitTime = waitTime;
+    }
+
+    /**
+     * @param parent Directory where Activity file resides
+     * @param child Activity file
+     */
+    public NeuroJetNeuronBuffer(final File parent, final String child) {
+        this(parent, child, 0);
     }
 
     /**
@@ -89,5 +99,34 @@ public class NeuroJetNeuronBuffer extends File {
             }
         }
         return _firingBuffer;
+    }
+
+    /**
+     * @param neuronRange Range of neurons to get the fraction of firing for
+     * @param timeRange Time range to sample for
+     * @return Fraction of the desired neurons firing out of the total number of firings for the range
+     */
+    public double fractionFired(final IntegerRange neuronRange, final IntegerRange timeRange) {
+        final List<Set<Integer>> neuronBuff = getFiringBuffer();
+        int totalNumFired = 0;
+        double totalPuffFired = 0;
+        for (final Integer i : timeRange) {
+            if (i < neuronBuff.size()) {
+                final Set<Integer> firingNeurons = neuronBuff.get(i);
+                if (!firingNeurons.isEmpty()) {
+                    totalNumFired += firingNeurons.size();
+                    final Set<Integer> firingPuff = SetUtils.intersection(firingNeurons, neuronRange.asSet());
+                    totalPuffFired += firingPuff.size();
+                }
+            }
+        }
+        return totalNumFired > 0 ? totalPuffFired / totalNumFired : 0.0;
+    }
+
+    /**
+     * @return Number of time steps in the firing buffer
+     */
+    public int numTimeSteps() {
+        return getFiringBuffer().size();
     }
 }

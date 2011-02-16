@@ -3,24 +3,28 @@
  */
 package edu.virginia.cs.geneticalgorithm.neurojet;
 
+import static edu.virginia.cs.common.utils.ArrayNumberUtils.*;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import edu.virginia.cs.common.utils.Condition;
 import edu.virginia.cs.common.utils.IntegerRange;
 import edu.virginia.cs.common.utils.Pause;
 import edu.virginia.cs.geneticalgorithm.Genotype;
 import edu.virginia.cs.geneticalgorithm.HaltableFitness;
+import edu.virginia.cs.neurojet.model.NeuroJetActivity;
 import edu.virginia.cs.neurojet.model.NeuroJetNeuronBuffer;
 
 class NeuroJetTraceFitness implements HaltableFitness, Runnable {
 
-    public static final int NUM_FIT_VALS = 3; // Run time + performance measure + target measure
+    public static final int NUM_FIT_VALS = 6; // Run time + 2 actvty measures + trend measure + perf measure + target measure
+    private static final int WAIT_TIME = 20 /* minutes */* 60 /* seconds per minute */* 1000 /* ms per sec */;
+    private final NeuroJetQuickFitnessGenerator _tstGenerator = new NeuroJetQuickFitnessGenerator();
     private final NeuroJetTraceFitnessIntermediary _parent;
     private final File _tempDir;
     private Process _process = null;
@@ -28,6 +32,7 @@ class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     private boolean _halted = false;
     private long _start = -1;
     private long _end = -1;
+    private NeuroJetNeuronBuffer _tstBuff = null;
     private final Object _lock = new Object();
     private final Object _lock2 = new Object();
     private final StringBuffer _out = new StringBuffer();
@@ -43,16 +48,33 @@ class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         return _parent.getParent();
     }
 
-    double getDesiredAct() {
+    public double getDesiredAct() {
         return _parent.getDesiredAct();
     }
 
-    double getMePct() {
+    public double getMePct() {
         return _parent.getMePct();
+    }
+
+    public static int getNumNeurons() {
+        return 2048;
+    }
+
+    public int getMe() {
+        return (int) Math.round(getNumNeurons() * getMePct() / 10);
     }
 
     double getTimeStep() {
         return _parent.getTimeStep();
+    }
+
+    public IntegerRange getPuffRange() {
+        final int me = getMe();
+        // Tone neurons are from 1 to me
+        // Puff neurons are from me + 1 to 2 * me
+        final int firstBlinkNeuron = me + 1;
+        final int lastBlinkNeuron = 2 * me;
+        return new IntegerRange(firstBlinkNeuron, lastBlinkNeuron);
     }
 
     File getTempDir() {
@@ -63,31 +85,58 @@ class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         return _end > 0;
     }
 
+    private void addActivityMeasures(final List<Double> fitnessValues) {
+        final NeuroJetActivity tstAct = new NeuroJetActivity(_tempDir, "tstWithinAct_final.dat", getTimeStep());
+        tstAct.setWaitTime(WAIT_TIME);
+        _tstGenerator.generateQuickFitness(tstAct, getDesiredAct());
+        fitnessValues.add(_tstGenerator.getSampleStdDev());
+        fitnessValues.add(_tstGenerator.getSquaredDeviationFromDesired());
+    }
+
+    private void addTrendMeasure(final List<Double> fitnessValues) {
+        final NeuroJetNeuronBuffer tstBuff = getTestBufferFile();
+        final int lastElement = tstBuff.numTimeSteps(); // Not inclusive
+        if (lastElement < 100) {
+            fitnessValues.add(0.0);
+        }
+        else {
+            final List<Double> fracTrend = new ArrayList<Double>();
+            final IntegerRange puffRange = getPuffRange();
+            // Only want the slope up to shortly after the puff was introduced
+            for (final Integer i : new IntegerRange(0, 10, Math.min(lastElement, 680))) {
+                fracTrend.add(tstBuff.fractionFired(puffRange, new IntegerRange(i, i + 9)));
+            }
+            final double trendSlope = slope(fracTrend);
+            fitnessValues.add(trendSlope);
+        }
+    }
+
+    private double slopeContribution(final double slope) {
+        final double minSlope = -0.05;
+        if (slope < minSlope) return 0;
+        return 1000 * Math.pow(slope - minSlope, 2);
+    }
+
     public List<Double> fitnessValues() {
         runSimulationIfNeeded();
         final List<Double> retval = new ArrayList<Double>();
         if (_halted) {
-            retval.add(0.0);
-            retval.add(0.0);
-            retval.add(0.0);
+            for (int i = 0; i < NUM_FIT_VALS; ++i) {
+                retval.add(0.0);
+            }
         }
         else {
-            // Read the resulting activity files
-            final double desiredAct = getDesiredAct();
-            final double mePct = getMePct();
-            final double timeStep = getTimeStep();
-            final int waitTime = 20 /* minutes */* 60 /* seconds per minute */* 1000 /* ms per sec */;
-            final NeuroJetNeuronBuffer tstBuff = new NeuroJetNeuronBuffer(_tempDir, "tstBuff.dat", waitTime);
-            // Make sure that the rest of the fitness routine is finished before proceeding
-            Pause.untilConditionMet(new FitnessFinished(this), waitTime); // We shouldn't have to wait that long or else something
-            // is very wrong
+            Pause.untilConditionMet(new FitnessFinished(this), WAIT_TIME);
             final double timeDiff = _end - _start + 1;
             assert (timeDiff > 0);
             retval.add(timeDiff > 0 ? timeDiff : 1);
-            final double fitness = generateTraceFitness(tstBuff, desiredAct, timeStep, mePct);
+            addActivityMeasures(retval);
+            addTrendMeasure(retval);
+            final double fitness = generateTraceFitness();
             assert (!Double.isNaN(fitness));
+            assert (fitness > 0);
             retval.add(fitness);
-            retval.add(hasTargetBehavior(desiredAct, mePct) ? 1.0 : 0.0);
+            retval.add(hasTargetBehavior());
         }
         return retval;
     }
@@ -194,10 +243,6 @@ class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         }
     }
 
-    private int calcPtnNeuronNum(final int totalNeurons, final double desiredAct, final double mePct) {
-        return (int) Math.round(totalNeurons * desiredAct * mePct / 22.5);
-    }
-
     static double generateTimeValue(final int when) {
         // Puff normally starts at time step 651 and lasts to 750
         // Responding in this time window demonstrates memory but not prediction
@@ -212,68 +257,42 @@ class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         return 0.01;
     }
 
-    /**
-     * @param desiredAct Desired activity level
-     * @param mePct Fraction of activity due to external neurons
-     * @return Whether the fitness function acquired the target behavior (i.e., blinked at the right time)
-     */
-    public boolean hasTargetBehavior(final double desiredAct, final double mePct) {
-        final NeuroJetNeuronBuffer tstBuff = new NeuroJetNeuronBuffer(_tempDir, "tstBuff.dat", 0);
-        final int me = calcPtnNeuronNum(2048, desiredAct, mePct);
-        // Tone neurons are from 1 to me
-        // Puff neurons are from me + 1 to 2 * me
-        final int firstBlinkNeuron = me + 1;
-        final int lastBlinkNeuron = 2 * me;
-        final List<Set<Integer>> neuronBuff = tstBuff.getFiringBuffer();
-        final int lastElement = neuronBuff.size(); // Not inclusive
-        final int first = 601;
-        final int last = Math.min(650, lastElement); // Not inclusive
-        int totalNumFired = 0;
-        double totalPuffFired = 0;
-        if (first <= last) {
-            for (final Integer i : new IntegerRange(first, last)) {
-                final Set<Integer> firingNeurons = neuronBuff.get(i);
-                if (!firingNeurons.isEmpty()) {
-                    totalNumFired += firingNeurons.size();
-                    firingNeurons.retainAll(new IntegerRange(firstBlinkNeuron, lastBlinkNeuron).asSet());
-                    totalPuffFired += firingNeurons.size();
-                }
-            }
+    private NeuroJetNeuronBuffer getTestBufferFile() {
+        if (_tstBuff == null) {
+            _tstBuff = new NeuroJetNeuronBuffer(_tempDir, "tstBuff.dat", WAIT_TIME);
         }
-        final double fracPuffFired = totalPuffFired / totalNumFired;
-        return (fracPuffFired >= 0.3 * mePct);
+        return _tstBuff;
     }
 
-    private double generateTraceFitness(final NeuroJetNeuronBuffer bufferFile, final double desiredAct, final double timeStep,
-                                        final double mePct) {
-        final int me = calcPtnNeuronNum(2048, desiredAct, mePct);
-        // Tone neurons are from 1 to me
-        // Puff neurons are from me + 1 to 2 * me
-        final int firstBlinkNeuron = me + 1;
-        final int lastBlinkNeuron = 2 * me;
-        final List<Set<Integer>> neuronBuff = bufferFile.getFiringBuffer();
-        double maxIntervalFitness = 0.0;
-        final int lastElement = neuronBuff.size(); // Not inclusive
+    /**
+     * @return Whether the fitness function acquired the target behavior (i.e., blinked at the right time)
+     */
+    public double hasTargetBehavior() {
+        final int firstBlinkTime = 601;
+        final int lastBlinkTime = 650; // Not inclusive
+        final double fracPuffFired = getTestBufferFile().fractionFired(getPuffRange(),
+                                                                       new IntegerRange(firstBlinkTime, lastBlinkTime));
+        return (fracPuffFired / (0.3 * getMePct()));
+    }
+
+    private double generateTraceFitness() {
+        double maxFracPuffFired = 0.0;
+        int maxEra = -1;
+        final NeuroJetNeuronBuffer tstBuff = getTestBufferFile();
+        final int lastElement = tstBuff.numTimeSteps(); // Not inclusive
+        final IntegerRange puffRange = getPuffRange();
         for (final Integer i : new IntegerRange(0, 50, lastElement)) {
-            final int curLast = Math.min(i + 49, lastElement); // Not inclusive
-            int totalNumFired = 0;
-            double totalPuffFired = 0;
-            // TODO: Eliminate redundancies with above function
-            for (final Integer j : new IntegerRange(i, curLast)) {
-                final Set<Integer> firingNeurons = neuronBuff.get(j);
-                if (!firingNeurons.isEmpty()) {
-                    totalNumFired += firingNeurons.size();
-                    firingNeurons.retainAll(new IntegerRange(firstBlinkNeuron, lastBlinkNeuron).asSet());
-                    totalPuffFired += firingNeurons.size();
-                }
-            }
-            final double intervalFitness = (totalPuffFired / (totalNumFired * mePct)) * generateTimeValue(i + 1);
-            if (maxIntervalFitness < intervalFitness) {
-                maxIntervalFitness = intervalFitness;
+            final double fracPuffFired = tstBuff.fractionFired(puffRange, new IntegerRange(i, i + 50));
+            if (maxFracPuffFired < fracPuffFired) {
+                maxFracPuffFired = fracPuffFired;
+                maxEra = i;
             }
         }
-        // Using the maximum interval fitness avoids creating "fitter" individuals by smearing the response
-        return maxIntervalFitness;
+        final int early = 200;
+        final double fracPuffEarlyFired = (maxEra > early) ? tstBuff.fractionFired(puffRange, new IntegerRange(1, early)) : 0.0;
+        final double retval = (maxFracPuffFired - fracPuffEarlyFired) * generateTimeValue(maxEra + 1) / getMePct();
+        // assert retval > 0;
+        return retval;
     }
 
     @Override
@@ -304,7 +323,9 @@ class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     @Override
     public double totalFitness() {
         final List<Double> fitVals = fitnessValues();
-        return 1 / fitVals.get(0) + fitVals.get(1);
+        final double actFitness = 1E-5 * _tstGenerator.overallFitness(fitVals.get(1), fitVals.get(2));
+        final double slopeFitness = slopeContribution(fitVals.get(3));
+        return 1 / fitVals.get(0) + actFitness + slopeFitness + fitVals.get(4) + fitVals.get(5);
     }
 
     private static class InvokerThread extends Thread {

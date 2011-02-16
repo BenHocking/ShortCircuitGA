@@ -3,9 +3,8 @@
  */
 package edu.virginia.cs.common.utils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -13,11 +12,7 @@ import java.util.Set;
  * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since May 4, 2010
  */
-public final class IntegerRange implements Iterable<Integer>, Iterator<Integer> {
-
-    private int _currentlyAt;
-    private final int _step;
-    private final int _stopAt;
+public final class IntegerRange extends ArrayList<Integer> {
 
     /**
      * Constructor for iterating over the integers from 0 to <tt>to - 1</tt>.
@@ -44,55 +39,15 @@ public final class IntegerRange implements Iterable<Integer>, Iterator<Integer> 
      */
     public IntegerRange(final int from, final int step, final int to) {
         assert (from == to || (from < to && step > 0) || (from > to && step < 0));
-        _currentlyAt = from;
-        _step = step;
-        _stopAt = to;
-    }
-
-    /**
-     * @see java.lang.Iterable#iterator()
-     */
-    @Override
-    public Iterator<Integer> iterator() {
-        return this;
-    }
-
-    /**
-     * @see java.util.Iterator#hasNext()
-     */
-    @Override
-    public boolean hasNext() {
-        return (_step > 0) ? (_currentlyAt < _stopAt) : (_currentlyAt > _stopAt);
-    }
-
-    /**
-     * @see java.util.Iterator#next()
-     */
-    @Override
-    public Integer next() {
-        if (!hasNext()) throw new NoSuchElementException("next called out of range");
-        final Integer retval = _currentlyAt;
-        _currentlyAt += _step;
-        return retval;
+        for (int i = from; i < to; i += step) {
+            add(i);
+        }
     }
 
     /**
      * @return this range as a Set
      */
     public Set<Integer> asSet() {
-        final Set<Integer> retval = new HashSet<Integer>();
-        for (final Integer i : this) {
-            retval.add(i);
-        }
-        return retval;
-    }
-
-    /**
-     * Not supported.
-     * @see java.util.Iterator#remove()
-     */
-    @Override
-    public void remove() {
-        /* do nothing, not supported */
+        return new HashSet<Integer>(this);
     }
 }

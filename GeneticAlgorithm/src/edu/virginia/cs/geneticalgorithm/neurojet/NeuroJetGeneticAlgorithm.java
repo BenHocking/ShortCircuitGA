@@ -40,7 +40,8 @@ public final class NeuroJetGeneticAlgorithm {
     private final static File NJ = new File("/Users/bhocking/Documents/workspace/NeuroJet/build/NeuroJet");
     private final static File WORKINGDIR = new File("/Users/bhocking/Documents/workspace/ShortCircuitGA/scripts");
     private final static int GENOTYPE_SIZE = 21; // 0 - 20
-    private final static double POST_SCALE_FACTOR = 4e7;
+    private final static double PRE_THRESHOLD = 1e5;
+    private final static double POST_SCALE_FACTOR = 0.5 * PRE_THRESHOLD;
     private final ScriptUpdater _updater;
     private final FitnessFactory _fitnessFactory;
     private final GeneticFactory _factory;
@@ -61,7 +62,7 @@ public final class NeuroJetGeneticAlgorithm {
         final NeuroJetTraceFitnessFactory traceFitnessFactory = new NeuroJetTraceFitnessFactory(traceScriptFiles, _updater, NJ,
                                                                                                 WORKINGDIR);
         final ProxyFitnessFactory quickFitnessFactory = new NeuroJetQuickFitnessFactory(traceFitnessFactory);
-        _fitnessFactory = new ShortCircuitFitnessFactory(quickFitnessFactory, Collections.singletonList(5e5),
+        _fitnessFactory = new ShortCircuitFitnessFactory(quickFitnessFactory, Collections.singletonList(PRE_THRESHOLD),
                                                          NeuroJetTraceFitness.NUM_FIT_VALS);
         ((ShortCircuitFitnessFactory) _fitnessFactory).setPostScale(POST_SCALE_FACTOR);
         final double xOverProb = 0.6;

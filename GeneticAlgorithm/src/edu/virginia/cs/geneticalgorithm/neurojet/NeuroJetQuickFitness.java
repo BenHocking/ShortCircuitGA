@@ -54,7 +54,7 @@ public final class NeuroJetQuickFitness implements ProxyFitness {
             _fitnessValues.add(_trnGenerator.getSquaredDeviationFromDesired());
             final NeuroJetActivity tstAct = new NeuroJetActivity(tempDir, "tstWithinAct.dat", timeStep);
             tstAct.setWaitTime(60000 * 1); // Wait up to one minute for tstWithinAct.dat to be ready (after tstWithinAct.dat is
-                                           // ready)
+            // ready)
             _tstGenerator.generateQuickFitness(tstAct, desiredAct);
             _fitnessValues.add(_tstGenerator.getSampleStdDev());
             _fitnessValues.add(_tstGenerator.getSquaredDeviationFromDesired());
@@ -87,5 +87,11 @@ public final class NeuroJetQuickFitness implements ProxyFitness {
     @Override
     public Fitness getPostFitness() {
         return _traceFitness;
+    }
+
+    @Override
+    public String toString() {
+        final double fitness = totalFitness();
+        return "{hash = " + hashCode() + ", fitness = '" + fitness + "'}";
     }
 }

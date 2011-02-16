@@ -71,6 +71,21 @@ public class NeuroJetActivity extends File {
     }
 
     /**
+     * Finds the average within-trial activity for all trials
+     * @return {@link java.util.List List} of activity for the requested trial
+     */
+    public List<Double> withinTrialActivity() {
+        final List<List<Double>> activity = getActivity();
+        if (activity.isEmpty()) return new ArrayList<Double>();
+        final List<Double> retval = new ArrayList<Double>(activity.get(0).size());
+        for (final List<Double> trialActivity : activity) {
+            accum(retval, trialActivity);
+        }
+        divide(retval, activity.size());
+        return retval;
+    }
+
+    /**
      * @return Activity for every trial in the simulation
      */
     public List<List<Double>> getActivity() {
@@ -143,7 +158,7 @@ public class NeuroJetActivity extends File {
      * @return Squared deviation of activity over a specific interval
      */
     public double squaredDeviation(final int intervalBegin, final int intervalEnd, final double desiredAct) {
-        final double deviation = averageActivity(intervalBegin, intervalEnd) - desiredAct;
+        final double deviation = (averageActivity(intervalBegin, intervalEnd) - desiredAct) / desiredAct;
         return deviation * deviation;
     }
 

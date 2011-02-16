@@ -124,16 +124,16 @@ public final class ArrayNumberUtils {
      * Adds up two equal sized Lists and stores the result in the first list
      * @param accumulator First list to add
      * @param toAccumulate Second list to add
-     * @pre list1.size() == list2.size()
-     * @exception IllegalArgumentException if two lists are not of the same size
      * @exception NullPointerException if either list is null
      */
     public static void accum(final List<Double> accumulator, final List<Double> toAccumulate) {
-        if (accumulator.size() != toAccumulate.size())
-            throw new IllegalArgumentException("Lists being added together must be of the same size.");
-        if (!accumulator.isEmpty()) {
-            for (final Integer i : new IntegerRange(accumulator.size())) {
-                accumulator.set(i, accumulator.get(i) + toAccumulate.get(i));
+        for (final Integer i : new IntegerRange(toAccumulate.size())) {
+            final double newVal = accumulator.get(i) + toAccumulate.get(i);
+            if (i < accumulator.size()) {
+                accumulator.set(i, newVal);
+            }
+            else {
+                accumulator.add(newVal);
             }
         }
     }
@@ -287,5 +287,22 @@ public final class ArrayNumberUtils {
             return Math.sqrt((numSums * totalSoS - totalSum * totalSum) / (numSums * (numSums - 1)));
         }
         return Double.NaN;
+    }
+
+    /**
+     * @param dblList List to calculate the slope of (x values are taken as integer locations in list)
+     * @return Slope of list
+     */
+    public static double slope(final List<Double> dblList) {
+        final int listSize = dblList.size();
+        if (listSize < 2) return Double.NaN;
+        double sumxy = 0;
+        for (int i = 0; i < listSize; ++i) {
+            sumxy += i * dblList.get(i);
+        }
+        final double sumx = (listSize - 1) * listSize / 2;
+        final double sumy = sum(dblList);
+        final double sumxx = (listSize - 1) * listSize * (2 * listSize - 1) / 6;
+        return (listSize * sumxy - sumx * sumy) / (listSize * sumxx - sumx * sumx);
     }
 }
