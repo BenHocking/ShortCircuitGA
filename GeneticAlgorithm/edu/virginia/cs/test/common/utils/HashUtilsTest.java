@@ -4,7 +4,7 @@
 package edu.virginia.cs.test.common.utils;
 
 import static edu.virginia.cs.common.utils.HashUtils.hash;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;

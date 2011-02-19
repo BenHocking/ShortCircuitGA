@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <project name="ShortCircuitGA" default="all">
-	<property name="top.dir" value = "${basedir}/.." />
+	<property name="top.dir" value = "${basedir}" />
 	<property name="jarname" value="shortcircuitga.jar" />
 	<property name="test.src.dir" value="${basedir}" />
 	<property name="classes" value="${top.dir}/classes" />
-	<property name="test.classes" value="${top.dir}/test-classes" />
+	<property name="test.classes" value="${top.dir}" />
 	<property name="instrumented.classes" value="${top.dir}/instrumented-classes" />
 	<property name="jars.dir" value="${top.dir}/jars" />
 	<property name="jar" location="${jars.dir}/${jarname}" />

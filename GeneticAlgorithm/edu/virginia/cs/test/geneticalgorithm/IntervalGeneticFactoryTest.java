@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
-package edu.virginia.cs.test;
+package edu.virginia.cs.test.geneticalgorithm;
 
 import java.util.Collections;
 import java.util.List;

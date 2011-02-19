@@ -1,6 +1,6 @@
 all:
 	mkdir -p classes
-	ant -f src/build.xml
+	ant all
 
 clean:
 	find . -name "*.ser" -delete
@@ -9,6 +9,6 @@ clean:
 
 coverage:
 	mkdir -p classes
-	ant -f src/build.xml _compile
-	ant -f src/build.xml coverage
-	open src/coberta-report/index.html
+	ant _compile
+	ant coverage
+	open coberta-report/index.html
