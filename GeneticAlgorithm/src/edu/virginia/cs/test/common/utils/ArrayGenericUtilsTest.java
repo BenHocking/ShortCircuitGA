@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
-package edu.virginia.cs.test;
+package edu.virginia.cs.test.common.utils;
 
 import static org.junit.Assert.*;
 
@@ -25,6 +25,7 @@ public class ArrayGenericUtilsTest {
      */
     @Test
     public void testNullLists() {
+        new ArrayGenericUtils(); // For coverage
         final List<Double> nullList = null;
         final List<Double> nonNullList = Collections.singletonList(1.2);
         assertTrue(ArrayGenericUtils.compare(nullList, nullList) == 0);

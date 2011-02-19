@@ -128,12 +128,11 @@ public final class ArrayNumberUtils {
      */
     public static void accum(final List<Double> accumulator, final List<Double> toAccumulate) {
         for (final Integer i : new IntegerRange(toAccumulate.size())) {
-            final double newVal = accumulator.get(i) + toAccumulate.get(i);
             if (i < accumulator.size()) {
-                accumulator.set(i, newVal);
+                accumulator.set(i, accumulator.get(i) + toAccumulate.get(i));
             }
             else {
-                accumulator.add(newVal);
+                accumulator.add(toAccumulate.get(i));
             }
         }
     }
@@ -149,7 +148,7 @@ public final class ArrayNumberUtils {
      */
     public static List<Double> divide(final List<Double> numerator, final List<Double> denominator) {
         if (numerator.size() != denominator.size())
-            throw new IllegalArgumentException("Lists being added together must be of the same size.");
+            throw new IllegalArgumentException("Lists being divided must be of the same size.");
         final List<Double> retval = new ArrayList<Double>(numerator.size());
         if (!numerator.isEmpty()) {
             for (final Integer i : new IntegerRange(numerator.size())) {
@@ -204,14 +203,15 @@ public final class ArrayNumberUtils {
      * @exception NumberFormatException if one of the Strings does not contain a parsable number.
      */
     public static double mean(final String[] values, final int first, final int last) {
-        double sum = 0.0;
         final int trueLast = Math.min(last + 1, values.length);
-        if (trueLast >= first) {
-            for (final Integer i : new IntegerRange(first, trueLast)) {
-                sum += Double.parseDouble(values[i]);
-            }
+        if (trueLast <= first) {
+            return Double.NaN;
         }
-        return sum / (trueLast - first + 1);
+        double sum = 0.0;
+        for (final Integer i : new IntegerRange(first, trueLast)) {
+            sum += Double.parseDouble(values[i]);
+        }
+        return sum / (trueLast - first);
     }
 
     /**
@@ -236,14 +236,15 @@ public final class ArrayNumberUtils {
      * @return Mean value of the selected range of elements
      */
     public static double mean(final List<Double> dblList, final int first, final int last) {
-        double sum = 0.0;
         final int trueLast = Math.min(last + 1, dblList.size());
-        if (trueLast >= first) {
-            for (final Integer i : new IntegerRange(first, trueLast)) {
-                sum += dblList.get(i);
-            }
+        if (trueLast <= first) {
+            return Double.NaN;
         }
-        return sum / (trueLast - first + 1);
+        double sum = 0.0;
+        for (final Integer i : new IntegerRange(first, trueLast)) {
+            sum += dblList.get(i);
+        }
+        return sum / (trueLast - first);
     }
 
     /**
@@ -258,7 +259,7 @@ public final class ArrayNumberUtils {
      */
     public static List<Double> specialDivide(final List<Double> numerator, final List<Double> denominator) {
         if (numerator.size() != denominator.size())
-            throw new IllegalArgumentException("Lists being added together must be of the same size.");
+            throw new IllegalArgumentException("Lists being divided must be of the same size.");
         final List<Double> retval = new ArrayList<Double>(numerator.size());
         if (!numerator.isEmpty()) {
             for (final Integer i : new IntegerRange(numerator.size())) {

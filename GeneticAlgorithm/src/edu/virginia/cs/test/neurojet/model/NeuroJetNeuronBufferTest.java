@@ -67,7 +67,7 @@ public class NeuroJetNeuronBufferTest {
         final double trendSlope = slope(fracTrend);
         final double minSlope = -0.1;
         final double slopeFitness = (trendSlope < minSlope || sumFrac < 1E-5) ? 0 : trendSlope - minSlope;
-        assertEquals(0.10014862889, slopeFitness, 1e-5);
+        assertEquals(0.10005, slopeFitness, 1e-4);
 
         final int firstBlinkTime = 601;
         final int lastBlinkTime = 650; // Not inclusive

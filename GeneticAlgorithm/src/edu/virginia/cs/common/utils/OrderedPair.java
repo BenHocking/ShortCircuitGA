@@ -45,7 +45,7 @@ public class OrderedPair<S, T> extends Pair<S, T> {
     @SuppressWarnings("unchecked")
     public <U> Collection<U> asCollection(final Class<U> clazz) {
         if (!(eq(getFirstClass(), clazz) && eq(getLastClass(), clazz))) {
-            throw new RuntimeException("Attempted to crease list of incompatible type '" + clazz.getSimpleName() + "'");
+            throw new IllegalArgumentException("Attempted to crease list of incompatible type '" + clazz.getSimpleName() + "'");
         }
         final Collection<U> retval = new ArrayList<U>();
         retval.add((U) getFirst());

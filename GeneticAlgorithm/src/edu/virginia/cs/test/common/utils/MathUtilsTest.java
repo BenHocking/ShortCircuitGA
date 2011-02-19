@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
-package edu.virginia.cs.test;
+package edu.virginia.cs.test.common.utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,8 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import edu.virginia.cs.common.utils.MathUtils;
 
 import static edu.virginia.cs.common.utils.MathUtils.*;
 
@@ -20,11 +22,12 @@ import static edu.virginia.cs.common.utils.MathUtils.*;
 public class MathUtilsTest {
 
     /**
-     * Test of {@link edu.virginia.cs.common.utils.MathUtils#imposeBounds(double, double, double) MathUtils.imposeBounds(double, double,
-     * double)}
+     * Test of {@link edu.virginia.cs.common.utils.MathUtils#imposeBounds(double, double, double) MathUtils.imposeBounds(double,
+     * double, double)}
      */
     @Test
     public void imposeBoundsTest() {
+        new MathUtils(); // For coverage
         final double min = Math.E;
         final double max = Math.PI;
         Assert.assertEquals(min, imposeBounds(min, 0, max), 0.0);
@@ -40,9 +43,9 @@ public class MathUtilsTest {
     }
 
     /**
-     * Test of {@link edu.virginia.cs.common.utils.MathUtils#scale(double, double, double) MathUtils.scale(double, double, double)} and
-     * {@link edu.virginia.cs.common.utils.MathUtils#scale(double, double, double, boolean) MathUtils.scale(double, double, double,
-     * boolean)}
+     * Test of {@link edu.virginia.cs.common.utils.MathUtils#scale(double, double, double) MathUtils.scale(double, double, double)}
+     * and {@link edu.virginia.cs.common.utils.MathUtils#scale(double, double, double, boolean) MathUtils.scale(double, double,
+     * double, boolean)}
      */
     @Test
     public void scaleTest() {
@@ -99,4 +102,14 @@ public class MathUtilsTest {
         Assert.assertEquals(Integer.valueOf(99966), bucketCnt.get(9));
         Assert.assertEquals(Integer.valueOf(99763), bucketCnt.get(10));
     }
+
+    /**
+     * Test of {@link edu.virginia.cs.common.utils.MathUtils#scaleIntInverse(int, int, int) MathUtils.scaleIntInverse(int, int,
+     * int)}
+     */
+    @Test
+    public void scaleIntInverseTest() {
+        Assert.assertEquals(0.5, scaleIntInverse(1, 2, 3), 0.0);
+    }
+
 }

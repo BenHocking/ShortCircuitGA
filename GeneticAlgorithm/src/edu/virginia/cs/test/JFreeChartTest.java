@@ -93,7 +93,7 @@ public class JFreeChartTest {
     public void mainTest() {
         spyDemo();
         timeDemo();
-        final int msToWait = 60000;
+        final int msToWait = 500;
         _scatterPlot.waitForTrigger(msToWait);
         _timePlot.waitForTrigger(msToWait);
     }

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
-package edu.virginia.cs.test;
+package edu.virginia.cs.test.common.utils;
 
 import static org.junit.Assert.*;
 

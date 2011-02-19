@@ -98,6 +98,6 @@ public final class MathUtils {
      */
     public static double scaleIntInverse(final int min, final int x, final int max) {
         final double intervalHalfWidth = 0.5 / (max - min + 1);
-        return intervalHalfWidth + (x - min) / (max - min + 1);
+        return intervalHalfWidth + ((double) (x - min)) / (max - min + 1);
     }
 }

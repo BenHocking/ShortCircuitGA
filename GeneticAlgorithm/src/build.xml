@@ -1,13 +1,22 @@
 <?xml version="1.0"?>
 <project name="ShortCircuitGA" default="all">
+	<property name="top.dir" value = "${basedir}/.." />
 	<property name="jarname" value="shortcircuitga.jar" />
 	<property name="test.src.dir" value="${basedir}" />
-	<property name="classes" value="${basedir}/../classes" />
-	<property name="test.classes" value="${basedir}/../test-classes" />
-	<property name="jars.dir" value="${basedir}/../jars" />
+	<property name="classes" value="${top.dir}/classes" />
+	<property name="test.classes" value="${top.dir}/test-classes" />
+	<property name="instrumented.classes" value="${top.dir}/instrumented-classes" />
+	<property name="jars.dir" value="${top.dir}/jars" />
 	<property name="jar" location="${jars.dir}/${jarname}" />
 	<property name="test.pattern.junit" value="**/*Test.java" />
 	<property name="test.report.dir" value="${basedir}/report" />
+
+	<path id="cobertura.classpath">
+	    <fileset dir="${jars.dir}">
+	        <include name="*.jar" />
+	    </fileset>
+	</path>
+	<taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
 
 	<path id="used.jars.path">
 		<fileset dir="${jars.dir}">
@@ -39,13 +48,20 @@
 		<delete dir="${test.report.dir}" />
 		<mkdir dir="${test.report.dir}" />
 	</target>
-	
+
+	<cobertura-instrument todir="${instrumented.classes}">
+	    <fileset dir="${classes}">
+	        <include name="**/*.class"/>
+	    </fileset>
+	</cobertura-instrument>
+
 	<!-- compile -->
 	<target name="_compile" depends="_init" description="Compiling.">
 		<javac nowarn="yes"
 		       source="1.6"
 		       srcdir="${test.src.dir}"
 		       destdir="${classes}"
+			   includeantruntime="false"
 		       debug="true"
 		       debuglevel="source,lines">
 			<include name="edu/**/*.java" />
@@ -86,9 +102,10 @@
 		       source="1.6"
 		       srcdir="${test.src.dir}"
 		       destdir="${test.classes}"
+			   includeantruntime="false"
 		       debug="true"
 		       debuglevel="source,lines">
-			<include name="**/test/*.java" />
+			<include name="**/test/**/*.java" />
 			<classpath refid="project.classpath" />
 		</javac>
 	</target>
@@ -100,8 +117,9 @@
 		       fork="true"
 		       haltonfailure="false">
 			<sysproperty key="basedir" value="${basedir}" />
-			<sysproperty key="java.awt.headless" value="true" />
+			<sysproperty key="java.awt.headless" value="false" />
 			<formatter type="xml" />
+			<classpath location="${instrumented.classes}" />
 			<classpath refid="project.classpath" />
 			<batchtest todir="${test.report.dir}">
 				<fileset dir="${test.src.dir}">
@@ -109,6 +127,10 @@
 				</fileset>
 			</batchtest>
 		</junit>
+	</target>
+	
+	<target name="coverage" depends="junit">
+	    <cobertura-report srcdir="${test.src.dir}" destdir="coberta-report"/>
 	</target>
 
 	<!-- Clean all -->

@@ -23,8 +23,7 @@ public class ArrayGenericUtils {
      * @return Value less than 0 if l1 is less than l2, value greater than 0 if l2 is less than l1, else zero
      * @exception RuntimeException if T does not implement {@link java.lang.Comparable Comparable}
      */
-    @SuppressWarnings("unchecked")
-    static public <T> int compare(final Iterable<T> l1, final Iterable<T> l2) {
+    static public <T extends Comparable<T>> int compare(final Iterable<T> l1, final Iterable<T> l2) {
         // A null list is "less than" a non-null list
         if (l1 == null) return (l2 != null) ? -1 : 0;
         if (l2 == null) return 1;
@@ -34,8 +33,7 @@ public class ArrayGenericUtils {
         while (i1.hasNext() && i2.hasNext()) {
             final T c1 = i1.next();
             final T c2 = i2.next();
-            if (!(c1 instanceof Comparable<?>)) throw new RuntimeException("Items must be Comparable");
-            final Comparable<T> cc1 = (Comparable<T>) c1;
+            final Comparable<T> cc1 = c1;
             final int result = cc1.compareTo(c2);
             if (result != 0) return result;
         }

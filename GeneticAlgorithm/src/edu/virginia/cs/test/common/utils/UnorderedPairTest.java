@@ -1,9 +1,12 @@
 /*
  * Copyright (c) 2010-2011 Ashlie Benjamin Hocking. All Rights reserved.
  */
-package edu.virginia.cs.test;
+package edu.virginia.cs.test.common.utils;
 
-import junit.framework.Assert;
+import static junit.framework.Assert.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -19,18 +22,33 @@ public final class UnorderedPairTest {
     final static UnorderedPair<Integer> pair1 = new UnorderedPair<Integer>(new Integer(3), new Integer(14));
     final static UnorderedPair<Integer> pair2 = new UnorderedPair<Integer>(new Integer(14), new Integer(3));
     final static UnorderedPair<Integer> pair3 = new UnorderedPair<Integer>(new Integer(3), new Integer(14));
+    final static UnorderedPair<Integer> pair4 = new UnorderedPair<Integer>(new Integer(3), new Integer(3));
     final static UnorderedPair<Integer> opair1 = new UnorderedPair<Integer>(new Integer(2), new Integer(14));
     final static UnorderedPair<Integer> opair2 = new UnorderedPair<Integer>(new Integer(3), new Integer(2));
+
+    /**
+     * Tests asCollection method in UnorderedPair
+     */
+    @Test
+    public void testAsCollection() {
+        final List<Integer> expected = new ArrayList<Integer>();
+        expected.add(3);
+        expected.add(14);
+        assertEquals(expected, pair1.asCollection());
+    }
 
     /**
      * Tests that pairs with a different (or same) order of same items are equal, but that others are not.
      */
     @Test
     public void testEquals() {
-        Assert.assertTrue(pair1.equals(pair2));
-        Assert.assertTrue(pair1.equals(pair3));
-        Assert.assertTrue(!pair1.equals(opair1));
-        Assert.assertTrue(!pair1.equals(opair2));
+        assertTrue(pair1.equals(pair2));
+        assertTrue(pair1.equals(pair3));
+        assertTrue(!pair1.equals(pair4));
+        assertTrue(!pair1.equals(opair1));
+        assertTrue(!pair1.equals(opair2));
+        assertEquals(false, pair1.equals(new Object()));
+        assertEquals(false, pair1.equals(null));
     }
 
     /**
@@ -38,10 +56,10 @@ public final class UnorderedPairTest {
      */
     @Test
     public void testHash() {
-        Assert.assertEquals(pair1.hashCode(), pair2.hashCode());
-        Assert.assertEquals(pair1.hashCode(), pair3.hashCode());
-        Assert.assertTrue(pair1.hashCode() != opair1.hashCode());
-        Assert.assertTrue(pair1.hashCode() != opair2.hashCode());
+        assertEquals(pair1.hashCode(), pair2.hashCode());
+        assertEquals(pair1.hashCode(), pair3.hashCode());
+        assertTrue(pair1.hashCode() != opair1.hashCode());
+        assertTrue(pair1.hashCode() != opair2.hashCode());
     }
 
 }

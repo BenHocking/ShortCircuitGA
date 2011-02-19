@@ -38,8 +38,7 @@ public final class IntegerRange extends ArrayList<Integer> {
      * @param to Upper bound (exclusive)
      */
     public IntegerRange(final int from, final int step, final int to) {
-        assert (from == to || (from < to && step > 0) || (from > to && step < 0));
-        for (int i = from; i < to; i += step) {
+        for (int i = from; step > 0 ? (i < to) : (i > to); i += step) {
             add(i);
         }
     }

@@ -39,7 +39,7 @@ public final class ListValueGenerator implements ValueGenerator {
     public double invert(final String s) {
         for (int i = 0; i < _list.size(); ++i) {
             if (_list.get(i).toString().equals(s)) {
-                return MathUtils.scaleIntInverse(0, i, _list.size());
+                return MathUtils.scaleIntInverse(0, i, _list.size() - 1);
             }
         }
         throw new IllegalArgumentException("'" + s + "' is not a valid value");
