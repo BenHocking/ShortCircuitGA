@@ -24,4 +24,9 @@ public interface Crossover {
      * @param mutator Class to use when mutating individuals after crossover
      */
     void setMutator(Mutator mutator);
+
+    /**
+     * @return Class to use when mutating individuals after crossover
+     */
+    Mutator getMutator();
 }

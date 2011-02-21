@@ -42,6 +42,10 @@ public final class IntervalGene implements Gene {
      */
     @Override
     public Gene generate(final Random rng) {
+        if (_sigma == 0) {
+            // Assume no deviation is wanted
+            return new IntervalGene(_value, _sigma);
+        }
         return new IntervalGene(rng.nextDouble(), _sigma);
     }
 
@@ -95,8 +99,13 @@ public final class IntervalGene implements Gene {
      */
     @Override
     public int compareTo(final Gene g) {
-        if (!(g instanceof IntervalGene)) throw new RuntimeException("Genes must be of the same type");
+        if (!(g instanceof IntervalGene)) throw new IllegalArgumentException("Genes must be of the same type");
         final IntervalGene ig = (IntervalGene) g;
         return (int) Math.signum(_value - ig._value);
+    }
+
+    @Override
+    public String toString() {
+        return "IntervalGene (" + _value + ", " + _sigma + ")";
     }
 }

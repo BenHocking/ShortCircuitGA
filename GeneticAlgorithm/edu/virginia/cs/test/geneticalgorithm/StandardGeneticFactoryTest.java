@@ -3,13 +3,18 @@
  */
 package edu.virginia.cs.test.geneticalgorithm;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import edu.virginia.cs.geneticalgorithm.AbstractFitness;
+import edu.virginia.cs.geneticalgorithm.DecayingIntervalMutator;
+import edu.virginia.cs.geneticalgorithm.Distribution;
 import edu.virginia.cs.geneticalgorithm.Fitness;
 import edu.virginia.cs.geneticalgorithm.FitnessFactory;
 import edu.virginia.cs.geneticalgorithm.Gene;
@@ -31,26 +36,36 @@ public final class StandardGeneticFactoryTest {
     private static int GENOTYPE_SIZE = 5;
     private static int NUM_GENERATIONS = 20;
 
-    private class TrivialStandardFitnessFactory implements FitnessFactory {
+    /**
+     * Trivial fitness function designed for easy testing
+     * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
+     * @since May 20, 2010
+     */
+    public static class TrivialStandardFitness extends AbstractFitness {
 
-        private class TrivialStandardFitness extends AbstractFitness {
+        private final Genotype _genotype;
 
-            private final Genotype _genotype;
-
-            TrivialStandardFitness(final Genotype genotype) {
-                _genotype = genotype;
-            }
-
-            @Override
-            public List<Double> fitnessValues() {
-                double retval = 0;
-                for (final Gene g : _genotype) {
-                    if (g == StandardGene.ONE) retval += 1.0;
-                }
-                return Collections.singletonList(retval);
-            }
-
+        TrivialStandardFitness(final Genotype genotype) {
+            _genotype = genotype;
         }
+
+        @Override
+        public List<Double> fitnessValues() {
+            double retval = 0;
+            for (final Gene g : _genotype) {
+                if (g == StandardGene.ONE) retval += 1.0;
+            }
+            return Collections.singletonList(retval);
+        }
+
+    }
+
+    /**
+     * Trivial fitness function factory designed for easy testing
+     * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
+     * @since May 20, 2010
+     */
+    public static class TrivialStandardFitnessFactory implements FitnessFactory {
 
         /**
          * @see edu.virginia.cs.geneticalgorithm.FitnessFactory#createFitness(edu.virginia.cs.geneticalgorithm.Genotype)
@@ -62,10 +77,24 @@ public final class StandardGeneticFactoryTest {
     }
 
     /**
+     * Tests setMutator method in StandardGeneticFactory
+     */
+    @Test
+    public void testSetMutator() {
+        final GeneticFactory factory = new StandardGeneticFactory(1);
+        final Random rng = new Random();
+        final DecayingIntervalMutator mutator = new DecayingIntervalMutator(0.05, 0.001, 0.025, 0.005, rng);
+        factory.setMutator(mutator);
+        assertEquals(mutator, factory.getCrossoverFunction().getMutator());
+    }
+
+    /**
      * Tests all of the components of the GeneticFactory in an integrative manner.
      */
     @Test
     public void mainTest() {
+        Reproduction.DEBUG_LEVEL = 0;
+        Reproduction.SetNumProcesses(1);
         final double tolerance = 1E-8;
         final long seed = 1;
         final GeneticFactory factory = new StandardGeneticFactory(seed);
@@ -76,14 +105,21 @@ public final class StandardGeneticFactoryTest {
         for (int i = 0; i < NUM_GENERATIONS; ++i) {
             population = reproduction.reproduce(population, _fitFn, factory.getSelectFunction(), factory.getCrossoverFunction());
         }
+        List<Distribution> history = reproduction.getHistory();
+        assertEquals(0, history.size());
         Assert.assertEquals(GENOTYPE_SIZE, reproduction.getBestFit().get(0), tolerance);
-        Assert.assertEquals(4.45, reproduction.getMeanFit(), tolerance);
+        Assert.assertEquals(4.2, reproduction.getMeanFit(), tolerance);
         allowDuplicates = false;
-        reproduction = new Reproduction(allowDuplicates, keepHistory);
-        for (int i = 0; i < NUM_GENERATIONS; ++i) {
+        reproduction = new Reproduction(allowDuplicates, true);
+        reproduction.setNumElites((int) (POP_SIZE * 0.1));
+        assertEquals(2, reproduction.getNumElites());
+        for (int i = 0; i < 4; ++i) {
             population = reproduction.reproduce(population, _fitFn, factory.getSelectFunction(), factory.getCrossoverFunction());
+            Reproduction.DEBUG_LEVEL = i;
         }
         Assert.assertEquals(GENOTYPE_SIZE, reproduction.getBestFit().get(0), tolerance);
-        Assert.assertEquals(2.9, reproduction.getMeanFit(), tolerance);
+        Assert.assertEquals(2.7, reproduction.getMeanFit(), tolerance);
+        history = reproduction.getHistory();
+        assertEquals(4, history.size());
     }
 }

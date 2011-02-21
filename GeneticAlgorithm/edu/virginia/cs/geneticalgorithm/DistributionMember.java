@@ -89,12 +89,12 @@ public final class DistributionMember extends OrderedPair<List<Double>, Genotype
     @Override
     public int compareTo(final DistributionMember o) {
         // This is the most important bit.
-        if (getValue() != o.getValue()) return (int) Math.signum(o.getValue() - getValue());
+        if (!getValue().equals(o.getValue())) return (int) Math.signum(o.getValue() - getValue());
         // The rest is arbitrary and just designed to keep non-identical DistributionMembers from being equal
         final List<Double> fitVals = getFitnessValues();
         final List<Double> otherVals = o.getFitnessValues();
         for (int i = 0; i < fitVals.size(); ++i) {
-            if (fitVals.get(i) != otherVals.get(i)) return (int) Math.signum(otherVals.get(i) - fitVals.get(i));
+            if (!fitVals.get(i).equals(otherVals.get(i))) return (int) Math.signum(otherVals.get(i) - fitVals.get(i));
         }
         final Genotype g = getGenotype();
         final Genotype og = o.getGenotype();

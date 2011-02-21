@@ -34,8 +34,8 @@ public class ShortCircuitFitnessFactory implements FitnessFactory {
         _postFit = postFactory;
         _postFitLen = postFitLen;
         if (postFactory == null && !preFactory.generatesPostFitness())
-            throw new RuntimeException("If the proxy fitness factory cannot generate a post "
-                                       + "fitness function, one must be provided!");
+            throw new IllegalArgumentException("If the proxy fitness factory cannot generate a post "
+                                               + "fitness function, one must be provided!");
     }
 
     /**
@@ -57,7 +57,7 @@ public class ShortCircuitFitnessFactory implements FitnessFactory {
      * the postFit {@link Fitness} function to be evaluated
      */
     public ShortCircuitFitnessFactory(final ProxyFitnessFactory preFactory, final List<Double> preThreshold) {
-        this(preFactory, preThreshold, null, 1);
+        this(preFactory, preThreshold, 1);
     }
 
     /**

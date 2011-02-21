@@ -3,13 +3,16 @@
  */
 package edu.virginia.cs.test.geneticalgorithm;
 
+import static org.junit.Assert.*;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import edu.virginia.cs.geneticalgorithm.AbstractFitness;
+import edu.virginia.cs.geneticalgorithm.DecayingIntervalMutator;
 import edu.virginia.cs.geneticalgorithm.Fitness;
 import edu.virginia.cs.geneticalgorithm.FitnessFactory;
 import edu.virginia.cs.geneticalgorithm.Gene;
@@ -31,9 +34,9 @@ public final class IntervalGeneticFactoryTest {
     private static int GENOTYPE_SIZE = 5;
     private static int NUM_GENERATIONS = 20;
 
-    private class TrivialIntervalFitnessFactory implements FitnessFactory {
+    private static class TrivialIntervalFitnessFactory implements FitnessFactory {
 
-        private class TrivialIntervalFitness extends AbstractFitness {
+        private static class TrivialIntervalFitness extends AbstractFitness {
 
             Genotype _genotype;
 
@@ -63,6 +66,18 @@ public final class IntervalGeneticFactoryTest {
     }
 
     /**
+     * Tests setMutator method in IntervalGeneticFactory
+     */
+    @Test
+    public void testSetMutator() {
+        final GeneticFactory factory = new IntervalGeneticFactory(1);
+        final Random rng = new Random();
+        final DecayingIntervalMutator mutator = new DecayingIntervalMutator(0.05, 0.001, 0.025, 0.005, rng);
+        factory.setMutator(mutator);
+        assertEquals(mutator, factory.getCrossoverFunction().getMutator());
+    }
+
+    /**
      * Tests all of the components of the GeneticFactory in an integrative manner.
      */
     @Test
@@ -78,18 +93,18 @@ public final class IntervalGeneticFactoryTest {
             population = reproduction.reproduce(population, _fitFnFactory, factory.getSelectFunction(),
                                                 factory.getCrossoverFunction());
         }
-        Assert.assertEquals(3.793964434630042, reproduction.getBestFits().get(0).get(0), tolerance);
+        assertEquals(3.793964434630042, reproduction.getBestFits().get(0).get(0), tolerance);
         // As POP_SIZE -> inf, you would expect reproduction.getMeanFits().get(0) -> GENOTYPE_SIZE / 2 (i.e., 2.5)
-        Assert.assertEquals(2.4418757761918597, reproduction.getMeanFits().get(0), tolerance);
-        Assert.assertEquals(4.15, reproduction.getBestFit().get(0), 0.1);
-        Assert.assertEquals(3.75, reproduction.getMeanFit(), 0.1);
+        assertEquals(2.4418757761918597, reproduction.getMeanFits().get(0), tolerance);
+        assertEquals(4.15, reproduction.getBestFit().get(0), 0.1);
+        assertEquals(3.75, reproduction.getMeanFit(), 0.1);
         allowDuplicates = false;
         reproduction = new Reproduction(allowDuplicates, keepHistory);
         for (int i = 0; i < NUM_GENERATIONS; ++i) {
             population = reproduction.reproduce(population, _fitFnFactory, factory.getSelectFunction(),
                                                 factory.getCrossoverFunction());
         }
-        Assert.assertEquals(4.5, reproduction.getBestFit().get(0), 0.15);
-        Assert.assertEquals(4.05, reproduction.getMeanFit(), 0.1);
+        assertEquals(4.5, reproduction.getBestFit().get(0), 0.15);
+        assertEquals(4.05, reproduction.getMeanFit(), 0.1);
     }
 }

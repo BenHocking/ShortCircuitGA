@@ -37,8 +37,9 @@ import edu.virginia.cs.geneticalgorithm.StandardGenotype;
 public final class NeuroJetGeneticAlgorithm {
 
     // TODO: Generalize the location of these File objects
-    private final static File NJ = new File("/Users/bhocking/Documents/workspace/NeuroJet/build/NeuroJet");
-    private final static File WORKINGDIR = new File("/Users/bhocking/Documents/workspace/ShortCircuitGA/scripts");
+    private static File NJ = new File("/Users/bhocking/Documents/workspace/NeuroJet/build/NeuroJet");
+    private static File WORKINGDIR = new File("/Users/bhocking/Documents/workspace/ShortCircuitGA/scripts");
+    private static File SCRIPTFILE = new File(WORKINGDIR, "trace_full.nj");
     private final static int GENOTYPE_SIZE = 21; // 0 - 20
     private final static double PRE_THRESHOLD = 1e5;
     private final static double POST_SCALE_FACTOR = 0.5 * PRE_THRESHOLD;
@@ -58,7 +59,7 @@ public final class NeuroJetGeneticAlgorithm {
     public NeuroJetGeneticAlgorithm(final int seed, final int popSize) {
         _updater = new ScriptUpdater();
         buildScriptUpdater();
-        final List<File> traceScriptFiles = Collections.singletonList(new File(WORKINGDIR, "trace_full.nj"));
+        final List<File> traceScriptFiles = Collections.singletonList(SCRIPTFILE);
         final NeuroJetTraceFitnessFactory traceFitnessFactory = new NeuroJetTraceFitnessFactory(traceScriptFiles, _updater, NJ,
                                                                                                 WORKINGDIR);
         final ProxyFitnessFactory quickFitnessFactory = new NeuroJetQuickFitnessFactory(traceFitnessFactory);
@@ -197,8 +198,20 @@ public final class NeuroJetGeneticAlgorithm {
      * @param args Ignored
      */
     public static void main(final String[] args) {
-        final int pop_size = 100;
-        final int num_generations = 150;
+        final int pop_size = args.length > 0 ? Integer.valueOf(args[0]) : 100;
+        final int num_generations = args.length > 1 ? Integer.valueOf(args[1]) : 150;
+        if (args.length > 2) {
+            NJ = new File(args[2]);
+        }
+        if (args.length > 3) {
+            WORKINGDIR = new File(args[3]);
+            if (!WORKINGDIR.exists()) {
+                WORKINGDIR.mkdir();
+            }
+        }
+        if (args.length > 4) {
+            SCRIPTFILE = new File(args[4]);
+        }
         final NeuroJetGeneticAlgorithm nga = new NeuroJetGeneticAlgorithm(1, pop_size);
         for (int i = 0; i < num_generations; ++i) {
             nga.reproduce();

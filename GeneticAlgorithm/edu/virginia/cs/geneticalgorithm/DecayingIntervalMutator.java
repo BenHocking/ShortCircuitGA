@@ -56,6 +56,13 @@ public final class DecayingIntervalMutator implements Mutator {
     }
 
     /**
+     * @return Standard deviation used when mutating {@link IntervalGene IntervalGenes}.
+     */
+    public double getMutateSigma() {
+        return _mutateSigma;
+    }
+
+    /**
      * @see edu.virginia.cs.geneticalgorithm.Mutator#mutate(edu.virginia.cs.geneticalgorithm.Genotype)
      */
     @Override

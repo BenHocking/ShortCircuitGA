@@ -26,7 +26,10 @@ public final class Reproduction {
     private final List<Double> _meanFits = new ArrayList<Double>();
     private final List<Distribution> _popHist = new ArrayList<Distribution>();
     private int _numElites = 0;
-    static int DEBUG_LEVEL = 1;
+    /**
+     * DEBUG_LEVEL controls detail of messages to standard out (0 is quiet)
+     */
+    public static int DEBUG_LEVEL = 1;
     private static Semaphore _monitor = new Semaphore(1);
 
     /**

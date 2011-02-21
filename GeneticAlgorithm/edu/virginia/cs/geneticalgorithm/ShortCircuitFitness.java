@@ -58,7 +58,7 @@ public class ShortCircuitFitness extends AbstractFitness {
         else {
             final List<Double> fitVals = _preFit.fitnessValues();
             if (fitVals.size() > _preThreshold.size())
-                throw new RuntimeException("Number of fitness values from first fitness function exceeds size of threshold test.");
+                throw new IllegalArgumentException("# of fitness values from prefitness function exceeds size of threshold test.");
             for (int i = 0; i < fitVals.size(); ++i) {
                 if (fitVals.get(i) < _preThreshold.get(i)) {
                     passedThreshold = false;
@@ -128,7 +128,7 @@ public class ShortCircuitFitness extends AbstractFitness {
 
     @Override
     public String toString() {
-        return "{hash = " + hashCode() + "\n\tpre = " + _preFit.toString() + "\n\tthreshold = " + _preThreshold.toString()
-               + "\n\tpost = " + _postFit.toString() + "}";
+        return "{hash = " + hashCode() + "\n\tpre = " + _preFit + "\n\tthreshold = " + _preThreshold + "\n\tpost = " + _postFit
+               + "}";
     }
 }

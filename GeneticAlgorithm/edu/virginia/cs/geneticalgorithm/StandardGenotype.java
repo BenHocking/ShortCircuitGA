@@ -31,7 +31,7 @@ public final class StandardGenotype extends ArrayList<Gene> implements Genotype 
     }
 
     /**
-     * 
+     * Empty genotype constructor
      */
     public StandardGenotype() {
         super();
@@ -93,7 +93,7 @@ public final class StandardGenotype extends ArrayList<Gene> implements Genotype 
      */
     @Override
     public int compareTo(final Genotype g) {
-        if (!(g instanceof StandardGenotype)) throw new RuntimeException("Genotypes must be of the same type");
+        if (!(g instanceof StandardGenotype)) throw new IllegalArgumentException("Genotypes must be of the same type");
         final StandardGenotype sg = (StandardGenotype) g;
         return ArrayGenericUtils.compare(this, sg);
     }

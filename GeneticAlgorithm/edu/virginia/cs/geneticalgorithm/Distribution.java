@@ -4,6 +4,7 @@
 package edu.virginia.cs.geneticalgorithm;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 24, 2010
  */
-public final class Distribution extends ArrayList<DistributionMember> {
+public class Distribution extends ArrayList<DistributionMember> {
 
     /**
      * Default constructor
@@ -44,7 +45,7 @@ public final class Distribution extends ArrayList<DistributionMember> {
      * Remove all but one of a group of DistributionMembers with the same {@link Genotype}.
      */
     public void removeDuplicates() {
-        final List<Boolean> duplicates = new ArrayList<Boolean>(size());
+        final List<Boolean> duplicates = new ArrayList<Boolean>(Collections.nCopies(size(), (Boolean) null));
         for (int i = 0; i < size(); ++i) {
             if (duplicates.get(i) == null) {
                 duplicates.set(i, false);
@@ -64,8 +65,8 @@ public final class Distribution extends ArrayList<DistributionMember> {
     }
 
     /**
-     * Figures out whether any fitness values have been calculated.
-     * @return Whether any fitness values have been calculated.
+     * Figures out whether all fitness values have been calculated.
+     * @return Whether all fitness values have been calculated.
      */
     public boolean hasValues() {
         for (final DistributionMember m : this) {

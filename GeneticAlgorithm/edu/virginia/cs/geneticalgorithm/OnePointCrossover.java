@@ -49,4 +49,11 @@ public final class OnePointCrossover implements Crossover {
         _mutator = mutator;
     }
 
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.Crossover#getMutator()
+     */
+    @Override
+    public Mutator getMutator() {
+        return _mutator;
+    }
 }

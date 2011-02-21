@@ -17,11 +17,18 @@ import edu.virginia.cs.common.utils.IntegerValueGenerator;
 public class IntegerValueGeneratorTest {
 
     /**
+     * @return Simple IntegerValueGenerator
+     */
+    public static IntegerValueGenerator generateIntegerValueGenerator() {
+        return new IntegerValueGenerator(1, 10);
+    }
+
+    /**
      * Test method for {@link edu.virginia.cs.common.utils.IntegerValueGenerator#generate(double)}.
      */
     @Test
     public final void testGenerate() {
-        final IntegerValueGenerator g = new IntegerValueGenerator(1, 10);
+        final IntegerValueGenerator g = generateIntegerValueGenerator();
         assertEquals("1", g.generate(0.0));
         assertEquals("10", g.generate(1.0));
         assertEquals("10", g.generate(2.0));
@@ -33,7 +40,7 @@ public class IntegerValueGeneratorTest {
      */
     @Test
     public final void testInvert() {
-        final IntegerValueGenerator g = new IntegerValueGenerator(1, 10);
+        final IntegerValueGenerator g = generateIntegerValueGenerator();
         assertEquals(0.05, g.invert("1"), 0.0);
         assertEquals(0.95, g.invert("10"), 1e-10);
         assertEquals(1.95, g.invert("20"), 0.0);

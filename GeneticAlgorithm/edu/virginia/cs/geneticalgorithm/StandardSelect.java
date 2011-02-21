@@ -11,7 +11,7 @@ import java.util.Random;
  * @author <a href="mailto:benjamin.hocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 25, 2010
  */
-final class StandardSelect implements Select {
+public final class StandardSelect implements Select {
 
     private final Random _rng;
 

@@ -77,7 +77,7 @@ public final class StandardGene implements Gene {
      */
     @Override
     public int compareTo(final Gene g) {
-        if (!(g instanceof StandardGene)) throw new RuntimeException("Genes must be of the same type");
+        if (!(g instanceof StandardGene)) throw new IllegalArgumentException("Genes must be of the same type");
         final StandardGene sg = (StandardGene) g;
         return getValue() - sg.getValue();
     }

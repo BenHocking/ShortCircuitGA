@@ -49,6 +49,13 @@ public final class IntervalMutator implements Mutator {
     }
 
     /**
+     * @return standard deviation to use when mutating interval genes
+     */
+    public double getMutateSigma() {
+        return _mutateSigma;
+    }
+
+    /**
      * @see edu.virginia.cs.geneticalgorithm.Mutator#mutate(edu.virginia.cs.geneticalgorithm.Genotype)
      */
     @Override

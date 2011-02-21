@@ -26,7 +26,7 @@ public class ConstantGeneInterpreter implements GeneInterpreter {
      * @param constant Constant value to return by {@link #generate(Genotype)}
      */
     public ConstantGeneInterpreter(final Number constant) {
-        _constant = constant.toString();
+        this(constant.toString());
     }
 
     /**
