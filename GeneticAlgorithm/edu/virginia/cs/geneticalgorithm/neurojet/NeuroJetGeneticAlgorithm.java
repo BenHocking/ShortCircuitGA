@@ -99,16 +99,6 @@ public final class NeuroJetGeneticAlgorithm {
         return _reproduction;
     }
 
-    /**
-     * Returns the current population ({@link java.util.List List}) of individuals (
-     * {@link edu.virginia.cs.geneticalgorithm.Genotype Genotype}).
-     * @return the current population ({@link java.util.List List}) of individuals (
-     * {@link edu.virginia.cs.geneticalgorithm.Genotype Genotype}).
-     */
-    public List<Genotype> getPopulation() {
-        return _population;
-    }
-
     private void buildScriptUpdater() {
         _updater.addDoubleMapping(0, "A", 2.0, 8.0); // InternrnExcDecay
         _updater.addIntegerMapping(1, "C", 1, 4); // InternrnAxonalDelay
@@ -137,12 +127,14 @@ public final class NeuroJetGeneticAlgorithm {
     private void doPCA() {
         final List<Distribution> history = _reproduction.getHistory();
         if (history.isEmpty()) {
-            System.out.println("Cannot perform PCA without history.");
-            return;
+            throw new RuntimeException("Cannot perform PCA without history.");
         }
         final Distribution first = history.get(0);
         final int numIndividualsPerGeneration = first.size(); // Needs to be constant across generations
         final int num_rows = history.size() * numIndividualsPerGeneration; // Total number of individuals
+        if (num_rows < 2) {
+            throw new RuntimeException("Cannot perform PCA without at least two rows of data.");
+        }
         final DistributionMember firstMember = first.get(0);
         final int num_cols = firstMember.getFitnessValues().size() + firstMember.getGenotype().getNumGenes();
         final double[] dmatrix = new double[num_rows * num_cols];

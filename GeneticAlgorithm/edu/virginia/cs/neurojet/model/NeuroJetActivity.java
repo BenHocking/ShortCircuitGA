@@ -41,9 +41,7 @@ public class NeuroJetActivity extends File {
      * @param timeStep Size of simulated time step in milliseconds
      */
     public NeuroJetActivity(final File parent, final String child, final double timeStep) {
-        super(parent, child);
-        _signal = new File(parent, child + ".ready");
-        _timeStep = timeStep;
+        this(new File(parent, child).getAbsolutePath(), timeStep);
     }
 
     /**

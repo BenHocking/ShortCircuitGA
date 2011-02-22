@@ -36,6 +36,26 @@ public class NeuroJetGeneticAlgorithmTest {
         };
         NeuroJetGeneticAlgorithm.main(args);
         assertTrue(workingDir.exists());
+        final String[] bad_args = {
+            "0", "0"
+        };
+        try {
+            NeuroJetGeneticAlgorithm.main(bad_args);
+            fail("Shouldn't have been able to do pca");
+        }
+        catch (final RuntimeException e) {
+            assertEquals("Cannot perform PCA without history.", e.getMessage());
+        }
+        final String[] bad_args2 = {
+            "1", "1", neuroJet.getAbsolutePath(), workingDir.getAbsolutePath(), scriptFile.getAbsolutePath()
+        };
+        try {
+            NeuroJetGeneticAlgorithm.main(bad_args2);
+            fail("Shouldn't have been able to do pca");
+        }
+        catch (final RuntimeException e) {
+            assertEquals("Cannot perform PCA without at least two rows of data.", e.getMessage());
+        }
     }
 
 }

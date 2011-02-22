@@ -6,6 +6,7 @@ package edu.virginia.cs.test.neurojet.model;
 import static edu.virginia.cs.common.utils.ArrayNumberUtils.slope;
 import static edu.virginia.cs.common.utils.ArrayNumberUtils.sum;
 import static org.junit.Assert.*;
+import static edu.virginia.cs.test.data.TestFileLoader.*;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -18,7 +19,6 @@ import org.junit.Test;
 
 import edu.virginia.cs.common.utils.IntegerRange;
 import edu.virginia.cs.neurojet.model.NeuroJetNeuronBuffer;
-import edu.virginia.cs.test.data.TestFileLoader;
 
 /**
  * Test harness for NeuroJetNeuronBuffer
@@ -34,7 +34,7 @@ public class NeuroJetNeuronBufferTest {
      */
     @Before
     public void setUp() throws Exception {
-        _buffFile = new NeuroJetNeuronBuffer(TestFileLoader.getDataDirectory(), "tstBuff.dat");
+        _buffFile = new NeuroJetNeuronBuffer(getDataDirectory(), "tstBuff.dat");
     }
 
     /**
@@ -43,7 +43,7 @@ public class NeuroJetNeuronBufferTest {
      */
     @Test
     public void testConstructors() throws URISyntaxException {
-        final File f1 = new NeuroJetNeuronBuffer(TestFileLoader.getDataDirectory(), "tstBuff.dat", 20);
+        final File f1 = new NeuroJetNeuronBuffer(getDataDirectory(), "tstBuff.dat", 20);
         assertEquals(f1, _buffFile);
         final String fileName = _buffFile.getAbsolutePath();
         final File f2 = new NeuroJetNeuronBuffer(fileName, 20);
@@ -108,7 +108,7 @@ public class NeuroJetNeuronBufferTest {
         final List<Set<Integer>> buff1 = _buffFile.getFiringBuffer();
         List<Set<Integer>> buff2 = _buffFile.getFiringBuffer(true);
         assertEquals(buff1, buff2);
-        final NeuroJetNeuronBuffer f1 = new NeuroJetNeuronBuffer(TestFileLoader.getDataDirectory(), "tstBuff-notthere.dat", 1);
+        final NeuroJetNeuronBuffer f1 = new NeuroJetNeuronBuffer(getDataDirectory(), "tstBuff-notthere.dat", 1);
         try {
             buff2 = f1.getFiringBuffer();
             fail("File shouldn't exist");

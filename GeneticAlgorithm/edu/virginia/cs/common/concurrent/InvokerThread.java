@@ -3,8 +3,10 @@
  */
 package edu.virginia.cs.common.concurrent;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,8 @@ public class InvokerThread extends Thread {
     private long _end = -1;
     private boolean _halted;
     private final Object _lock = new Object();
+    private final StringBuffer _out = new StringBuffer();
+    private final StringBuffer _err = new StringBuffer();
 
     /**
      * Constructor
@@ -42,22 +46,53 @@ public class InvokerThread extends Thread {
 
     @Override
     public void run() {
-        synchronized (_lock) {
-            _halted = false;
-            _preprocessor.run();
-            final List<String> command = new ArrayList<String>();
-            try {
-                command.add(_executable.getCanonicalPath());
-                command.addAll(_arguments);
-                final ProcessBuilder builder = new ProcessBuilder(command);
-                builder.directory(_workingDir);
-                _process = builder.start();
-                _start = System.currentTimeMillis();
+        final Thread t = new Thread() {
+
+            @Override
+            public void run() {
+                synchronized (_lock) {
+                    try {
+                        _halted = false;
+                        _start = System.currentTimeMillis();
+                        _end = -1;
+                        try {
+                            if (_preprocessor != null) {
+                                _preprocessor.run();
+                            }
+                            final List<String> command = new ArrayList<String>();
+                            command.add(_executable.getCanonicalPath());
+                            command.addAll(_arguments);
+                            final ProcessBuilder builder = new ProcessBuilder(command);
+                            builder.directory(_workingDir);
+                            _process = builder.start();
+                            final BufferedReader out = new BufferedReader(new InputStreamReader(_process.getInputStream()));
+                            String line;
+                            while ((line = out.readLine()) != null) {
+                                _out.append(line);
+                            }
+                            try {
+                                final BufferedReader err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
+                                while ((line = err.readLine()) != null) {
+                                    _err.append(line);
+                                }
+                            }
+                            catch (final IOException e) {
+                                _err.append(e.getStackTrace().toString());
+                            }
+                        }
+                        catch (final IOException e) {
+                            if (!_halted) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+                    finally {
+                        _end = System.currentTimeMillis();
+                    }
+                }
             }
-            catch (final IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        };
+        t.run();
     }
 
     /**
@@ -66,7 +101,9 @@ public class InvokerThread extends Thread {
      */
     public long getDuration() {
         synchronized (_lock) {
-            return ((_end > 0) ? _end : System.currentTimeMillis()) - _start + 1;
+            final long e = ((_end > 0) ? _end : System.currentTimeMillis());
+            final long s = (_start > 0) ? _start : e;
+            return e - s + 1;
         }
     }
 
@@ -76,7 +113,9 @@ public class InvokerThread extends Thread {
     public void halt() {
         synchronized (_lock) {
             if (!_halted) {
-                _process.destroy();
+                if (_process != null) {
+                    _process.destroy();
+                }
                 _end = System.currentTimeMillis();
                 _halted = true;
             }
