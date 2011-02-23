@@ -43,7 +43,6 @@ public final class NeuroJetGeneticAlgorithm {
     private final static int GENOTYPE_SIZE = 21; // 0 - 20
     private final static double PRE_THRESHOLD = 1e5;
     private final static double POST_SCALE_FACTOR = 0.5 * PRE_THRESHOLD;
-    private final ScriptUpdater _updater;
     private final FitnessFactory _fitnessFactory;
     private final GeneticFactory _factory;
     private final Reproduction _reproduction;
@@ -57,10 +56,9 @@ public final class NeuroJetGeneticAlgorithm {
      * @param popSize Number of individuals to use in the population.
      */
     public NeuroJetGeneticAlgorithm(final int seed, final int popSize) {
-        _updater = new ScriptUpdater();
-        buildScriptUpdater();
         final List<File> traceScriptFiles = Collections.singletonList(SCRIPTFILE);
-        final NeuroJetTraceFitnessFactory traceFitnessFactory = new NeuroJetTraceFitnessFactory(traceScriptFiles, _updater, NJ,
+        final NeuroJetTraceFitnessFactory traceFitnessFactory = new NeuroJetTraceFitnessFactory(traceScriptFiles,
+                                                                                                buildScriptUpdater(), NJ,
                                                                                                 WORKINGDIR);
         final ProxyFitnessFactory quickFitnessFactory = new NeuroJetQuickFitnessFactory(traceFitnessFactory);
         _fitnessFactory = new ShortCircuitFitnessFactory(quickFitnessFactory, Collections.singletonList(PRE_THRESHOLD),
@@ -99,29 +97,34 @@ public final class NeuroJetGeneticAlgorithm {
         return _reproduction;
     }
 
-    private void buildScriptUpdater() {
-        _updater.addDoubleMapping(0, "A", 2.0, 8.0); // InternrnExcDecay
-        _updater.addIntegerMapping(1, "C", 1, 4); // InternrnAxonalDelay
-        _updater.addIntegerMapping(2, "D", 3, 15); // dendFilterWidth
-        _updater.addIntegerMapping(3, "E", 1, 5); // minAxDelay
-        _updater.addIntegerMapping(4, "F", "E", 7); // maxAxDelay
-        _updater.addDesiredActMapping(5, "G", 1, 5); // Desired activity (Hz)
-        _updater.addDoubleMapping(6, "H", 0, 1); // Synaptic failure
-        _updater.addDoubleMapping(7, "I", 90, 190); // Off-rate time constant
-        _updater.addDoubleMapping(8, "J", 2, 19); // On-rate time constant
-        _updater.addDoubleMapping(9, "K", 0, 0.1); // KFB
-        _updater.addDoubleMapping(10, "L", 0, 0.1); // KFF
-        _updater.addDoubleMapping(11, "M", 0, 0.1); // K0
-        _updater.addConstantMapping(-1, "N", 500); // Trace duration (constant)
-        _updater.addDoubleMapping(12, "O", 0.005, 0.1); // mu
-        _updater.addDoubleMapping(13, "P", 0, 2); // lambda
-        _updater.addDoubleMapping(14, "Q", 0.01, 0.03); // IzhA
-        _updater.addDoubleMapping(15, "R", -0.1, -0.05); // IzhB
-        _updater.addDoubleMapping(16, "S", -70, -50); // IzhC
-        _updater.addDoubleMapping(17, "T", 5, 7); // IzhD
-        _updater.addDoubleMapping(18, "U", -70, -50); // IzhvStart
-        _updater.addDoubleMapping(19, "W", 5, 15); // IzhIMult
-        _updater.addDoubleMapping(20, "X", 0.2, 0.5); // mePct
+    /**
+     * @return ScriptUpdater that replaces wild cards with parameter values
+     */
+    public static ScriptUpdater buildScriptUpdater() {
+        final ScriptUpdater updater = new ScriptUpdater();
+        updater.addDoubleMapping(0, "A", 2.0, 8.0); // InternrnExcDecay
+        updater.addIntegerMapping(1, "C", 1, 4); // InternrnAxonalDelay
+        updater.addIntegerMapping(2, "D", 3, 15); // dendFilterWidth
+        updater.addIntegerMapping(3, "E", 1, 5); // minAxDelay
+        updater.addIntegerMapping(4, "F", "E", 7); // maxAxDelay
+        updater.addDesiredActMapping(5, "G", 1, 5); // Desired activity (Hz)
+        updater.addDoubleMapping(6, "H", 0, 1); // Synaptic failure
+        updater.addDoubleMapping(7, "I", 90, 190); // Off-rate time constant
+        updater.addDoubleMapping(8, "J", 2, 19); // On-rate time constant
+        updater.addDoubleMapping(9, "K", 0, 0.1); // KFB
+        updater.addDoubleMapping(10, "L", 0, 0.1); // KFF
+        updater.addDoubleMapping(11, "M", 0, 0.1); // K0
+        updater.addConstantMapping(-1, "N", 500); // Trace duration (constant)
+        updater.addDoubleMapping(12, "O", 0.005, 0.1); // mu
+        updater.addDoubleMapping(13, "P", 0, 2); // lambda
+        updater.addDoubleMapping(14, "Q", 0.01, 0.03); // IzhA
+        updater.addDoubleMapping(15, "R", -0.1, -0.05); // IzhB
+        updater.addDoubleMapping(16, "S", -70, -50); // IzhC
+        updater.addDoubleMapping(17, "T", 5, 7); // IzhD
+        updater.addDoubleMapping(18, "U", -70, -50); // IzhvStart
+        updater.addDoubleMapping(19, "W", 5, 15); // IzhIMult
+        updater.addMePctMapping(20, "X", 0.2, 0.5); // mePct
+        return updater;
     }
 
     private void doPCA() {

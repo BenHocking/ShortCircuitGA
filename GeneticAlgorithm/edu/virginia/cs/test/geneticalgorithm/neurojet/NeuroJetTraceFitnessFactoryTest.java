@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.Test;
 
 import edu.virginia.cs.geneticalgorithm.Fitness;
+import edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetGeneticAlgorithm;
 import edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness;
 import edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitnessFactory;
 import edu.virginia.cs.geneticalgorithm.neurojet.ScriptUpdater;
@@ -42,7 +43,8 @@ public class NeuroJetTraceFitnessFactoryTest {
     public static NeuroJetTraceFitnessFactory createNeuroJetTraceFitness() throws URISyntaxException {
         final File scriptFile = TestFileLoader.getFile("trace_full.nj");
         final List<File> scriptFiles = Collections.singletonList(scriptFile);
-        return new NeuroJetTraceFitnessFactory(scriptFiles, new ScriptUpdater(), getNeuroJet(), TestFileLoader.getDataDirectory());
+        return new NeuroJetTraceFitnessFactory(scriptFiles, NeuroJetGeneticAlgorithm.buildScriptUpdater(), getNeuroJet(),
+                                               TestFileLoader.getDataDirectory());
     }
 
     /**
@@ -101,7 +103,14 @@ public class NeuroJetTraceFitnessFactoryTest {
         catch (final IllegalArgumentException e) {
             assertEquals("individual must be of type StandardGenotype", e.getMessage());
         }
-        final Fitness f = factory.createFitness(StandardGenotypeTest.createStandardGenotype(30));
+        try {
+            factory.createFitness(StandardGenotypeTest.createStandardGenotype(30));
+            fail("Shouldn't work with a Standard 0/1 gene");
+        }
+        catch (final IllegalArgumentException e) {
+            assertEquals("Gene being matched against is not an IntervalGene", e.getMessage());
+        }
+        final Fitness f = factory.createFitness(StandardGenotypeTest.createStandardIntervalGenotype(30, 0.5));
         assertTrue(f instanceof NeuroJetTraceFitness);
     }
 }

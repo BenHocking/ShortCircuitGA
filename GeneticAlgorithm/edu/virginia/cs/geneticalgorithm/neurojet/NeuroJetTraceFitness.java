@@ -45,6 +45,7 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     private final Object _lock2 = new Object();
     private final StringBuffer _out = new StringBuffer();
     private final StringBuffer _err = new StringBuffer();
+    private final List<Double> _fitVals = new ArrayList<Double>();
 
     NeuroJetTraceFitness(final NeuroJetTraceFitnessIntermediary parent, final int dirID) {
         _parent = parent;
@@ -141,27 +142,28 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     }
 
     public List<Double> fitnessValues() {
-        runSimulationIfNeeded();
-        final List<Double> retval = new ArrayList<Double>();
-        if (_halted) {
-            for (int i = 0; i < NUM_FIT_VALS; ++i) {
-                retval.add(0.0);
+        if (_fitVals.isEmpty()) {
+            runSimulationIfNeeded();
+            if (_halted) {
+                for (int i = 0; i < NUM_FIT_VALS; ++i) {
+                    _fitVals.add(0.0);
+                }
+            }
+            else {
+                Pause.untilConditionMet(new FitnessFinished(this), WAIT_TIME);
+                final double timeDiff = _end - _start + 1;
+                assert (timeDiff > 0);
+                _fitVals.add(timeDiff > 0 ? timeDiff : 1);
+                addActivityMeasures(_fitVals);
+                addTrendMeasure(_fitVals);
+                final double fitness = generateTraceFitness();
+                assert (!Double.isNaN(fitness));
+                assert (fitness > 0);
+                _fitVals.add(fitness);
+                _fitVals.add(hasTargetBehavior());
             }
         }
-        else {
-            Pause.untilConditionMet(new FitnessFinished(this), WAIT_TIME);
-            final double timeDiff = _end - _start + 1;
-            assert (timeDiff > 0);
-            retval.add(timeDiff > 0 ? timeDiff : 1);
-            addActivityMeasures(retval);
-            addTrendMeasure(retval);
-            final double fitness = generateTraceFitness();
-            assert (!Double.isNaN(fitness));
-            assert (fitness > 0);
-            retval.add(fitness);
-            retval.add(hasTargetBehavior());
-        }
-        return retval;
+        return _fitVals;
     }
 
     void runSimulationIfNeeded() {
@@ -348,7 +350,7 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         final List<Double> fitVals = fitnessValues();
         final double actFitness = 1E-5 * _tstGenerator.overallFitness(fitVals.get(1), fitVals.get(2));
         final double slopeFitness = slopeContribution(fitVals.get(3));
-        return 1 / fitVals.get(0) + actFitness + slopeFitness + fitVals.get(4) + fitVals.get(5);
+        return 1 / (fitVals.get(0) + 1) + actFitness + slopeFitness + fitVals.get(4) + fitVals.get(5);
     }
 
     private static class InvokerThread extends Thread {

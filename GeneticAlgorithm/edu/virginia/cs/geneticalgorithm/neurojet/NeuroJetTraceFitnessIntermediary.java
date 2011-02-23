@@ -23,8 +23,11 @@ public final class NeuroJetTraceFitnessIntermediary {
 
     static final int NUM_FIT_VALS = 2; // Run time + trace score
 
+    /**
+     * Whether or not to delete working files when finished
+     */
+    public static boolean DELETE_WORKING_FILES = false;
     // Made package just to avoid warnings about dead code
-    static final boolean DELETE_WORKING_FILES = false;
     static final boolean DEBUG = false;
 
     private static Integer _counter = 0;
