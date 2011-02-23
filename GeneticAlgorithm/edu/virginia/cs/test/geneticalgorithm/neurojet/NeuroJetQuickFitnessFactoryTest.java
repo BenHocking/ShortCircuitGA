@@ -14,7 +14,7 @@ import edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetQuickFitnessFactory;
  * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Feb 20, 2011
  */
-public class NeuroJetQuickFitnesFactoryTest {
+public class NeuroJetQuickFitnessFactoryTest {
 
     /**
      * Test method for constructors

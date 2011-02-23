@@ -20,9 +20,17 @@ import edu.virginia.cs.geneticalgorithm.HaltableFitness;
 import edu.virginia.cs.neurojet.model.NeuroJetActivity;
 import edu.virginia.cs.neurojet.model.NeuroJetNeuronBuffer;
 
-class NeuroJetTraceFitness implements HaltableFitness, Runnable {
+/**
+ * Standard trace fitness function
+ * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
+ * @since Apr 27, 2010
+ */
+public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
 
-    public static final int NUM_FIT_VALS = 6; // Run time + 2 actvty measures + trend measure + perf measure + target measure
+    /**
+     * Run time + 2 actvty measures + trend measure + perf measure + target measure
+     */
+    public static final int NUM_FIT_VALS = 6;
     private static final int WAIT_TIME = 20 /* minutes */* 60 /* seconds per minute */* 1000 /* ms per sec */;
     private final NeuroJetQuickFitnessGenerator _tstGenerator = new NeuroJetQuickFitnessGenerator();
     private final NeuroJetTraceFitnessIntermediary _parent;
@@ -48,18 +56,30 @@ class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         return _parent.getParent();
     }
 
+    /**
+     * @return Desired activity
+     */
     public double getDesiredAct() {
         return _parent.getDesiredAct();
     }
 
+    /**
+     * @return Percentage of activity due to external activation
+     */
     public double getMePct() {
         return _parent.getMePct();
     }
 
+    /**
+     * @return Number of neurons in simulation
+     */
     public static int getNumNeurons() {
         return 2048;
     }
 
+    /**
+     * @return Pattern size
+     */
     public int getMe() {
         return (int) Math.round(getNumNeurons() * getMePct() / 10);
     }
@@ -68,6 +88,9 @@ class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         return _parent.getTimeStep();
     }
 
+    /**
+     * @return Which neurons are in the puff pattern
+     */
     public IntegerRange getPuffRange() {
         final int me = getMe();
         // Tone neurons are from 1 to me

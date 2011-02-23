@@ -66,7 +66,8 @@ public class NeuroJetTraceFitnessFactory implements FitnessFactory {
      */
     @Override
     public Fitness createFitness(final Genotype individual) {
-        if (!(individual instanceof StandardGenotype)) throw new RuntimeException("individual must be of type StandardGenotype");
+        if (!(individual instanceof StandardGenotype))
+            throw new IllegalArgumentException("individual must be of type StandardGenotype");
         return NeuroJetTraceFitnessIntermediary.createFitness(this, (StandardGenotype) individual, _scriptFiles, _updater,
                                                               _neuroJet, _workingDir, 1);
     }
