@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.Test;
 
 import edu.virginia.cs.common.utils.IntegerRange;
+import edu.virginia.cs.geneticalgorithm.Fitness;
 import edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness;
 import edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitnessFactory;
 import edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitnessIntermediary;
@@ -24,18 +25,25 @@ import edu.virginia.cs.test.geneticalgorithm.StandardGenotypeTest;
 public class NeuroJetTraceFitnessTest {
 
     private static NeuroJetTraceFitness _fitness = null;
+    private static NeuroJetTraceFitnessFactory _factory = null;
+    private static Object _factoryLock = new Object();
 
     private static void createFitness() throws URISyntaxException {
-        if (_fitness == null) _fitness = buildFitness();
+        if (_fitness == null) _fitness = buildFitness(0.5);
     }
 
     /**
+     * @param val Value to assign to all IntervalGene objects
      * @return NeuroJetTraceFitness suitable for testing
      * @throws URISyntaxException Shouldn't happen
      */
-    public static NeuroJetTraceFitness buildFitness() throws URISyntaxException {
-        final NeuroJetTraceFitnessFactory factory = NeuroJetTraceFitnessFactoryTest.createNeuroJetTraceFitness();
-        return (NeuroJetTraceFitness) factory.createFitness(StandardGenotypeTest.createStandardIntervalGenotype(30, 0.5));
+    public static NeuroJetTraceFitness buildFitness(final double val) throws URISyntaxException {
+        synchronized (_factoryLock) {
+            if (_factory == null) {
+                _factory = NeuroJetTraceFitnessFactoryTest.createNeuroJetTraceFitness();
+            }
+        }
+        return (NeuroJetTraceFitness) _factory.createFitness(StandardGenotypeTest.createStandardIntervalGenotype(30, val));
     }
 
     /**
@@ -151,6 +159,10 @@ public class NeuroJetTraceFitnessTest {
     public final void testTotalFitness() throws URISyntaxException {
         createFitness();
         assertEquals(2.513025, _fitness.totalFitness(), 1E-5); // TODO Make test more robust
+        Fitness f = buildFitness(0.0);
+        assertEquals(2.623615, f.totalFitness(), 1E-5);
+        f = buildFitness(1.0);
+        assertEquals(2.511775, f.totalFitness(), 1E-5);
     }
 
 }

@@ -44,7 +44,6 @@ final class NeuroJetQuickFitnessGenerator {
     double overallFitness(final double sampleStdDev, final double squaredDeviation) {
         final double x = getSampleStdDevFitness(sampleStdDev);
         final double y = getSquaredDeviationFromDesiredFitness(squaredDeviation);
-        assert (y > x);
         return x + y;
     }
 
@@ -57,15 +56,12 @@ final class NeuroJetQuickFitnessGenerator {
         for (final List<Double> withinTrial : activity) {
             final int lastElement = withinTrial.size(); // Not inclusive
             numSums += lastElement;
-            assert (lastElement == 750);
             for (final Integer i : new IntegerRange(0, 75, lastElement)) {
                 final int curLast = Math.min(i + 74, lastElement); // Not inclusive
                 final int curNumElems = curLast - i + 1;
                 actFitness += activityFile.squaredDeviation(i + 1, curLast + 1, desiredAct) * curNumElems;
             }
         }
-        assert (actFitness > 0);
         _sqDevFromDesired = actFitness /= numSums;
-        assert ((1000.0 / _sqDevFromDesired) < MAX_SQ_DEV_FIT);
     }
 }
