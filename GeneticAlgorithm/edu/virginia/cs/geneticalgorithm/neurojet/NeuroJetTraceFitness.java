@@ -152,13 +152,11 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
             else {
                 Pause.untilConditionMet(new FitnessFinished(this), WAIT_TIME);
                 final double timeDiff = _end - _start + 1;
-                assert (timeDiff > 0);
                 _fitVals.add(timeDiff > 0 ? timeDiff : 1);
                 addActivityMeasures(_fitVals);
                 addTrendMeasure(_fitVals);
                 final double fitness = generateTraceFitness();
-                assert (!Double.isNaN(fitness));
-                assert (fitness > 0);
+                assert (fitness >= 0);
                 _fitVals.add(fitness);
                 _fitVals.add(hasTargetBehavior());
             }
@@ -316,7 +314,6 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         final int early = 200;
         final double fracPuffEarlyFired = (maxEra > early) ? tstBuff.fractionFired(puffRange, new IntegerRange(1, early)) : 0.0;
         final double retval = (maxFracPuffFired - fracPuffEarlyFired) * generateTimeValue(maxEra + 1) / getMePct();
-        // assert retval > 0;
         return retval;
     }
 
