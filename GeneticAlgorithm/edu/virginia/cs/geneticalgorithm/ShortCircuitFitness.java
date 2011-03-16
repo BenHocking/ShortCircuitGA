@@ -3,6 +3,7 @@
  */
 package edu.virginia.cs.geneticalgorithm;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -74,7 +75,7 @@ public class ShortCircuitFitness extends AbstractFitness {
      */
     @Override
     public List<Double> fitnessValues() {
-        final List<Double> retval = _preFit.fitnessValues();
+        final List<Double> retval = new ArrayList<Double>(_preFit.fitnessValues());
         if (passedThreshold()) {
             // Evaluate the post-fitness function
             retval.addAll(_postFit.fitnessValues());
@@ -86,7 +87,7 @@ public class ShortCircuitFitness extends AbstractFitness {
             // Assign zero for the post-fitness function values
             retval.addAll(Collections.nCopies(_postFitLen, 0.0));
         }
-        return retval;
+        return Collections.unmodifiableList(retval);
     }
 
     /**
@@ -130,5 +131,13 @@ public class ShortCircuitFitness extends AbstractFitness {
     public String toString() {
         return "{hash = " + hashCode() + "\n\tpre = " + _preFit + "\n\tthreshold = " + _preThreshold + "\n\tpost = " + _postFit
                + "}";
+    }
+
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.Fitness#numFitnessValues()
+     */
+    @Override
+    public int numFitnessValues() {
+        return _preFit.numFitnessValues() + _postFit.numFitnessValues();
     }
 }

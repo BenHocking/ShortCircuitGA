@@ -4,12 +4,14 @@
 package edu.virginia.cs.geneticalgorithm.neurojet;
 
 import static edu.virginia.cs.common.utils.ArrayNumberUtils.*;
+import static edu.virginia.cs.geneticalgorithm.AbstractFitness.*;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import edu.virginia.cs.common.utils.Condition;
@@ -28,7 +30,7 @@ import edu.virginia.cs.neurojet.model.NeuroJetNeuronBuffer;
 public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
 
     /**
-     * Run time + 2 actvty measures + trend measure + perf measure + target measure
+     * Run time + 2 activity measures + trend measure + performance measure + target measure
      */
     public static final int NUM_FIT_VALS = 6;
     private static final int WAIT_TIME = 20 /* minutes */* 60 /* seconds per minute */* 1000 /* ms per sec */;
@@ -45,7 +47,7 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     private final Object _lock2 = new Object();
     private final StringBuffer _out = new StringBuffer();
     private final StringBuffer _err = new StringBuffer();
-    private final List<Double> _fitVals = new ArrayList<Double>();
+    private final List<Double> _fitnessValues = new ArrayList<Double>();
 
     NeuroJetTraceFitness(final NeuroJetTraceFitnessIntermediary parent, final int dirID) {
         _parent = parent;
@@ -142,26 +144,27 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     }
 
     public List<Double> fitnessValues() {
-        if (_fitVals.isEmpty()) {
+        if (_fitnessValues.isEmpty()) {
             runSimulationIfNeeded();
             if (_halted) {
                 for (int i = 0; i < NUM_FIT_VALS; ++i) {
-                    _fitVals.add(0.0);
+                    _fitnessValues.add(0.0);
                 }
             }
             else {
                 Pause.untilConditionMet(new FitnessFinished(this), WAIT_TIME);
                 final double timeDiff = _end - _start + 1;
-                _fitVals.add(timeDiff > 0 ? timeDiff : 1);
-                addActivityMeasures(_fitVals);
-                addTrendMeasure(_fitVals);
+                _fitnessValues.add(timeDiff > 0 ? timeDiff : 1);
+                addActivityMeasures(_fitnessValues);
+                addTrendMeasure(_fitnessValues);
                 final double fitness = generateTraceFitness();
                 assert (fitness >= 0);
-                _fitVals.add(fitness);
-                _fitVals.add(hasTargetBehavior());
+                _fitnessValues.add(fitness);
+                _fitnessValues.add(hasTargetBehavior());
             }
         }
-        return _fitVals;
+        checkFitnessSize(this, _fitnessValues);
+        return Collections.unmodifiableList(_fitnessValues);
     }
 
     void runSimulationIfNeeded() {
@@ -348,6 +351,14 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         final double actFitness = 1E-5 * _tstGenerator.overallFitness(fitVals.get(1), fitVals.get(2));
         final double slopeFitness = slopeContribution(fitVals.get(3));
         return 1 / (fitVals.get(0) + 1) + actFitness + slopeFitness + fitVals.get(4) + fitVals.get(5);
+    }
+
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.Fitness#numFitnessValues()
+     */
+    @Override
+    public int numFitnessValues() {
+        return NUM_FIT_VALS;
     }
 
     private static class InvokerThread extends Thread {

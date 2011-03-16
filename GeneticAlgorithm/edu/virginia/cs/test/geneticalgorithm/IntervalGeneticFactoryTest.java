@@ -53,6 +53,10 @@ public final class IntervalGeneticFactoryTest {
                 return Collections.singletonList(retval);
             }
 
+            @Override
+            public int numFitnessValues() {
+                return 1;
+            }
         }
 
         /**

@@ -26,4 +26,16 @@ public abstract class AbstractFitness implements Fitness {
         return retval;
     }
 
+    /**
+     * @param f Fitness function providing the expected number of fitness values
+     * @param fitness Actual number of fitness values
+     */
+    public static void checkFitnessSize(final Fitness f, final List<Double> fitness) {
+        if (f.numFitnessValues() != fitness.size()) {
+            final String errMsg = "Program error resulted in unexpected number of fitness values.\nFound: " + fitness.size()
+                                  + ", expected: " + f.numFitnessValues();
+            throw new RuntimeException(errMsg);
+        }
+    }
+
 }

@@ -3,8 +3,11 @@
  */
 package edu.virginia.cs.geneticalgorithm.neurojet;
 
+import static edu.virginia.cs.geneticalgorithm.AbstractFitness.*;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import edu.virginia.cs.geneticalgorithm.Fitness;
@@ -58,9 +61,9 @@ public final class NeuroJetQuickFitness implements ProxyFitness {
             _tstGenerator.generateQuickFitness(tstAct, desiredAct);
             _fitnessValues.add(_tstGenerator.getSampleStdDev());
             _fitnessValues.add(_tstGenerator.getSquaredDeviationFromDesired());
-            assert (_fitnessValues.size() == NUM_FIT_VALS);
         }
-        return _fitnessValues;
+        checkFitnessSize(this, _fitnessValues);
+        return Collections.unmodifiableList(_fitnessValues);
     }
 
     /**
@@ -93,5 +96,13 @@ public final class NeuroJetQuickFitness implements ProxyFitness {
     public String toString() {
         final double fitness = totalFitness();
         return "{hash = " + hashCode() + ", fitness = '" + fitness + "'}";
+    }
+
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.Fitness#numFitnessValues()
+     */
+    @Override
+    public int numFitnessValues() {
+        return NUM_FIT_VALS;
     }
 }

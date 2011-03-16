@@ -58,6 +58,10 @@ public final class StandardGeneticFactoryTest {
             return Collections.singletonList(retval);
         }
 
+        @Override
+        public int numFitnessValues() {
+            return 1;
+        }
     }
 
     /**

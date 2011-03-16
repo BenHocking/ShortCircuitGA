@@ -23,4 +23,9 @@ public interface Fitness {
      * @return Overall Fitness
      */
     public double totalFitness();
+
+    /**
+     * @return Expected number of fitness values
+     */
+    public int numFitnessValues();
 }

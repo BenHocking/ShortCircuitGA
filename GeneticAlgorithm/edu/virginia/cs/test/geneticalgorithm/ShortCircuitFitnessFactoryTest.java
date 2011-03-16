@@ -93,7 +93,16 @@ public class ShortCircuitFitnessFactoryTest {
             if (_isErrorful) {
                 retval.add(-1.0);
             }
+            AbstractFitness.checkFitnessSize(this, retval);
             return retval;
+        }
+
+        /**
+         * @see edu.virginia.cs.geneticalgorithm.Fitness#numFitnessValues()
+         */
+        @Override
+        public int numFitnessValues() {
+            return _isErrorful ? _numThresholds + 1 : _numThresholds;
         }
     }
 
