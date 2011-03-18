@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import edu.virginia.cs.common.utils.Condition;
@@ -38,7 +37,6 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     private final NeuroJetTraceFitnessIntermediary _parent;
     private final File _tempDir;
     private Process _process = null;
-    private boolean _started = false;
     private boolean _halted = false;
     private long _start = -1;
     private long _end = -1;
@@ -143,38 +141,65 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         return 1000 * Math.pow(slope - minSlope, 2);
     }
 
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.Fitness#fitnessValues()
+     */
+    @Override
     public List<Double> fitnessValues() {
-        if (_fitnessValues.isEmpty()) {
-            runSimulationIfNeeded();
-            if (_halted) {
-                for (int i = 0; i < NUM_FIT_VALS; ++i) {
-                    _fitnessValues.add(0.0);
-                }
-            }
-            else {
-                Pause.untilConditionMet(new FitnessFinished(this), WAIT_TIME);
-                final double timeDiff = _end - _start + 1;
-                _fitnessValues.add(timeDiff > 0 ? timeDiff : 1);
-                addActivityMeasures(_fitnessValues);
-                addTrendMeasure(_fitnessValues);
-                final double fitness = generateTraceFitness();
-                assert (fitness >= 0);
-                _fitnessValues.add(fitness);
-                _fitnessValues.add(hasTargetBehavior());
-            }
-        }
-        checkFitnessSize(this, _fitnessValues);
-        return Collections.unmodifiableList(_fitnessValues);
+        runSimulationIfNeeded();
+        return _parent.getMeanFitnessValues();
+    }
+
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.Fitness#totalFitness()
+     */
+    @Override
+    public double totalFitness() {
+        runSimulationIfNeeded();
+        return _parent.getMeanTotalFitness();
+    }
+
+    /**
+     * @see edu.virginia.cs.geneticalgorithm.Fitness#numFitnessValues()
+     */
+    @Override
+    public int numFitnessValues() {
+        return NUM_FIT_VALS;
     }
 
     void runSimulationIfNeeded() {
         synchronized (_lock) {
-            if (!_started) {
+            if (_fitnessValues.isEmpty()) {
                 _halted = false;
-                _started = true;
                 invoke();
+                double totalFitness = 0;
+                if (_halted) {
+                    for (int i = 0; i < NUM_FIT_VALS; ++i) {
+                        _fitnessValues.add(0.0);
+                    }
+                }
+                else {
+                    Pause.untilConditionMet(new FitnessFinished(this), WAIT_TIME);
+                    final double timeDiff = _end - _start + 1;
+                    _fitnessValues.add(timeDiff > 0 ? timeDiff : 1);
+                    addActivityMeasures(_fitnessValues);
+                    addTrendMeasure(_fitnessValues);
+                    final double fitness = generateTraceFitness();
+                    assert (fitness >= 0);
+                    _fitnessValues.add(fitness);
+                    _fitnessValues.add(hasTargetBehavior());
+                    totalFitness = calcTotalFitness(_fitnessValues);
+                }
+                checkFitnessSize(this, _fitnessValues);
+                _parent.addToSummedFitnessValues(_fitnessValues, totalFitness);
             }
         }
+    }
+
+    private double calcTotalFitness(final List<Double> fitVals) {
+        final double actFitness = 1E-5 * _tstGenerator.overallFitness(fitVals.get(1), fitVals.get(2));
+        final double slopeFitness = slopeContribution(fitVals.get(3));
+        return 1 / (fitVals.get(0) + 1) + actFitness + slopeFitness + fitVals.get(4) + fitVals.get(5);
     }
 
     private void deleteExistingFiles() {
@@ -340,25 +365,6 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     private void invoke() {
         final Thread thread = new InvokerThread(this);
         thread.start();
-    }
-
-    /**
-     * @see edu.virginia.cs.geneticalgorithm.Fitness#totalFitness()
-     */
-    @Override
-    public double totalFitness() {
-        final List<Double> fitVals = fitnessValues();
-        final double actFitness = 1E-5 * _tstGenerator.overallFitness(fitVals.get(1), fitVals.get(2));
-        final double slopeFitness = slopeContribution(fitVals.get(3));
-        return 1 / (fitVals.get(0) + 1) + actFitness + slopeFitness + fitVals.get(4) + fitVals.get(5);
-    }
-
-    /**
-     * @see edu.virginia.cs.geneticalgorithm.Fitness#numFitnessValues()
-     */
-    @Override
-    public int numFitnessValues() {
-        return NUM_FIT_VALS;
     }
 
     private static class InvokerThread extends Thread {

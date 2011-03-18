@@ -5,6 +5,7 @@ package edu.virginia.cs.geneticalgorithm.neurojet;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,6 @@ import edu.virginia.cs.geneticalgorithm.StandardGenotype;
  * @since Apr 27, 2010
  */
 public final class NeuroJetTraceFitnessIntermediary {
-
-    static final int NUM_FIT_VALS = 2; // Run time + trace score
 
     /**
      * Whether or not to delete working files when finished
@@ -41,6 +40,7 @@ public final class NeuroJetTraceFitnessIntermediary {
     private final List<NeuroJetTraceFitness> _instances;
     private List<Double> _summedFitnessValues;
     private double _summedTotalFitness;
+    private int _numSums;
     private final NeuroJetTraceFitnessFactory _parent;
     private final StandardGenotype _genotype;
     private static final Map<Genotype, NeuroJetTraceFitnessIntermediary> _fitMap = new HashMap<Genotype, NeuroJetTraceFitnessIntermediary>();
@@ -91,10 +91,11 @@ public final class NeuroJetTraceFitnessIntermediary {
         _maxSamples = maxSamples;
         _instances = new ArrayList<NeuroJetTraceFitness>();
         _summedFitnessValues = new ArrayList<Double>();
-        for (int i = 0; i < NUM_FIT_VALS; ++i) {
+        for (int i = 0; i < NeuroJetTraceFitness.NUM_FIT_VALS; ++i) {
             _summedFitnessValues.add(0.0);
         }
         _summedTotalFitness = 0;
+        _numSums = 0;
         _workingDir = workingDir != null ? workingDir : _mainFile.getParentFile();
     }
 
@@ -105,14 +106,15 @@ public final class NeuroJetTraceFitnessIntermediary {
     void addToSummedFitnessValues(final List<Double> listToAdd, final double totalToAdd) {
         _summedFitnessValues = ArrayNumberUtils.add(_summedFitnessValues, listToAdd);
         _summedTotalFitness += totalToAdd;
+        ++_numSums;
     }
 
     List<Double> getMeanFitnessValues() {
-        return ArrayNumberUtils.divide(_summedFitnessValues, _instances.size());
+        return Collections.unmodifiableList(ArrayNumberUtils.divide(_summedFitnessValues, _numSums));
     }
 
     double getMeanTotalFitness() {
-        return _summedTotalFitness / _instances.size();
+        return _summedTotalFitness / _numSums;
     }
 
     /**
