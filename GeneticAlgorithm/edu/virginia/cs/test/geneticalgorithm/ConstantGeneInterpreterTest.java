@@ -8,9 +8,9 @@ import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.ConstantGeneInterpreter;
-import edu.virginia.cs.geneticalgorithm.IntervalGene;
-import edu.virginia.cs.geneticalgorithm.StandardGene;
+import edu.virginia.cs.geneticalgorithm.gene.IntervalGene;
+import edu.virginia.cs.geneticalgorithm.gene.StandardGene;
+import edu.virginia.cs.geneticalgorithm.gene.interpreter.ConstantGeneInterpreter;
 
 /**
  * Test harness for ConstantGeneInterpreter
@@ -31,8 +31,8 @@ public class ConstantGeneInterpreterTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.ConstantGeneInterpreter#setDefaultGene(edu.virginia.cs.geneticalgorithm.Gene)} and
-     * {@link edu.virginia.cs.geneticalgorithm.ConstantGeneInterpreter#invert(java.lang.String, edu.virginia.cs.geneticalgorithm.Genotype)}
+     * {@link edu.virginia.cs.geneticalgorithm.gene.interpreter.ConstantGeneInterpreter#setDefaultGene(edu.virginia.cs.geneticalgorithm.Gene)} and
+     * {@link edu.virginia.cs.geneticalgorithm.gene.interpreter.ConstantGeneInterpreter#invert(java.lang.String, edu.virginia.cs.geneticalgorithm.Genotype)}
      * .
      */
     @Test
@@ -46,7 +46,7 @@ public class ConstantGeneInterpreterTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.ConstantGeneInterpreter#generate(edu.virginia.cs.geneticalgorithm.Genotype)}.
+     * {@link edu.virginia.cs.geneticalgorithm.gene.interpreter.ConstantGeneInterpreter#generate(edu.virginia.cs.geneticalgorithm.Genotype)}.
      */
     @Test
     public final void testGenerate() {

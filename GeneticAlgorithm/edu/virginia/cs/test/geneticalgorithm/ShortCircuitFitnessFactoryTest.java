@@ -11,17 +11,17 @@ import java.util.List;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.AbstractFitness;
-import edu.virginia.cs.geneticalgorithm.Fitness;
-import edu.virginia.cs.geneticalgorithm.FitnessFactory;
-import edu.virginia.cs.geneticalgorithm.Gene;
-import edu.virginia.cs.geneticalgorithm.Genotype;
-import edu.virginia.cs.geneticalgorithm.HaltableFitness;
-import edu.virginia.cs.geneticalgorithm.ProxyFitness;
-import edu.virginia.cs.geneticalgorithm.ProxyFitnessFactory;
-import edu.virginia.cs.geneticalgorithm.ShortCircuitFitness;
-import edu.virginia.cs.geneticalgorithm.ShortCircuitFitnessFactory;
-import edu.virginia.cs.geneticalgorithm.StandardGene;
+import edu.virginia.cs.geneticalgorithm.fitness.AbstractFitness;
+import edu.virginia.cs.geneticalgorithm.fitness.Fitness;
+import edu.virginia.cs.geneticalgorithm.fitness.FitnessFactory;
+import edu.virginia.cs.geneticalgorithm.fitness.HaltableFitness;
+import edu.virginia.cs.geneticalgorithm.fitness.ProxyFitness;
+import edu.virginia.cs.geneticalgorithm.fitness.ProxyFitnessFactory;
+import edu.virginia.cs.geneticalgorithm.fitness.ShortCircuitFitness;
+import edu.virginia.cs.geneticalgorithm.fitness.ShortCircuitFitnessFactory;
+import edu.virginia.cs.geneticalgorithm.gene.Gene;
+import edu.virginia.cs.geneticalgorithm.gene.Genotype;
+import edu.virginia.cs.geneticalgorithm.gene.StandardGene;
 
 /**
  * Test harness for ShortCircuitFitnessFactory and ShortCircuitFitness
@@ -41,7 +41,7 @@ public class ShortCircuitFitnessFactoryTest {
         }
 
         /**
-         * @see edu.virginia.cs.geneticalgorithm.HaltableFitness#halt()
+         * @see edu.virginia.cs.geneticalgorithm.fitness.HaltableFitness#halt()
          */
         @Override
         public void halt() { /* does nothing */
@@ -62,7 +62,7 @@ public class ShortCircuitFitnessFactoryTest {
         }
 
         /**
-         * @see edu.virginia.cs.geneticalgorithm.ProxyFitness#generatesPostFitness()
+         * @see edu.virginia.cs.geneticalgorithm.fitness.ProxyFitness#generatesPostFitness()
          */
         @Override
         public boolean generatesPostFitness() {
@@ -70,7 +70,7 @@ public class ShortCircuitFitnessFactoryTest {
         }
 
         /**
-         * @see edu.virginia.cs.geneticalgorithm.ProxyFitness#getPostFitness()
+         * @see edu.virginia.cs.geneticalgorithm.fitness.ProxyFitness#getPostFitness()
          */
         @Override
         public Fitness getPostFitness() {
@@ -78,7 +78,7 @@ public class ShortCircuitFitnessFactoryTest {
         }
 
         /**
-         * @see edu.virginia.cs.geneticalgorithm.Fitness#fitnessValues()
+         * @see edu.virginia.cs.geneticalgorithm.fitness.Fitness#fitnessValues()
          */
         @Override
         public List<Double> fitnessValues() {
@@ -98,7 +98,7 @@ public class ShortCircuitFitnessFactoryTest {
         }
 
         /**
-         * @see edu.virginia.cs.geneticalgorithm.Fitness#numFitnessValues()
+         * @see edu.virginia.cs.geneticalgorithm.fitness.Fitness#numFitnessValues()
          */
         @Override
         public int numFitnessValues() {
@@ -113,7 +113,7 @@ public class ShortCircuitFitnessFactoryTest {
         }
 
         /**
-         * @see edu.virginia.cs.geneticalgorithm.ProxyFitness#generatesPostFitness()
+         * @see edu.virginia.cs.geneticalgorithm.fitness.ProxyFitness#generatesPostFitness()
          */
         @Override
         public boolean generatesPostFitness() {
@@ -121,7 +121,7 @@ public class ShortCircuitFitnessFactoryTest {
         }
 
         /**
-         * @see edu.virginia.cs.geneticalgorithm.ProxyFitness#getPostFitness()
+         * @see edu.virginia.cs.geneticalgorithm.fitness.ProxyFitness#getPostFitness()
          */
         @Override
         public Fitness getPostFitness() {
@@ -141,7 +141,7 @@ public class ShortCircuitFitnessFactoryTest {
         }
 
         /**
-         * @see edu.virginia.cs.geneticalgorithm.ProxyFitnessFactory#createFitness(edu.virginia.cs.geneticalgorithm.Genotype)
+         * @see edu.virginia.cs.geneticalgorithm.fitness.ProxyFitnessFactory#createFitness(edu.virginia.cs.geneticalgorithm.gene.Genotype)
          */
         @Override
         public ProxyFitness createFitness(final Genotype individual) {
@@ -150,7 +150,7 @@ public class ShortCircuitFitnessFactoryTest {
         }
 
         /**
-         * @see edu.virginia.cs.geneticalgorithm.ProxyFitnessFactory#generatesPostFitness()
+         * @see edu.virginia.cs.geneticalgorithm.fitness.ProxyFitnessFactory#generatesPostFitness()
          */
         @Override
         public boolean generatesPostFitness() {
@@ -190,10 +190,10 @@ public class ShortCircuitFitnessFactoryTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.ShortCircuitFitnessFactory#createFitness(edu.virginia.cs.geneticalgorithm.Genotype)},
-     * {@link edu.virginia.cs.geneticalgorithm.ShortCircuitFitnessFactory#setPostScale(double)},
-     * {@link edu.virginia.cs.geneticalgorithm.ShortCircuitFitness#setPostScale(double)}, and
-     * {@link edu.virginia.cs.geneticalgorithm.ShortCircuitFitness#getPostScale()}
+     * {@link edu.virginia.cs.geneticalgorithm.fitness.ShortCircuitFitnessFactory#createFitness(edu.virginia.cs.geneticalgorithm.gene.Genotype)},
+     * {@link edu.virginia.cs.geneticalgorithm.fitness.ShortCircuitFitnessFactory#setPostScale(double)},
+     * {@link edu.virginia.cs.geneticalgorithm.fitness.ShortCircuitFitness#setPostScale(double)}, and
+     * {@link edu.virginia.cs.geneticalgorithm.fitness.ShortCircuitFitness#getPostScale()}
      */
     @Test
     public final void testCreateFitness() {
@@ -207,7 +207,7 @@ public class ShortCircuitFitnessFactoryTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.ShortCircuitFitness#totalFitness()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.fitness.ShortCircuitFitness#totalFitness()}.
      */
     @Test
     public final void testTotalFitness() {
@@ -238,7 +238,7 @@ public class ShortCircuitFitnessFactoryTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.ShortCircuitFitness#fitnessValues()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.fitness.ShortCircuitFitness#fitnessValues()}.
      */
     @Test
     public final void testFitnessValues() {

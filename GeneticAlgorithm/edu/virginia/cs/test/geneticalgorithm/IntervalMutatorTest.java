@@ -9,10 +9,10 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.Gene;
-import edu.virginia.cs.geneticalgorithm.IntervalGene;
-import edu.virginia.cs.geneticalgorithm.IntervalMutator;
-import edu.virginia.cs.geneticalgorithm.StandardGenotype;
+import edu.virginia.cs.geneticalgorithm.gene.Gene;
+import edu.virginia.cs.geneticalgorithm.gene.IntervalGene;
+import edu.virginia.cs.geneticalgorithm.gene.StandardGenotype;
+import edu.virginia.cs.geneticalgorithm.mutator.IntervalMutator;
 
 /**
  * Test harness for IntervalMutator
@@ -29,7 +29,7 @@ public class IntervalMutatorTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.IntervalMutator#setMutateRate(double)}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.mutator.IntervalMutator#setMutateRate(double)}.
      */
     @Test
     public final void testSetMutateRate() {
@@ -39,7 +39,7 @@ public class IntervalMutatorTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.IntervalMutator#getMutateRate()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.mutator.IntervalMutator#getMutateRate()}.
      */
     @Test
     public final void testGetMutateRate() {
@@ -50,7 +50,7 @@ public class IntervalMutatorTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.IntervalMutator#setMutateSigma(double)}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.mutator.IntervalMutator#setMutateSigma(double)}.
      */
     @Test
     public final void testSetMutateSigma() {
@@ -74,7 +74,7 @@ public class IntervalMutatorTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.IntervalMutator#mutate(edu.virginia.cs.geneticalgorithm.Genotype)}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.mutator.IntervalMutator#mutate(edu.virginia.cs.geneticalgorithm.Genotype)}.
      */
     @Test
     public final void testMutate() {

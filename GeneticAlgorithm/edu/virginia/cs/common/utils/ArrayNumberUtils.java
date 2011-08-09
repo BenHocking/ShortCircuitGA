@@ -93,12 +93,22 @@ public final class ArrayNumberUtils {
     public static <T extends Number> double sumOfSquares(final List<T> numberList) {
         double retval = 0;
         if (!numberList.isEmpty()) {
-            for (final Integer i : new IntegerRange(numberList.size())) {
+            for (int i = 0; i < numberList.size(); ++i) {
                 final double v = numberList.get(i).doubleValue();
                 retval += v * v;
             }
         }
         return retval;
+    }
+
+    /**
+     * Normalizes a list of doubles such that the sum of the list equals 1
+     * @param list List to normalize
+     * @return Normalized list (note that original list is unmodified)
+     */
+    public static List<Double> normalize(final List<Double> list) {
+        final double listSum = sum(list);
+        return divide(list, listSum);
     }
 
     /**
@@ -115,6 +125,21 @@ public final class ArrayNumberUtils {
         if (!list1.isEmpty()) {
             for (final Integer i : new IntegerRange(list1.size())) {
                 retval.add(list1.get(i) + list2.get(i));
+            }
+        }
+        return retval;
+    }
+
+    /**
+     * @param list List to add to
+     * @param toAdd Amount to add to the list
+     * @return List with all values increased by toAdd
+     */
+    public static List<Double> add(final List<Double> list, final double toAdd) {
+        final List<Double> retval = new ArrayList<Double>(list.size());
+        if (!list.isEmpty()) {
+            for (final Integer i : new IntegerRange(list.size())) {
+                retval.add(list.get(i) + toAdd);
             }
         }
         return retval;
@@ -305,5 +330,22 @@ public final class ArrayNumberUtils {
         final double sumy = sum(dblList);
         final double sumxx = (listSize - 1) * listSize * (2 * listSize - 1) / 6;
         return (listSize * sumxy - sumx * sumy) / (listSize * sumxx - sumx * sumx);
+    }
+
+    /**
+     * @param first List to be subtracted form
+     * @param second List to subtract from the first
+     * @return Difference between lists
+     */
+    public static List<Double> subtract(final List<Double> first, final List<Double> second) {
+        if (first.size() != second.size()) throw new IllegalArgumentException("Lists being subtracted must be of the same size.");
+        final List<Double> retval = new ArrayList<Double>(first.size());
+        if (!first.isEmpty()) {
+            final int listSize = first.size();
+            for (int i = 0; i < listSize; ++i) {
+                retval.add(first.get(i) - second.get(i));
+            }
+        }
+        return retval;
     }
 }

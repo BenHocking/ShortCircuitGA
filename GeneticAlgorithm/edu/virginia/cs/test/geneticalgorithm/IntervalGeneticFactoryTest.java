@@ -11,16 +11,16 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.AbstractFitness;
-import edu.virginia.cs.geneticalgorithm.DecayingIntervalMutator;
-import edu.virginia.cs.geneticalgorithm.Fitness;
-import edu.virginia.cs.geneticalgorithm.FitnessFactory;
-import edu.virginia.cs.geneticalgorithm.Gene;
-import edu.virginia.cs.geneticalgorithm.GeneticFactory;
-import edu.virginia.cs.geneticalgorithm.Genotype;
-import edu.virginia.cs.geneticalgorithm.IntervalGene;
-import edu.virginia.cs.geneticalgorithm.IntervalGeneticFactory;
-import edu.virginia.cs.geneticalgorithm.Reproduction;
+import edu.virginia.cs.geneticalgorithm.fitness.AbstractFitness;
+import edu.virginia.cs.geneticalgorithm.fitness.Fitness;
+import edu.virginia.cs.geneticalgorithm.fitness.FitnessFactory;
+import edu.virginia.cs.geneticalgorithm.gene.Gene;
+import edu.virginia.cs.geneticalgorithm.gene.GeneticFactory;
+import edu.virginia.cs.geneticalgorithm.gene.Genotype;
+import edu.virginia.cs.geneticalgorithm.gene.IntervalGene;
+import edu.virginia.cs.geneticalgorithm.gene.IntervalGeneticFactory;
+import edu.virginia.cs.geneticalgorithm.mutator.DecayingIntervalMutator;
+import edu.virginia.cs.geneticalgorithm.reproduction.Reproduction;
 
 /**
  * Test of the {@link IntervalGeneticFactory} class.
@@ -60,7 +60,7 @@ public final class IntervalGeneticFactoryTest {
         }
 
         /**
-         * @see edu.virginia.cs.geneticalgorithm.FitnessFactory#createFitness(edu.virginia.cs.geneticalgorithm.Genotype)
+         * @see edu.virginia.cs.geneticalgorithm.fitness.FitnessFactory#createFitness(edu.virginia.cs.geneticalgorithm.gene.Genotype)
          */
         @Override
         public Fitness createFitness(final Genotype individual) {

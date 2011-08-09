@@ -7,11 +7,11 @@ import static org.junit.Assert.*;
 
 import org.junit.*;
 
-import edu.virginia.cs.geneticalgorithm.CompositeGeneInterpreter;
-import edu.virginia.cs.geneticalgorithm.ConstantGeneInterpreter;
-import edu.virginia.cs.geneticalgorithm.Gene;
-import edu.virginia.cs.geneticalgorithm.Genotype;
-import edu.virginia.cs.geneticalgorithm.IntervalGene;
+import edu.virginia.cs.geneticalgorithm.gene.Gene;
+import edu.virginia.cs.geneticalgorithm.gene.Genotype;
+import edu.virginia.cs.geneticalgorithm.gene.IntervalGene;
+import edu.virginia.cs.geneticalgorithm.gene.interpreter.CompositeGeneInterpreter;
+import edu.virginia.cs.geneticalgorithm.gene.interpreter.ConstantGeneInterpreter;
 
 /**
  * Test harness for CompositeGeneInterpreter
@@ -39,7 +39,7 @@ public class CompositeGeneInterpreterTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.CompositeGeneInterpreter#generate(edu.virginia.cs.geneticalgorithm.Genotype)}.
+     * {@link edu.virginia.cs.geneticalgorithm.gene.interpreter.CompositeGeneInterpreter#generate(edu.virginia.cs.geneticalgorithm.gene.Genotype)}.
      */
     @Test
     public final void testGenerate() {
@@ -56,7 +56,7 @@ public class CompositeGeneInterpreterTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.CompositeGeneInterpreter#invert(java.lang.String, edu.virginia.cs.geneticalgorithm.Genotype)}
+     * {@link edu.virginia.cs.geneticalgorithm.gene.interpreter.CompositeGeneInterpreter#invert(java.lang.String, edu.virginia.cs.geneticalgorithm.gene.Genotype)}
      * .
      */
     @Test

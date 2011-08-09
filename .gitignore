@@ -6,6 +6,12 @@ scripts/trace_[0-9][0-9]
 scripts/trace_[0-9][0-9][0-9]
 scripts/trace_[0-9][0-9][0-9][0-9]
 scripts/trace_[0-9][0-9][0-9][0-9][0-9]
+scripts/randVol_[0-9]
+scripts/randVol_[0-9][0-9]
+scripts/randVol_[0-9][0-9][0-9]
+scripts/randVol_[0-9][0-9][0-9][0-9]
+scripts/randVol_[0-9][0-9][0-9][0-9][0-9]
+tmp*
 */pca_results.txt
 GeneticAlgorithm/jars/shortcircuitga.jar
 GeneticAlgorithm/src/report

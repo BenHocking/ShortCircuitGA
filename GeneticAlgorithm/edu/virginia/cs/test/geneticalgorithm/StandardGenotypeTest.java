@@ -9,9 +9,9 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.IntervalGene;
-import edu.virginia.cs.geneticalgorithm.StandardGene;
-import edu.virginia.cs.geneticalgorithm.StandardGenotype;
+import edu.virginia.cs.geneticalgorithm.gene.IntervalGene;
+import edu.virginia.cs.geneticalgorithm.gene.StandardGene;
+import edu.virginia.cs.geneticalgorithm.gene.StandardGenotype;
 
 /**
  * Test harness for StandardGenotype
@@ -40,7 +40,7 @@ public class StandardGenotypeTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.StandardGenotype#hashCode()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.gene.StandardGenotype#hashCode()}.
      */
     @Test
     public final void testHashCode() {
@@ -53,7 +53,7 @@ public class StandardGenotypeTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.StandardGenotype#StandardGenotype()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.gene.StandardGenotype#StandardGenotype()}.
      */
     @Test
     public final void testStandardGenotype() {
@@ -63,7 +63,7 @@ public class StandardGenotypeTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.StandardGenotype#setGene(int, edu.virginia.cs.geneticalgorithm.Gene)}
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.gene.StandardGenotype#setGene(int, edu.virginia.cs.geneticalgorithm.Gene)}
      * .
      */
     @Test
@@ -74,7 +74,7 @@ public class StandardGenotypeTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.StandardGenotype#getGene(int)}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.gene.StandardGenotype#getGene(int)}.
      */
     @Test
     public final void testGetGene() {
@@ -85,7 +85,7 @@ public class StandardGenotypeTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.StandardGenotype#getNumGenes()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.gene.StandardGenotype#getNumGenes()}.
      */
     @Test
     public final void testGetNumGenes() {
@@ -94,7 +94,7 @@ public class StandardGenotypeTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.StandardGenotype#clone()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.gene.StandardGenotype#clone()}.
      */
     @Test
     public final void testClone() {
@@ -107,7 +107,7 @@ public class StandardGenotypeTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.StandardGenotype#equals(java.lang.Object)}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.gene.StandardGenotype#equals(java.lang.Object)}.
      */
     @Test
     public final void testEqualsObject() {
@@ -131,7 +131,7 @@ public class StandardGenotypeTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.StandardGenotype#compareTo(edu.virginia.cs.geneticalgorithm.Genotype)}.
+     * {@link edu.virginia.cs.geneticalgorithm.gene.StandardGenotype#compareTo(edu.virginia.cs.geneticalgorithm.Genotype)}.
      */
     @Test
     public final void testCompareTo() {

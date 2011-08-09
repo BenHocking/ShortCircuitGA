@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetQuickFitnessFactory;
+import edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetQuickFitnessFactory;
 
 /**
  * Test harness for NeuroJetQuickFitnessFactory

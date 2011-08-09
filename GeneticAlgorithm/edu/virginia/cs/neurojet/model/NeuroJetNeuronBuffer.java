@@ -17,7 +17,7 @@ import edu.virginia.cs.common.utils.Pause;
 import edu.virginia.cs.common.utils.SetUtils;
 
 /**
- * TODO Add description
+ * File containing NeuroJet Buffer data
  * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Dec 5, 2010
  */

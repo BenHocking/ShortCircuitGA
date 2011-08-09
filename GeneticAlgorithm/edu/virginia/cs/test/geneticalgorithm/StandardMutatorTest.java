@@ -9,7 +9,7 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.StandardMutator;
+import edu.virginia.cs.geneticalgorithm.mutator.StandardMutator;
 
 /**
  * TODO Add description
@@ -19,8 +19,8 @@ import edu.virginia.cs.geneticalgorithm.StandardMutator;
 public class StandardMutatorTest {
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.StandardMutator#setMutateRate(double)} and
-     * {@link edu.virginia.cs.geneticalgorithm.StandardMutator#getMutateRate()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.mutator.StandardMutator#setMutateRate(double)} and
+     * {@link edu.virginia.cs.geneticalgorithm.mutator.StandardMutator#getMutateRate()}.
      */
     @Test
     public final void testSetAndGetMutateRate() {
@@ -33,7 +33,7 @@ public class StandardMutatorTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.StandardMutator#mutate(edu.virginia.cs.geneticalgorithm.Genotype)}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.mutator.StandardMutator#mutate(edu.virginia.cs.geneticalgorithm.Genotype)}.
      */
     @Test
     public final void testMutate() {

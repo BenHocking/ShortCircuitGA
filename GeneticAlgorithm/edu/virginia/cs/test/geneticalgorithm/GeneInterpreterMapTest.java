@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.ConstantGeneInterpreter;
-import edu.virginia.cs.geneticalgorithm.GeneInterpreterMap;
+import edu.virginia.cs.geneticalgorithm.gene.interpreter.ConstantGeneInterpreter;
+import edu.virginia.cs.geneticalgorithm.gene.interpreter.GeneInterpreterMap;
 
 /**
  * Test harness for GeneInterpeterMap
@@ -25,7 +25,7 @@ public class GeneInterpreterMapTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.GeneInterpreterMap#getAllPatterns()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.gene.interpreter.GeneInterpreterMap#getAllPatterns()}.
      */
     @Test
     public final void testGetAllPatterns() {
@@ -37,7 +37,7 @@ public class GeneInterpreterMapTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.GeneInterpreterMap#generateValue(java.lang.Object, edu.virginia.cs.geneticalgorithm.StandardGenotype)}
+     * {@link edu.virginia.cs.geneticalgorithm.gene.interpreter.GeneInterpreterMap#generateValue(java.lang.Object, edu.virginia.cs.geneticalgorithm.StandardGenotype)}
      * .
      */
     @Test

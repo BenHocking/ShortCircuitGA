@@ -8,9 +8,9 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import edu.virginia.cs.common.utils.IntegerValueGenerator;
-import edu.virginia.cs.geneticalgorithm.Genotype;
-import edu.virginia.cs.geneticalgorithm.IntervalGene;
-import edu.virginia.cs.geneticalgorithm.SimpleGeneInterpreter;
+import edu.virginia.cs.geneticalgorithm.gene.Genotype;
+import edu.virginia.cs.geneticalgorithm.gene.IntervalGene;
+import edu.virginia.cs.geneticalgorithm.gene.interpreter.SimpleGeneInterpreter;
 import edu.virginia.cs.test.common.utils.IntegerValueGeneratorTest;
 
 /**
@@ -22,7 +22,7 @@ public class SimpleGeneInterpreterTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.SimpleGeneInterpreter#generate(edu.virginia.cs.geneticalgorithm.Genotype)}.
+     * {@link edu.virginia.cs.geneticalgorithm.gene.interpreter.SimpleGeneInterpreter#generate(edu.virginia.cs.geneticalgorithm.gene.Genotype)}.
      */
     @Test
     public final void testGenerate() {
@@ -42,7 +42,7 @@ public class SimpleGeneInterpreterTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.SimpleGeneInterpreter#invert(java.lang.String, edu.virginia.cs.geneticalgorithm.Genotype)}
+     * {@link edu.virginia.cs.geneticalgorithm.gene.interpreter.SimpleGeneInterpreter#invert(java.lang.String, edu.virginia.cs.geneticalgorithm.gene.Genotype)}
      * .
      */
     @Test

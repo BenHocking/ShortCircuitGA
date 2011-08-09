@@ -9,10 +9,10 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.DecayingIntervalMutator;
-import edu.virginia.cs.geneticalgorithm.Gene;
-import edu.virginia.cs.geneticalgorithm.IntervalGene;
-import edu.virginia.cs.geneticalgorithm.StandardGenotype;
+import edu.virginia.cs.geneticalgorithm.gene.Gene;
+import edu.virginia.cs.geneticalgorithm.gene.IntervalGene;
+import edu.virginia.cs.geneticalgorithm.gene.StandardGenotype;
+import edu.virginia.cs.geneticalgorithm.mutator.DecayingIntervalMutator;
 
 /**
  * Test harness for DecayingIntervalMutator
@@ -22,8 +22,8 @@ import edu.virginia.cs.geneticalgorithm.StandardGenotype;
 public class DecayingIntervalMutatorTest {
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.DecayingIntervalMutator#setMutateRate(double)} and
-     * {@link edu.virginia.cs.geneticalgorithm.DecayingIntervalMutator#getMutateRate()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.mutator.DecayingIntervalMutator#setMutateRate(double)} and
+     * {@link edu.virginia.cs.geneticalgorithm.mutator.DecayingIntervalMutator#getMutateRate()}.
      */
     @Test
     public final void testSetAndGetMutateRate() {
@@ -36,8 +36,8 @@ public class DecayingIntervalMutatorTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.DecayingIntervalMutator#setMutateSigma(double)} and
-     * {@link edu.virginia.cs.geneticalgorithm.DecayingIntervalMutator#mutate(edu.virginia.cs.geneticalgorithm.Genotype)}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.mutator.DecayingIntervalMutator#setMutateSigma(double)} and
+     * {@link edu.virginia.cs.geneticalgorithm.mutator.DecayingIntervalMutator#mutate(edu.virginia.cs.geneticalgorithm.Genotype)}.
      */
     @Test
     public final void testSetAndGetMutateSigma() {
@@ -63,8 +63,8 @@ public class DecayingIntervalMutatorTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.DecayingIntervalMutator#setMutateSigma(double)} and
-     * {@link edu.virginia.cs.geneticalgorithm.DecayingIntervalMutator#mutate(edu.virginia.cs.geneticalgorithm.Genotype)}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.mutator.DecayingIntervalMutator#setMutateSigma(double)} and
+     * {@link edu.virginia.cs.geneticalgorithm.mutator.DecayingIntervalMutator#mutate(edu.virginia.cs.geneticalgorithm.Genotype)}.
      */
     @Test
     public final void testMutate() {

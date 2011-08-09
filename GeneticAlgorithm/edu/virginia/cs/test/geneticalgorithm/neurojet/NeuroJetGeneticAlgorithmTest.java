@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetGeneticAlgorithm;
+import edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetGeneticAlgorithm;
 import edu.virginia.cs.test.data.TestFileLoader;
 
 /**

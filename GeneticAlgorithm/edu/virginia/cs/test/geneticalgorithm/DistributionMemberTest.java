@@ -9,8 +9,8 @@ import java.util.Collections;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.DistributionMember;
-import edu.virginia.cs.geneticalgorithm.Genotype;
+import edu.virginia.cs.geneticalgorithm.distribution.DistributionMember;
+import edu.virginia.cs.geneticalgorithm.gene.Genotype;
 
 /**
  * Test harness for DistributionMember
@@ -40,7 +40,7 @@ public class DistributionMemberTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.DistributionMember#toString()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.distribution.DistributionMember#toString()}.
      */
     @Test
     public final void testToString() {
@@ -53,7 +53,7 @@ public class DistributionMemberTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.DistributionMember#DistributionMember(edu.virginia.cs.geneticalgorithm.DistributionMember)}
+     * {@link edu.virginia.cs.geneticalgorithm.distribution.DistributionMember#DistributionMember(edu.virginia.cs.geneticalgorithm.distribution.DistributionMember)}
      * .
      */
     @Test
@@ -76,7 +76,7 @@ public class DistributionMemberTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.DistributionMember#getValue()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.distribution.DistributionMember#getValue()}.
      */
     @Test
     public final void testGetValue() {
@@ -85,7 +85,7 @@ public class DistributionMemberTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.DistributionMember#getFitnessValues()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.distribution.DistributionMember#getFitnessValues()}.
      */
     @Test
     public final void testGetFitnessValues() {
@@ -94,7 +94,7 @@ public class DistributionMemberTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.DistributionMember#getGenotype()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.distribution.DistributionMember#getGenotype()}.
      */
     @Test
     public final void testGetGenotype() {
@@ -105,7 +105,7 @@ public class DistributionMemberTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.DistributionMember#compareTo(edu.virginia.cs.geneticalgorithm.DistributionMember)}.
+     * {@link edu.virginia.cs.geneticalgorithm.distribution.DistributionMember#compareTo(edu.virginia.cs.geneticalgorithm.distribution.DistributionMember)}.
      */
     @Test
     public final void testCompareTo() {

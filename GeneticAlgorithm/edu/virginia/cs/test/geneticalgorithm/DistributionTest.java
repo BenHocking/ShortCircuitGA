@@ -7,8 +7,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.Distribution;
-import edu.virginia.cs.geneticalgorithm.DistributionMember;
+import edu.virginia.cs.geneticalgorithm.distribution.Distribution;
+import edu.virginia.cs.geneticalgorithm.distribution.DistributionMember;
 
 /**
  * Test harness for Distribution
@@ -19,7 +19,7 @@ public class DistributionTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.Distribution#Distribution(edu.virginia.cs.geneticalgorithm.Distribution)}.
+     * {@link edu.virginia.cs.geneticalgorithm.distribution.Distribution#Distribution(edu.virginia.cs.geneticalgorithm.distribution.Distribution)}.
      */
     @Test
     public final void testDistributionCopyConstructor() {
@@ -33,7 +33,7 @@ public class DistributionTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.Distribution#getLast()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.distribution.Distribution#getLast()}.
      */
     @Test
     public final void testGetLast() {
@@ -44,7 +44,7 @@ public class DistributionTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.Distribution#removeDuplicates()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.distribution.Distribution#removeDuplicates()}.
      */
     @Test
     public final void testRemoveDuplicates() {
@@ -60,7 +60,7 @@ public class DistributionTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.Distribution#hasValues()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.distribution.Distribution#hasValues()}.
      */
     @Test
     public final void testHasValues() {
@@ -75,7 +75,7 @@ public class DistributionTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.Distribution#normalize()}.
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.distribution.Distribution#normalize()}.
      */
     @Test
     public final void testNormalize() {

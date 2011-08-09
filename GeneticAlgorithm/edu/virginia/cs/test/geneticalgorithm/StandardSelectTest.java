@@ -9,9 +9,9 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.Distribution;
-import edu.virginia.cs.geneticalgorithm.Genotype;
-import edu.virginia.cs.geneticalgorithm.StandardSelect;
+import edu.virginia.cs.geneticalgorithm.distribution.Distribution;
+import edu.virginia.cs.geneticalgorithm.gene.Genotype;
+import edu.virginia.cs.geneticalgorithm.select.StandardSelect;
 
 /**
  * Test harness for StandardSelect
@@ -21,7 +21,7 @@ import edu.virginia.cs.geneticalgorithm.StandardSelect;
 public class StandardSelectTest {
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.StandardSelect#select(edu.virginia.cs.geneticalgorithm.Distribution)}
+     * Test method for {@link edu.virginia.cs.geneticalgorithm.select.StandardSelect#select(edu.virginia.cs.geneticalgorithm.distribution.Distribution)}
      * .
      */
     @Test

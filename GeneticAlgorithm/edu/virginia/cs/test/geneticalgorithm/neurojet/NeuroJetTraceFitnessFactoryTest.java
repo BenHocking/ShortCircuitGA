@@ -13,11 +13,11 @@ import java.util.List;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.Fitness;
-import edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetGeneticAlgorithm;
-import edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness;
-import edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitnessFactory;
-import edu.virginia.cs.geneticalgorithm.neurojet.ScriptUpdater;
+import edu.virginia.cs.geneticalgorithm.fitness.Fitness;
+import edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetGeneticAlgorithm;
+import edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness;
+import edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitnessFactory;
+import edu.virginia.cs.neurojet.geneticalgorithm.ScriptUpdater;
 import edu.virginia.cs.test.data.TestFileLoader;
 import edu.virginia.cs.test.geneticalgorithm.StandardGenotypeTest;
 

@@ -1,6 +1,6 @@
 @CreateVar(
 #  numTrainTrials 200
-  numTrainTrials 100
+  numTrainTrials 300
   dwellTime 144       # ms
   OffRate InsertIHere # ms
   OnRate InsertJHere           # ms
@@ -17,6 +17,7 @@
   TraceDuration InsertNHere
   setMu InsertOHere
   setLambda InsertPHere
+  randomSeed InsertSeedHere
 )
 
 @SetVar(deltaT 1)
@@ -120,9 +121,9 @@
 # mePct varies from 0.2 to 0.5
   me ^Calc(round[^(ni) * ^(mePct) / 10]) # 10 is arbitrary
 )
-@SaveData(-from me -to me.dat)
-@SaveData(-from mePct -to mePct.dat)
-@SaveData(-from ActivityHz -to ActivityHz.dat)
+#@SaveData(-from me -to me.dat)
+#@SaveData(-from mePct -to mePct.dat)
+#@SaveData(-from ActivityHz -to ActivityHz.dat)
 
 ?If(exists[PyrToInternrnWtAdjDecay]) {
   @SetVar(PyrToInternrnWtAdjDecay ^Calc(exp[-^(deltaT)/^(PyrToInternrnWtAdjDecayRate)]))
@@ -167,7 +168,10 @@
   tracelen ^Num2Int(^Calc(^(TraceDuration) / ^(deltaT)))
 )
 
-@SetVar(seed 1)
+?If(strcmp[^(randomSeed),Insert:Seed:Here]=0) {
+  @SetVar(randomSeed 1)
+}
+@SetVar(seed ^(randomSeed))
 @SeedRNG()
 @CreateNetwork(-mindelay ^(minAxDelay) -maxdelay ^(maxAxDelay) -dist uniform -low ^Calc(0.9 * ^(wStart)) -high ^Calc(1.1 * ^(wStart)))
 
@@ -185,7 +189,7 @@
 @CreateVar(firstRecur ^Calc(^(lastN)+1))
 @PrintVar(deltaT alpha firstRecur Activity me MidPoint)
 
-@SetVar(seed 1)
+@SetVar(seed ^(randomSeed))
 @SeedRNG()
 
 @PrintVar(deltaT alpha Activity me MidPoint)
@@ -193,37 +197,72 @@
 @Test(-name testTraceSeq -time ^SequenceLength(-from testTraceSeq) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
 @PrintVar(AveTestAct)
 @CreateVar(tempTest 0)
+@CreateVar(tempData 0)
 %(i 1 ^(numTrainTrials)) {
   @ResetFiring()
   @Test(-name InitPtn -time ^SequenceLength(-from InitPtn) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
   @Train(-name trainTraceSeq -trials 1 -nocomp -norecord 7 TrainingThresholds TrainingBusLines TrainingIntBusLines TrainingKWeights TrainingInhibitions TrainingFBInternrnExc TrainingFFInternrnExc)
   @PrintVar(AveTrainAct)
   ?If(^(i) = 1) {
-    @SaveData(-from TrainingActivity -to trnWithinAct.dat)
-    @SaveData(-from me -to trnWithinAct.dat.ready)
+    @FileReset(fit_trn_mean_act.dat fit_trn_ssd_act.dat)
+    %(j 1 701 50) {
+      # This is a little confusing because we're using N (neuron) where P (timestep) makes more sense
+      # That's because CopyData was designed for 0/1 patterns and not activities
+      @CopyData(-from TrainingActivity -Nstart ^(j) -Nend ^Calc(^(j) + 49) -to subAct -type mat)
+      @SetVar(tempData ^Calc(mean[subAct]))
+      @SetVar(tempData ^Calc(1000 * ^(tempData) / ^(deltaT))) # Convert to Hz
+      @SaveData(-from tempData -to fit_trn_mean_act.dat -append)
+    }
+    @SetVar(tempData ^Calc(sqrt[var[TrainingActivity]]))
+    @SetVar(tempData ^Calc(1000 * ^(tempData) / ^(deltaT))) # Convert to Hz
+    @SaveData(-from tempData -to fit_trn_ssd_act.dat)
   }
   @DeleteData(TrainingBuffer)
   @SetVar(tempTest 0)
   ?If(^(i) = 1) {
     @SetVar(tempTest 1)
   }  
-  ?If(^(i) = ^(numTrainTrials)) {
+#  ?If(^(i) = ^(numTrainTrials)) {
+#    @SetVar(tempTest 1)
+#  }
+  ?If(^(i) % 50 = 0) {
     @SetVar(tempTest 1)
-  }  
+  }
   ?If(^(tempTest) = 1) {
     @ResetFiring()
     @Test(-name InitPtn -time ^SequenceLength(-from InitPtn) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
     @Test(-name testTraceSeq -time ^SequenceLength(-from testTraceSeq) -nocomp -norecord 7 TestingThresholds TestingBusLines TestingIntBusLines TestingKWeights TestingInhibitions TestingFBInternrnExc TestingFFInternrnExc)
     @PrintVar(AveTestAct)
-    ?If(^(i) = 1) {
-      @SaveData(-from TestingActivity -to tstWithinAct.dat)
-      @SaveData(-from me -to tstWithinAct.dat.ready)
+      ?If(^(i) = 1) {
+      @FileReset(fit_tst_mean_act.dat fit_tst_ssd_act.dat)
+      %(j 1 701 50) {
+        # This is a little confusing because we're using N (neuron) where P (timestep) makes more sense
+        # That's because CopyData was designed for 0/1 patterns and not activities
+        @CopyData(-from TestingActivity -Nstart ^(j) -Nend ^Calc(^(j) + 49) -to subAct -type mat)
+        @SetVar(tempData ^Calc(mean[subAct]))
+        @SetVar(tempData ^Calc(1000 * ^(tempData) / ^(deltaT))) # Convert to Hz
+        @SaveData(-from tempData -to fit_tst_mean_act.dat -append)
+      }
+      @SetVar(tempData ^Calc(sqrt[var[TestingActivity]]))
+      @SetVar(tempData ^Calc(1000 * ^(tempData) / ^(deltaT))) # Convert to Hz
+      @SaveData(-from tempData -to fit_tst_ssd_act.dat)
+      @SaveData(-from tempTest -to fit_quick.ready)
     }
-    ?If(^(i) = ^(numTrainTrials)) {
-      @SaveData(-from TestingActivity -to tstWithinAct_final.dat)
-      @SaveData(-from me -to tstWithinAct_final.dat.ready)
-      @SaveData(-from TestingBuffer -to tstBuff.dat)
-      @SaveData(-from me -to tstBuff.dat.ready)
+#    ?If(^(i) = ^(numTrainTrials)) {
+#      @SaveData(-from TestingActivity -to tstWithinAct_final.dat)
+#      @SaveData(-from me -to tstWithinAct_final.dat.ready)
+#      @SaveData(-from TestingBuffer -to tstBuff.dat)
+#      @SaveData(-from me -to tstBuff.dat.ready)
+#    }
+#    ?If(^(i) % 50 = 0 & ~[^(i) = ^(numTrainTrials)]) {
+    ?If(^(i) % 50 = 0) {
+      @FileReset(fit2_:^(i):.dat)
+      %(j 1 701 50) {
+        @CopyData(-from TestingBuffer -Nstart ^Calc(^(me) + 1) -Nend ^Calc(^(me) * 2) -Pstart ^(j) -Pend ^Calc(^(j) + 49) -to subBuff -type mat)
+        @SetVar(tempData ^Calc(mean[subBuff]))
+        @SaveData(-from tempData -to fit2_:^(i):.dat -append)
+      }
+      @SaveData(-from tempTest -to fit2_:^(i):.dat.ready)
     }
     @DeleteData(TestingBuffer)
   }

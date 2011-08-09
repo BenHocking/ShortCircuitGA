@@ -9,9 +9,9 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import edu.virginia.cs.geneticalgorithm.IntervalMutator;
-import edu.virginia.cs.geneticalgorithm.Mutator;
-import edu.virginia.cs.geneticalgorithm.OnePointCrossover;
+import edu.virginia.cs.geneticalgorithm.crossover.OnePointCrossover;
+import edu.virginia.cs.geneticalgorithm.mutator.IntervalMutator;
+import edu.virginia.cs.geneticalgorithm.mutator.Mutator;
 
 /**
  * Test harness for OnePointCrossover routines not tested in StandardGeneticFactoryTest. TODO Add better test here for crossover
@@ -22,8 +22,8 @@ public class OnePointCrossoverTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.OnePointCrossover#setMutator(edu.virginia.cs.geneticalgorithm.Mutator)} and
-     * {@link edu.virginia.cs.geneticalgorithm.OnePointCrossover#getMutator()}.
+     * {@link edu.virginia.cs.geneticalgorithm.crossover.OnePointCrossover#setMutator(edu.virginia.cs.geneticalgorithm.mutator.Mutator)} and
+     * {@link edu.virginia.cs.geneticalgorithm.crossover.OnePointCrossover#getMutator()}.
      */
     @Test
     public final void testSetAndGetMutator() {
