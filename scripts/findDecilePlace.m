@@ -4,7 +4,7 @@ function result = findDecilePlace(value, deciles)
         result = 10;
     else
         % Find first decile greater than this value
-        result = find(deciles >=a value)(1);
+        result = find(deciles >= value)(1);
     end
 
 end

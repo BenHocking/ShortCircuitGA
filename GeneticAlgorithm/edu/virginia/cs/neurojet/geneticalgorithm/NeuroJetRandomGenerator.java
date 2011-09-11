@@ -53,19 +53,12 @@ public class NeuroJetRandomGenerator {
      * @throws IOException if an error happens while reading the template script file or writing the generated script file
      */
     public void generateScripts() throws IOException {
-        int dirID = 0;
+        int dirID = _seed - 1;
         int seed = _seed;
         for (final Genotype i : _population) {
-            if (dirID >= 8998) {
-                final File tempDir = new File(NeuroJetGeneticAlgorithm.WORKINGDIR, "rand" + _randType + "_"
-                                                                                   + String.valueOf(++dirID));
-                final File script = new File(tempDir, NeuroJetGeneticAlgorithm.SCRIPTFILE.getName());
-                _scriptUpdater.createScriptFromTemplate(script, NeuroJetGeneticAlgorithm.SCRIPTFILE, (StandardGenotype) i, ++seed);
-            }
-            else {
-                ++seed;
-                ++dirID;
-            }
+            final File tempDir = new File(NeuroJetGeneticAlgorithm.WORKINGDIR, "rand" + _randType + "_" + String.valueOf(++dirID));
+            final File script = new File(tempDir, NeuroJetGeneticAlgorithm.SCRIPTFILE.getName());
+            _scriptUpdater.createScriptFromTemplate(script, NeuroJetGeneticAlgorithm.SCRIPTFILE, (StandardGenotype) i, ++seed);
         }
     }
 }

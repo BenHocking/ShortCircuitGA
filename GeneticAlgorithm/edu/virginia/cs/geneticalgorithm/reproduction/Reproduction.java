@@ -3,7 +3,13 @@
  */
 package edu.virginia.cs.geneticalgorithm.reproduction;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -17,8 +23,10 @@ import edu.virginia.cs.geneticalgorithm.distribution.Distribution;
 import edu.virginia.cs.geneticalgorithm.distribution.DistributionMember;
 import edu.virginia.cs.geneticalgorithm.fitness.Fitness;
 import edu.virginia.cs.geneticalgorithm.fitness.FitnessFactory;
+import edu.virginia.cs.geneticalgorithm.fitness.ShortCircuitFitness;
 import edu.virginia.cs.geneticalgorithm.gene.Genotype;
 import edu.virginia.cs.geneticalgorithm.select.Select;
+import edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness;
 
 /**
  * Class governing how a population of individuals in a genetic algorithm reproduce. It requires the specification of a
@@ -35,6 +43,7 @@ public final class Reproduction {
     private final List<Double> _meanFits = new ArrayList<Double>();
     private final List<Distribution> _popHist = new ArrayList<Distribution>();
     private int _numElites = 0;
+    private int _currentGeneration = 0;
     /**
      * DEBUG_LEVEL controls detail of messages to standard out (0 is quiet)
      */
@@ -83,6 +92,7 @@ public final class Reproduction {
      */
     public List<Genotype> reproduce(final List<Genotype> population, final int newPopSize, final FitnessFactory fitFactory,
                                     final Select selFn, final Crossover xFn) {
+        ++_currentGeneration;
         double totalFit = 0;
         double bestFit = 0; // Best is maximal, and all fitness values need to be positive
         List<Double> bestFitList = new ArrayList<Double>();
@@ -102,6 +112,39 @@ public final class Reproduction {
             final Fitness fitFn = fitFactory.createFitness(i);
             final List<Double> fitList = fitFn.fitnessValues();
             final double fit = fitFn.totalFitness();
+            // TODO: Fix this hack
+            Fitness workingFitFn = fitFn;
+            if (workingFitFn instanceof ShortCircuitFitness) {
+                workingFitFn = ((ShortCircuitFitness) workingFitFn).getPostFitness();
+            }
+            if (workingFitFn instanceof NeuroJetTraceFitness) {
+                try {
+                    final File workingDir = ((NeuroJetTraceFitness) workingFitFn).getWorkingDir();
+                    final File generationFile = new File(workingDir, "generations.dat");
+                    final StringBuilder priorGenerations = new StringBuilder();
+                    boolean alreadyAccountedFor = false;
+                    if (generationFile.exists()) {
+                        final BufferedReader reader = new BufferedReader(new FileReader(generationFile));
+                        final String line = reader.readLine();
+                        priorGenerations.append(line);
+                        final String[] generations = priorGenerations.toString().split(" ");
+                        alreadyAccountedFor = Arrays.asList(generations).contains(String.valueOf(_currentGeneration));
+                        if (!alreadyAccountedFor) {
+                            priorGenerations.append(" ");
+                        }
+                        reader.close();
+                    }
+                    if (!alreadyAccountedFor) {
+                        priorGenerations.append(String.valueOf(_currentGeneration));
+                        final PrintStream out = new PrintStream(new FileOutputStream(generationFile));
+                        out.println(priorGenerations.toString());
+                        out.close();
+                    }
+                }
+                catch (final Exception e) {
+                    throw new RuntimeException("Runtime exception", e);
+                }
+            }
             _monitor.release();
             if (DEBUG_LEVEL > 1) System.out.println("\tfitness: " + fit);
             distribution.add(new DistributionMember(fit, fitList, i));

@@ -48,7 +48,7 @@ public final class NeuroJetQuickFitness implements ProxyFitness {
         if (_fitnessValues.isEmpty()) {
             // Read the resulting activity files
             final double desiredAct = _traceFitness.getDesiredAct();
-            final File tempDir = _traceFitness.getTempDir();
+            final File tempDir = _traceFitness.getWorkingDir();
             final int waitTime = 60000 * 5; // Wait up to five minutes for tstWithinAct.dat to be ready
             final File signalFile = new File(tempDir, SIGNAL_FILE);
             FileData activityFile = new FileData(tempDir, MEAN_TRAIN_ACTIVITY_DATA_FILE, waitTime, signalFile);

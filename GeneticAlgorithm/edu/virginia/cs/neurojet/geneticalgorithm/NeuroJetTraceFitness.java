@@ -123,7 +123,10 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         return new IntegerRange(firstBlinkNeuron, lastBlinkNeuron);
     }
 
-    File getTempDir() {
+    /**
+     * @return Directory where this fitness performs its calculations
+     */
+    public File getWorkingDir() {
         return _tempDir;
     }
 
@@ -325,6 +328,7 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
                     // Launch NeuroJet
                     final List<String> command = new ArrayList<String>();
                     try {
+                        //
                         command.add(getGrandparent().getNeuroJet().getCanonicalPath());
                         command.add(scriptFile.getCanonicalPath());
                         final ProcessBuilder builder = new ProcessBuilder(command);

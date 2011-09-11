@@ -83,8 +83,11 @@ public abstract class ActivityFitnessGenerator implements FitnessGenerator {
     @Override
     public final List<Double> fitnessValues() {
         final List<Double> retval = new ArrayList<Double>();
-        retval.add(getSampleStdDev());
-        retval.add(getSquaredDeviationFromDesired());
+        // retval.add(getSampleStdDev());
+        // retval.add(getSquaredDeviationFromDesired());
+        // Use fitness components instead of actual values
+        retval.add(getSampleStdDevFitness(getSampleStdDev()));
+        retval.add(getSquaredDeviationFromDesiredFitness(getSquaredDeviationFromDesired()));
         return retval;
     }
 

@@ -112,6 +112,13 @@ public class ShortCircuitFitness extends AbstractFitness {
     }
 
     /**
+     * @return Post (i.e., second) fitness function
+     */
+    public Fitness getPostFitness() {
+        return _postFit;
+    }
+
+    /**
      * @see edu.virginia.cs.geneticalgorithm.fitness.Fitness#totalFitness()
      */
     @Override

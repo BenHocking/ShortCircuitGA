@@ -14,10 +14,15 @@ import edu.virginia.cs.neurojet.model.FileData;
  */
 final class ActivitySummaryFitnessGenerator extends ActivityFitnessGenerator {
 
+    /** File containing training activity averages */
     public static final String MEAN_TRAIN_ACTIVITY_DATA_FILE = "fit_trn_mean_act.dat";
+    /** File containing training activity sample standard deviations */
     public static final String SSD_TRAIN_ACTIVITY_DATA_FILE = "fit_trn_ssd_act.dat";
+    /** File containing testing activity averages */
     public static final String MEAN_TEST_ACTIVITY_DATA_FILE = "fit_tst_mean_act.dat";
+    /** File containing testing activity sample standard deviations */
     public static final String SSD_TEST_ACTIVITY_DATA_FILE = "fit_tst_ssd_act.dat";
+    /** File indicating that the files required for evaluating fitness are available for reading */
     public static final String SIGNAL_FILE = "fit_quick.ready";
 
     private final FileData _activityFile;
