@@ -29,7 +29,7 @@ import edu.virginia.cs.geneticalgorithm.gene.StandardGenotype;
 import edu.virginia.cs.geneticalgorithm.mutator.DecayingIntervalMutator;
 import edu.virginia.cs.geneticalgorithm.mutator.Mutator;
 import edu.virginia.cs.geneticalgorithm.reproduction.Reproduction;
-import edu.virginia.cs.geneticalgorithm.select.ParetoRankedSelect;
+import edu.virginia.cs.geneticalgorithm.select.BonusSelect;
 import edu.virginia.cs.geneticalgorithm.select.Select;
 
 /**
@@ -102,7 +102,7 @@ public final class NeuroJetGeneticAlgorithm {
         _reproduction = new Reproduction(allowDuplicates, keepHistory);
         _reproduction.setNumElites(Math.round(popSize * 0.1f));
         final List<Double> ranking = Arrays.asList(0.0, 0.1, 0.1, 0.1, 0.1, 0.0, 0.1, 0.1, 0.4, 2.0, 1.2, 3.0);
-        _select = new ParetoRankedSelect(new Random(), ranking);
+        _select = new BonusSelect(new Random(seed), ranking);
     }
 
     /**
@@ -217,6 +217,7 @@ public final class NeuroJetGeneticAlgorithm {
      * @param args Ignored
      */
     public static void main(final String[] args) {
+        // TODO: Change these arguments
         final int pop_size = args.length > 0 ? Integer.valueOf(args[0]) : 100;
         final int num_generations = args.length > 1 ? Integer.valueOf(args[1]) : 150;
         if (args.length > 2) {

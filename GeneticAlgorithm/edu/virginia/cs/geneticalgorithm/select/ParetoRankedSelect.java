@@ -28,7 +28,7 @@ public final class ParetoRankedSelect implements Select {
 
     /**
      * Constructor taking a {@link Random Random Number Generator}
-     * @param rng {@link Random Random Number Generator} used by {@link #select(Distribution)}
+     * @param rng {@link Random Random Number Generator} used by {@link SelectUtils#substituteSelect(Random, Distribution, List)}
      */
     public ParetoRankedSelect(final Random rng) {
         this(rng, null);
@@ -36,7 +36,7 @@ public final class ParetoRankedSelect implements Select {
 
     /**
      * Constructor taking a {@link Random Random Number Generator}
-     * @param rng {@link Random Random Number Generator} used by {@link #select(Distribution, List)}
+     * @param rng {@link Random Random Number Generator} used by {@link SelectUtils#substituteSelect(Random, Distribution, List)}
      * @param rankWeighting Value to assign to each place in distribution members' fitness values list
      */
     public ParetoRankedSelect(final Random rng, final List<Double> rankWeighting) {
@@ -44,17 +44,6 @@ public final class ParetoRankedSelect implements Select {
         if (rankWeighting != null) {
             _rankWeighting.addAll(rankWeighting);
         }
-    }
-
-    private List<List<Double>> enumerateFitnessValues(final Distribution distribution) {
-        final List<List<Double>> enumeratedFitnessValues = new ArrayList<List<Double>>();
-        for (int i = 0; i < distribution.size(); ++i) {
-            final List<Double> toAdd = new ArrayList<Double>();
-            toAdd.add(Double.valueOf(i));
-            toAdd.addAll(distribution.get(i).getFitnessValues());
-            enumeratedFitnessValues.add(toAdd);
-        }
-        return enumeratedFitnessValues;
     }
 
     /**
@@ -68,7 +57,7 @@ public final class ParetoRankedSelect implements Select {
                 _rankWeighting.add(Double.valueOf(1.0));
             }
         }
-        final List<List<Double>> enumeratedFitnessValues = enumerateFitnessValues(distribution);
+        final List<List<Double>> enumeratedFitnessValues = SelectUtils.enumerateFitnessValues(distribution);
         final int numIndividuals = distribution.size();
         final List<Double> paretoFitnessValues = new ArrayList<Double>(Collections.nCopies(numIndividuals, Double.valueOf(0.0)));
         for (int i = 0; i < numFitnessValues; ++i) {
@@ -79,17 +68,6 @@ public final class ParetoRankedSelect implements Select {
                 paretoFitnessValues.set(j, paretoFitnessValues.get(j) + rankValue);
             }
         }
-        return select(distribution, ArrayNumberUtils.normalize(paretoFitnessValues));
-    }
-
-    private Genotype select(final Distribution distribution, final List<Double> paretoFitnessValues) {
-        final double selector = _rng.nextDouble();
-        double totalProb = 0;
-        for (int i = 0; i < distribution.size(); ++i) {
-            totalProb += paretoFitnessValues.get(i);
-            if (totalProb > selector) return distribution.get(i).getLast();
-        }
-        // Default to last one in case of rounding error
-        return distribution.getLast().getGenotype();
+        return SelectUtils.substituteSelect(_rng, distribution, ArrayNumberUtils.normalize(paretoFitnessValues));
     }
 }

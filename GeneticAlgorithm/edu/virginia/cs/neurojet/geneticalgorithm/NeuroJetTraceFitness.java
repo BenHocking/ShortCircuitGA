@@ -318,6 +318,10 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
                     }
                 }
                 final File lastReadyFile = new File(_tempDir, "fit2_300.dat.ready");
+                // if (!(filesMatch(scriptFile, cfFile) && lastReadyFile.exists())) {
+                // System.out.println("Files match: " + filesMatch(scriptFile, cfFile));
+                // System.out.println("lastReadyFile.exists(): " + lastReadyFile.exists());
+                // }
                 if (filesMatch(scriptFile, cfFile) && lastReadyFile.exists()) {
                     _start = 0;
                     _end = 1; // Signifies completion
