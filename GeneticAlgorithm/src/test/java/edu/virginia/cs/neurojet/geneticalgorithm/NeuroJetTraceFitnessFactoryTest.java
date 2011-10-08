@@ -48,16 +48,17 @@ public class NeuroJetTraceFitnessFactoryTest {
      * @throws URISyntaxException Shouldn't happen
      */
     @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public final void testConstructors() throws URISyntaxException {
         try {
-            new NeuroJetTraceFitnessFactory(null, null, null, null);
+            new NeuroJetTraceFitnessFactory(null, null, null, null, null);
             fail("Null script files");
         }
         catch (final IllegalArgumentException e) {
             assertEquals("Argument scriptFiles cannot be null or empty", e.getMessage());
         }
         try {
-            new NeuroJetTraceFitnessFactory(new ArrayList<File>(), null, null, null);
+            new NeuroJetTraceFitnessFactory(new ArrayList<File>(), null, null, null, null);
             fail("No script files");
         }
         catch (final IllegalArgumentException e) {
@@ -66,7 +67,7 @@ public class NeuroJetTraceFitnessFactoryTest {
         final File scriptFile = TestFileLoader.getFile("trace_full.nj");
         final List<File> scriptFiles = Collections.singletonList(scriptFile);
         try {
-            new NeuroJetTraceFitnessFactory(scriptFiles, null, null, null);
+            new NeuroJetTraceFitnessFactory(scriptFiles, null, null, null, null);
             fail("No NeuroJet");
         }
         catch (final IllegalArgumentException e) {

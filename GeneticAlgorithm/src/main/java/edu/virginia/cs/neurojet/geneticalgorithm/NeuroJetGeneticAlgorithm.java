@@ -4,28 +4,20 @@
 package edu.virginia.cs.neurojet.geneticalgorithm;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import javax.vecmath.GMatrix;
 
 //import edu.tufts.cs.geometry.PCA;
 //import edu.tufts.cs.geometry.PCA.PrincipalComponent;
-import edu.virginia.cs.geneticalgorithm.distribution.Distribution;
-import edu.virginia.cs.geneticalgorithm.distribution.DistributionMember;
 import edu.virginia.cs.geneticalgorithm.fitness.FitnessFactory;
 import edu.virginia.cs.geneticalgorithm.fitness.ProxyFitnessFactory;
 import edu.virginia.cs.geneticalgorithm.fitness.ShortCircuitFitnessFactory;
 import edu.virginia.cs.geneticalgorithm.gene.GeneticFactory;
 import edu.virginia.cs.geneticalgorithm.gene.Genotype;
-import edu.virginia.cs.geneticalgorithm.gene.IntervalGene;
 import edu.virginia.cs.geneticalgorithm.gene.IntervalGeneticFactory;
-import edu.virginia.cs.geneticalgorithm.gene.StandardGenotype;
 import edu.virginia.cs.geneticalgorithm.mutator.DecayingIntervalMutator;
 import edu.virginia.cs.geneticalgorithm.mutator.Mutator;
 import edu.virginia.cs.geneticalgorithm.reproduction.Reproduction;
@@ -43,6 +35,7 @@ public final class NeuroJetGeneticAlgorithm {
     static File NJ = new File("/Users/bhocking/Documents/workspace/NeuroJet/build/NeuroJet");
     static File WORKINGDIR = new File("/Users/bhocking/Documents/workspace/ShortCircuitGA/scripts");
     static File SCRIPTFILE = new File(WORKINGDIR, "trace_full.nj");
+    static File PREPAREFILE = null;
     final static int GENOTYPE_SIZE = 21; // 0 - 20
     private final static double PRE_THRESHOLD = 1e5;
     private final static double POST_SCALE_FACTOR = 0.5 * PRE_THRESHOLD;
@@ -90,7 +83,7 @@ public final class NeuroJetGeneticAlgorithm {
         final List<File> traceScriptFiles = Collections.singletonList(SCRIPTFILE);
         final NeuroJetTraceFitnessFactory traceFitnessFactory = new NeuroJetTraceFitnessFactory(traceScriptFiles,
                                                                                                 buildScriptUpdater(), NJ,
-                                                                                                WORKINGDIR);
+                                                                                                WORKINGDIR, PREPAREFILE);
         final ProxyFitnessFactory quickFitnessFactory = new NeuroJetQuickFitnessFactory(traceFitnessFactory);
         _fitnessFactory = new ShortCircuitFitnessFactory(quickFitnessFactory, Collections.singletonList(PRE_THRESHOLD),
                                                          NeuroJetTraceFitness.NUM_FIT_VALS);
@@ -231,6 +224,9 @@ public final class NeuroJetGeneticAlgorithm {
         }
         if (args.length > 4) {
             SCRIPTFILE = new File(args[4]);
+        }
+        if (args.length > 5) {
+            PREPAREFILE = new File(args[5]);
         }
         final NeuroJetGeneticAlgorithm nga = new NeuroJetGeneticAlgorithm(3, pop_size);
         for (int i = 0; i < num_generations; ++i) {

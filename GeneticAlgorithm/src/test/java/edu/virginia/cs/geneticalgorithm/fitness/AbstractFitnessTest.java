@@ -41,6 +41,11 @@ public class AbstractFitnessTest {
             return _generateErrors ? 0 : NUM_FIT_VALS;
         }
 
+        @Override
+        public void prepare() {
+            // No preparation required
+        }
+
     }
 
     /**

@@ -41,6 +41,11 @@ public final class NeuroJetQuickFitness implements ProxyFitness {
     }
 
     @Override
+    public void prepare() {
+        _traceFitness.prepare();
+    }
+
+    @Override
     public List<Double> fitnessValues() {
         final long beginTime = System.currentTimeMillis();
         _traceFitness.runSimulationIfNeeded(); // starts the real fitness function running

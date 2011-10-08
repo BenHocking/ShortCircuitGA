@@ -36,6 +36,11 @@ public class ShortCircuitFitnessFactoryTest {
             super(genotype);
         }
 
+        @Override
+        public void prepare() {
+            // No preparation required
+        }
+
         /**
          * @see edu.virginia.cs.geneticalgorithm.fitness.HaltableFitness#halt()
          */
@@ -55,6 +60,11 @@ public class ShortCircuitFitnessFactoryTest {
             _genotype = individual;
             _isErrorful = numThresholds < 0;
             _numThresholds = Math.abs(numThresholds);
+        }
+
+        @Override
+        public void prepare() {
+            // No preparation required
         }
 
         /**

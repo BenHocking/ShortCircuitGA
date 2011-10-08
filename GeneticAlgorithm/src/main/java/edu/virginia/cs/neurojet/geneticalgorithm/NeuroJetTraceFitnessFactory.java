@@ -24,6 +24,7 @@ public class NeuroJetTraceFitnessFactory implements FitnessFactory {
     private final List<File> _scriptFiles;
     private final ScriptUpdater _updater;
     private final File _neuroJet;
+    private final File _prepareScript;
 
     /**
      * Constructor
@@ -34,9 +35,10 @@ public class NeuroJetTraceFitnessFactory implements FitnessFactory {
      * @param neuroJet Location of the NeuroJet executable
      * @param workingDir Directory that subdirectories will be created off (if null, this uses the location of the first file in the
      * scriptFiles {@link java.util.List List}).
+     * @param prepareScript TODO document
      */
     public NeuroJetTraceFitnessFactory(final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet,
-                                       final File workingDir) {
+                                       final File workingDir, final File prepareScript) {
         if (scriptFiles == null || scriptFiles.isEmpty())
             throw new IllegalArgumentException("Argument scriptFiles cannot be null or empty");
         if (neuroJet == null || !neuroJet.exists())
@@ -52,6 +54,22 @@ public class NeuroJetTraceFitnessFactory implements FitnessFactory {
         _updater = updater;
         _neuroJet = neuroJet;
         _workingDir = workingDir != null ? workingDir : _mainFile.getParentFile();
+        _prepareScript = prepareScript;
+    }
+
+    /**
+     * Constructor
+     * @param scriptFiles {@link java.util.List List} of script files that NeuroJet needs to run the experiment. The first file in
+     * the list is the one actually run, with the other files presumably a dependency of it.
+     * @param updater {@link ScriptUpdater} that contains the parameter values to map to the
+     * {@link edu.virginia.cs.geneticalgorithm.gene.Genotype Genotype}.
+     * @param neuroJet Location of the NeuroJet executable
+     * @param workingDir Directory that subdirectories will be created off (if null, this uses the location of the first file in the
+     * scriptFiles {@link java.util.List List}).
+     */
+    public NeuroJetTraceFitnessFactory(final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet,
+                                       final File workingDir) {
+        this(scriptFiles, updater, neuroJet, workingDir, null);
     }
 
     /**
@@ -96,5 +114,9 @@ public class NeuroJetTraceFitnessFactory implements FitnessFactory {
 
     File getNeuroJet() {
         return _neuroJet;
+    }
+
+    File getPrepareScript() {
+        return _prepareScript;
     }
 }

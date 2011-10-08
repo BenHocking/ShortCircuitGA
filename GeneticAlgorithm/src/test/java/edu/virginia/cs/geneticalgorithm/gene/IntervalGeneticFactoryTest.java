@@ -40,6 +40,11 @@ public final class IntervalGeneticFactoryTest {
             }
 
             @Override
+            public void prepare() {
+                // No preparation required
+            }
+
+            @Override
             public List<Double> fitnessValues() {
                 double retval = 0;
                 for (final Gene g : _genotype) {

@@ -3,6 +3,8 @@
  */
 package edu.virginia.cs.geneticalgorithm.reproduction;
 
+import edu.virginia.cs.common.utils.OrderedPair;
+import edu.virginia.cs.common.utils.Pair;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -100,7 +102,13 @@ public final class Reproduction {
         int ctr = 0;
         String bestDesc = "";
         if (DEBUG_LEVEL == 1) System.out.print("Evaluating individual:");
+        List<Pair<Genotype, Fitness>> fitnesses = new ArrayList<Pair<Genotype, Fitness>>();
         for (final Genotype i : population) {
+            final Fitness fitFn = fitFactory.createFitness(i);
+            fitnesses.add(new OrderedPair<Genotype, Fitness>(i, fitFn));
+            fitFn.prepare();
+        }
+        for (final Pair<Genotype, Fitness> pair : fitnesses) {
             if (DEBUG_LEVEL > 1) System.out.println("Finding fitness of individual #" + ++ctr);
             if (DEBUG_LEVEL == 1) System.out.print(" " + ++ctr);
             try {
@@ -109,7 +117,8 @@ public final class Reproduction {
             catch (final InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            final Fitness fitFn = fitFactory.createFitness(i);
+            final Genotype i = pair.getFirst();
+            final Fitness fitFn = pair.getLast();
             final List<Double> fitList = fitFn.fitnessValues();
             final double fit = fitFn.totalFitness();
             // TODO: Fix this hack

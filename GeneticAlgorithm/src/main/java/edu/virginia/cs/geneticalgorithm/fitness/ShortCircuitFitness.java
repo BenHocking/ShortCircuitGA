@@ -73,6 +73,15 @@ public class ShortCircuitFitness extends AbstractFitness {
     }
 
     /**
+     * @see edu.virginia.cs.geneticalgorithm.fitness.Fitness#prepare()
+     */
+    @Override
+    public void prepare() {
+        _preFit.prepare();
+        _postFit.prepare();
+    }
+
+    /**
      * @see edu.virginia.cs.geneticalgorithm.fitness.Fitness#fitnessValues()
      */
     @Override

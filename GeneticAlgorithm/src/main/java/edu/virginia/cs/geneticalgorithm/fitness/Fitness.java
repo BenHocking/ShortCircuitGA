@@ -14,6 +14,11 @@ import java.util.List;
 public interface Fitness {
 
     /**
+     * Performs any required pre-fitness evaluation steps
+     */
+    public void prepare();
+
+    /**
      * @return Multi-objective fitness values
      */
     public List<Double> fitnessValues();

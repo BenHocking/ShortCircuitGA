@@ -25,8 +25,9 @@ import edu.virginia.cs.common.utils.Pause;
 import edu.virginia.cs.common.utils.ShapeMatcher;
 import edu.virginia.cs.geneticalgorithm.fitness.FitnessGenerator;
 import edu.virginia.cs.geneticalgorithm.fitness.HaltableFitness;
-import edu.virginia.cs.geneticalgorithm.gene.Genotype;
 import edu.virginia.cs.neurojet.model.FileData;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Standard trace fitness function
@@ -39,7 +40,7 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
      * Run time + 2 activity measures + trend measure + shape meeasure + performance measure + target measure
      */
     public static final int NUM_FIT_VALS = 7;
-    private static final int WAIT_TIME = 20 /* minutes */* 60 /* seconds per minute */* 1000 /* ms per sec */;
+    private static final int WAIT_TIME = 20 /* minutes */ * 60 /* seconds per minute */ * 1000 /* ms per sec */;
     private static final double ACTIVITY_MULTIPLIER = 1E-5;
     private static int NUM_TRIALS = 150;
     private final NeuroJetTraceFitnessIntermediary _parent;
@@ -47,8 +48,7 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     private final int _dirID;
     private Process _process = null;
     private boolean _halted = false;
-    private long _start = -1;
-    private long _end = -1;
+    private long _end = -1; // FIXME
     // private NeuroJetNeuronBuffer _tstBuff = null;
     private final Object _lock = new Object();
     private final Object _lock2 = new Object();
@@ -57,6 +57,7 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     private final List<Double> _fitnessValues = new ArrayList<Double>();
     private final static List<Double> _desiredShape = new ArrayList<Double>();
     private FitnessGenerator _tstGenerator = null;
+    private boolean _isPrepared = false;
 
     NeuroJetTraceFitness(final NeuroJetTraceFitnessIntermediary parent, final int dirID) {
         _parent = parent;
@@ -145,7 +146,7 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     private List<Double> getFracFired(final int whichTrial) {
         // _tstBuff = new NeuroJetNeuronBuffer(_tempDir, "tstBuff.dat", WAIT_TIME);
         final FileData summaryBuffData = new FileData(_tempDir, "fit2_" + whichTrial + ".dat", WAIT_TIME,
-                                                      new File(_tempDir, "fit2_150.dat.ready"));
+            new File(_tempDir, "fit2_150.dat.ready"));
         return summaryBuffData.getData();
     }
 
@@ -162,7 +163,9 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
 
     private double slopeContribution(final double slope) {
         final double minSlope = -0.05;
-        if (slope < minSlope) return 0;
+        if (slope < minSlope) {
+            return 0;
+        }
         return 1000 * Math.pow(slope - minSlope, 2);
     }
 
@@ -190,6 +193,75 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
             }
         }
         fitnessValues.add(bestValue);
+    }
+
+    @Override
+    public void prepare() {
+        if (!_isPrepared) {
+            try {
+                File scriptFile = getGrandparent().getMainFile();
+                final File cfFile = copyPreviousScriptFile(scriptFile);
+                final ScriptUpdater updater = getGrandparent().getUpdater();
+                if (NeuroJetTraceFitnessIntermediary.DELETE_WORKING_FILES) {
+                    _tempDir.deleteOnExit();
+                }
+                for (final File f : getGrandparent().getScriptFiles()) {
+                    final File script = new File(_tempDir, f.getName());
+                    if (f.equals(getGrandparent().getMainFile())) {
+                        scriptFile = script;
+                    }
+                    try {
+                        updater.createScriptFromTemplate(script, f, _parent.getGenotype(), _dirID);
+                    }
+                    catch (final IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                final File lastReadyFile = new File(_tempDir, "fit2_300.dat.ready");
+                // if (!(filesMatch(scriptFile, cfFile) && lastReadyFile.exists())) {
+                // System.out.println("Files match: " + filesMatch(scriptFile, cfFile));
+                // System.out.println("lastReadyFile.exists(): " + lastReadyFile.exists());
+                // }
+                if (filesMatch(scriptFile, cfFile) && lastReadyFile.exists()) {
+                    _end = 1; // Signifies completion
+                    _halted = true; // So that we don't try to halt an unstarted thread
+                }
+                else {
+                    deleteExistingFiles(getGrandparent().getScriptFiles());
+                    final File prepareScript = getGrandparent().getPrepareScript();
+                    if (prepareScript != null) {
+                        final List<String> command = new ArrayList<String>();
+                        command.add(prepareScript.getCanonicalPath());
+                        command.add(scriptFile.getParentFile().getCanonicalPath());
+                        command.add(String.valueOf(_dirID));
+                        final ProcessBuilder builder = new ProcessBuilder(command);
+                        builder.directory(_tempDir);
+                        _process = builder.start();
+                        final BufferedReader out = new BufferedReader(new InputStreamReader(_process.getInputStream()));
+                        String line;
+                        while ((line = out.readLine()) != null) {
+                            _out.append(line);
+                        }
+                        try {
+                            final BufferedReader err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
+                            while ((line = err.readLine()) != null) {
+                                _err.append(line);
+                            }
+                        }
+                        catch (final IOException e) {
+                            _err.append(e.getStackTrace().toString());
+                        }
+                    }
+                }
+                _isPrepared = true;
+            }
+            catch (FileNotFoundException ex) {
+                Logger.getLogger(NeuroJetTraceFitness.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            catch (IOException ex) {
+                Logger.getLogger(NeuroJetTraceFitness.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     /**
@@ -231,8 +303,7 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
                 }
                 else {
                     Pause.untilConditionMet(new FitnessFinished(this), WAIT_TIME);
-                    final double timeDiff = _end - _start + 1;
-                    _fitnessValues.add(1 / (timeDiff > 0 ? timeDiff : 1));
+                    _fitnessValues.add(1.0); //FIXME: Remove this (need to adjust other calculations)
                     addActivityMeasures(_fitnessValues);
                     addTrendMeasure(_fitnessValues);
                     addShapeMeasure(_fitnessValues);
@@ -297,79 +368,42 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     private void runSimulationInThread() {
         synchronized (_lock2) {
             try {
-                _start = System.currentTimeMillis();
                 // Each fitness calculation happens in its own directory, allowing this function to be run in parallel
                 File scriptFile = getGrandparent().getMainFile();
-                final File cfFile = copyPreviousScriptFile(scriptFile);
                 final ScriptUpdater updater = getGrandparent().getUpdater();
-                if (NeuroJetTraceFitnessIntermediary.DELETE_WORKING_FILES) {
-                    _tempDir.deleteOnExit();
-                }
-                for (final File f : getGrandparent().getScriptFiles()) {
-                    final File script = new File(_tempDir, f.getName());
-                    if (f.equals(getGrandparent().getMainFile())) {
-                        scriptFile = script;
+                final File lastReadyFile = new File(_tempDir, "fit2_300.dat.ready");
+                // Launch NeuroJet
+                final List<String> command = new ArrayList<String>();
+                try {
+                    //
+                    command.add(getGrandparent().getNeuroJet().getCanonicalPath());
+                    command.add(scriptFile.getCanonicalPath());
+                    final ProcessBuilder builder = new ProcessBuilder(command);
+                    builder.directory(_tempDir);
+                    _process = builder.start();
+                    final BufferedReader out = new BufferedReader(new InputStreamReader(_process.getInputStream()));
+                    String line;
+                    while ((line = out.readLine()) != null) {
+                        _out.append(line);
                     }
                     try {
-                        updater.createScriptFromTemplate(script, f, _parent.getGenotype(), _dirID);
+                        final BufferedReader err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
+                        while ((line = err.readLine()) != null) {
+                            _err.append(line);
+                        }
                     }
                     catch (final IOException e) {
+                        _err.append(e.getStackTrace().toString());
+                    }
+                }
+                catch (final IOException e) {
+                    if (!_halted) {
                         throw new RuntimeException(e);
                     }
                 }
-                final File lastReadyFile = new File(_tempDir, "fit2_300.dat.ready");
-                // if (!(filesMatch(scriptFile, cfFile) && lastReadyFile.exists())) {
-                // System.out.println("Files match: " + filesMatch(scriptFile, cfFile));
-                // System.out.println("lastReadyFile.exists(): " + lastReadyFile.exists());
-                // }
-                if (filesMatch(scriptFile, cfFile) && lastReadyFile.exists()) {
-                    _start = 0;
-                    _end = 1; // Signifies completion
-                    _halted = true; // So that we don't try to halt an unstarted thread
-                }
-                else {
-                    deleteExistingFiles(getGrandparent().getScriptFiles());
-                    // Launch NeuroJet
-                    final List<String> command = new ArrayList<String>();
-                    try {
-                        //
-                        command.add(getGrandparent().getNeuroJet().getCanonicalPath());
-                        command.add(scriptFile.getCanonicalPath());
-                        final ProcessBuilder builder = new ProcessBuilder(command);
-                        builder.directory(_tempDir);
-                        _process = builder.start();
-                        final BufferedReader out = new BufferedReader(new InputStreamReader(_process.getInputStream()));
-                        String line;
-                        while ((line = out.readLine()) != null) {
-                            _out.append(line);
-                        }
-                        try {
-                            final BufferedReader err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
-                            while ((line = err.readLine()) != null) {
-                                _err.append(line);
-                            }
-                        }
-                        catch (final IOException e) {
-                            _err.append(e.getStackTrace().toString());
-                        }
-                    }
-                    catch (final IOException e) {
-                        if (!_halted) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-            }
-            catch (final FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            catch (final IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
             finally {
-                _end = System.currentTimeMillis();
+                _end = 1;
             }
         }
     }
@@ -388,7 +422,9 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
                 String line1 = null;
                 String line2 = null;
                 while (((line1 = in1.readLine()) != null) && ((line2 = in2.readLine()) != null)) {
-                    if (!line1.equals(line2)) return false;
+                    if (!line1.equals(line2)) {
+                        return false;
+                    }
                 }
                 if (line2 != null) { // Short-circuit evaluation in while loop requires this
                     line2 = in2.readLine();
@@ -441,13 +477,17 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
                 retval = false;
             }
             finally {
-                if (in != null) try {
-                    in.close();
+                if (in != null) {
+                    try {
+                        in.close();
+                    }
+                    catch (final IOException e) {
+                        retval = false;
+                    }
                 }
-                catch (final IOException e) {
-                    retval = false;
+                if (out != null) {
+                    out.close();
                 }
-                if (out != null) out.close();
             }
         }
         return retval;
@@ -456,13 +496,21 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     static double generateTimeValue(final int when) {
         // Puff normally starts at time step 651 and lasts to 750
         // Responding in this time window demonstrates memory but not prediction
-        if (when >= 651) return 0.4;
+        if (when >= 651) {
+            return 0.4;
+        }
         // Ideal are responses in the 551 to 650 window
-        if (when >= 551) return 1.0;
+        if (when >= 551) {
+            return 1.0;
+        }
         // The 100 ms before that isn't so bad
-        if (when >= 451) return 0.5;
+        if (when >= 451) {
+            return 0.5;
+        }
         // The 200 ms before that isn't so good
-        if (when >= 251) return 0.05;
+        if (when >= 251) {
+            return 0.05;
+        }
         // The first few hundred ms is too early
         return 0.01;
     }
@@ -473,7 +521,6 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     // }
     // return _tstBuff;
     // }
-
     /**
      * @return Whether the fitness function acquired the target behavior (i.e., blinked at the right time)
      */
@@ -552,7 +599,5 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         public boolean met() {
             return _fitness.isFinished();
         }
-
     }
-
 }
