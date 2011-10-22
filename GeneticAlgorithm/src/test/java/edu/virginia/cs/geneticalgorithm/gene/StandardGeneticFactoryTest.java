@@ -71,6 +71,11 @@ public final class StandardGeneticFactoryTest {
      */
     public static class TrivialStandardFitnessFactory implements FitnessFactory {
 
+        @Override
+        public void ready() {
+            // Nothing to do
+        }
+
         /**
          * @see edu.virginia.cs.geneticalgorithm.fitness.FitnessFactory#createFitness(edu.virginia.cs.geneticalgorithm.gene.Genotype)
          */

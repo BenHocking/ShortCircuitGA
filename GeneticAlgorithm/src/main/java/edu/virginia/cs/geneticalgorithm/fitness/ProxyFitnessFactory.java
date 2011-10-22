@@ -17,6 +17,7 @@ public interface ProxyFitnessFactory extends FitnessFactory {
      * @param individual {@link Genotype} describing the individual to evaluate
      * @return {@link Fitness} function to evaluate the individual with
      */
+    @Override
     public ProxyFitness createFitness(Genotype individual);
 
     /**

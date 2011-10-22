@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Thread that invokes another runnable and tracks its output, errors, and time running
@@ -55,6 +57,8 @@ public class InvokerThread extends Thread {
                         _halted = false;
                         _start = System.currentTimeMillis();
                         _end = -1;
+                        BufferedReader err = null;
+                        BufferedReader out = null;
                         try {
                             if (_preprocessor != null) {
                                 _preprocessor.run();
@@ -65,22 +69,30 @@ public class InvokerThread extends Thread {
                             final ProcessBuilder builder = new ProcessBuilder(command);
                             builder.directory(_workingDir);
                             _process = builder.start();
-                            final BufferedReader out = new BufferedReader(new InputStreamReader(_process.getInputStream()));
+                            out = new BufferedReader(new InputStreamReader(_process.getInputStream()));
                             String line;
                             while ((line = out.readLine()) != null) {
                                 _out.append(line);
                             }
                             try {
-                                final BufferedReader err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
+                                err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
                                 while ((line = err.readLine()) != null) {
                                     _err.append(line);
                                 }
                             }
                             catch (final IOException e) {
+                                err.close();
                                 _err.append(e.getStackTrace().toString());
                             }
                         }
                         catch (final IOException e) {
+                            if (out != null) try {
+                                out.close();
+                            }
+                            catch (IOException ex) {
+                                Logger.getLogger(InvokerThread.class.getName()).log(Level.SEVERE, null, ex);
+                                throw new RuntimeException(ex);
+                            }
                             if (!_halted) {
                                 throw new RuntimeException(e);
                             }
@@ -121,5 +133,4 @@ public class InvokerThread extends Thread {
             }
         }
     }
-
 }

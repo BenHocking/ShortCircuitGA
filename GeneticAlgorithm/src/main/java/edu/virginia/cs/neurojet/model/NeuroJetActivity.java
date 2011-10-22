@@ -107,13 +107,17 @@ public class NeuroJetActivity extends File {
                     throw new IOException("Couldn't find file '" + _signal.getPath() + "'");
                 }
                 final BufferedReader actReader = new BufferedReader(new FileReader(this));
-                _activityList = new ArrayList<List<Double>>();
-                String line;
-                while ((line = actReader.readLine()) != null) {
-                    final String[] activities = line.split("\\s");
-                    _activityList.add(multiply(toDoubleList(activities), hzConvFactor));
+                try {
+                    _activityList = new ArrayList<List<Double>>();
+                    String line;
+                    while ((line = actReader.readLine()) != null) {
+                        final String[] activities = line.split("\\s");
+                        _activityList.add(multiply(toDoubleList(activities), hzConvFactor));
+                    }
                 }
-                actReader.close();
+                finally {
+                    actReader.close();
+                }
             }
             catch (final IOException e) {
                 throw new RuntimeException(e);

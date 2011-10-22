@@ -4,12 +4,18 @@
 package edu.virginia.cs.neurojet.geneticalgorithm;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import edu.virginia.cs.geneticalgorithm.fitness.Fitness;
 import edu.virginia.cs.geneticalgorithm.fitness.FitnessFactory;
 import edu.virginia.cs.geneticalgorithm.gene.Genotype;
 import edu.virginia.cs.geneticalgorithm.gene.StandardGenotype;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Factory to generate a fitness function to determine whether this is a reasonable choice of parameter settings for learning trace
@@ -118,5 +124,27 @@ public class NeuroJetTraceFitnessFactory implements FitnessFactory {
 
     File getPrepareScript() {
         return _prepareScript;
+    }
+
+    @Override
+    public void ready() {
+        if (_prepareScript != null) {
+            try {
+                final List<String> command = new ArrayList<String>();
+                command.add(_prepareScript.getCanonicalPath());
+                final ProcessBuilder builder = new ProcessBuilder(command);
+                builder.directory(getWorkingDir());
+                Process process = builder.start();
+                final BufferedReader out = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                while (out.readLine() != null) {
+                }
+                final BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+                while (err.readLine() != null) {
+                }
+            }
+            catch (IOException ex) {
+                Logger.getLogger(NeuroJetTraceFitnessFactory.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }

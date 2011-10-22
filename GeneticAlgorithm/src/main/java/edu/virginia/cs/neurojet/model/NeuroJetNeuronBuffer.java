@@ -78,21 +78,25 @@ public class NeuroJetNeuronBuffer extends File {
                     throw new IOException("Couldn't find file '" + _signal.getPath() + "'");
                 }
                 final BufferedReader reader = new BufferedReader(new FileReader(this));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    final String[] lineData = line.split("\\s");
-                    final boolean isOn = (Integer.parseInt(lineData[2]) != 0);
-                    if (isOn) {
-                        final Integer neuron = Integer.parseInt(lineData[1]);
-                        final int timePos = Integer.parseInt(lineData[0]);
-                        while (_firingBuffer.size() < timePos) {
-                            _firingBuffer.add(new HashSet<Integer>());
+                try {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        final String[] lineData = line.split("\\s");
+                        final boolean isOn = (Integer.parseInt(lineData[2]) != 0);
+                        if (isOn) {
+                            final Integer neuron = Integer.parseInt(lineData[1]);
+                            final int timePos = Integer.parseInt(lineData[0]);
+                            while (_firingBuffer.size() < timePos) {
+                                _firingBuffer.add(new HashSet<Integer>());
+                            }
+                            final Set<Integer> firingSet = _firingBuffer.get(timePos - 1);
+                            firingSet.add(neuron);
                         }
-                        final Set<Integer> firingSet = _firingBuffer.get(timePos - 1);
-                        firingSet.add(neuron);
                     }
                 }
-                reader.close();
+                finally {
+                    reader.close();
+                }
             }
             catch (final IOException e) {
                 throw new RuntimeException(e);

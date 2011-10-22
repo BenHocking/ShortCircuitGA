@@ -18,4 +18,9 @@ public interface FitnessFactory {
      * @return {@link Fitness} function to evaluate the individual with
      */
     public Fitness createFitness(Genotype individual);
+
+    /**
+     * Invoked after all fitnesses are prepared, but before they are evaluated
+     */
+    public void ready();
 }

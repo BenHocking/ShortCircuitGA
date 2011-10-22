@@ -49,4 +49,9 @@ public class NeuroJetQuickFitnessFactory implements ProxyFitnessFactory {
         return _generatesPostFitness;
     }
 
+    @Override
+    public void ready() {
+        _postFitnessFactory.ready();
+    }
+
 }

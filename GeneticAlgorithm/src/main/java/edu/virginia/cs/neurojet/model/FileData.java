@@ -59,12 +59,16 @@ public class FileData extends File {
                         throw new IOException("Couldn't find file '" + _signal.getPath() + "'");
                     }
                     final BufferedReader reader = new BufferedReader(new FileReader(this));
-                    _data = new ArrayList<Double>();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        _data.add(Double.valueOf(line));
+                    try {
+                        _data = new ArrayList<Double>();
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            _data.add(Double.valueOf(line));
+                        }
                     }
-                    reader.close();
+                    finally {
+                        reader.close();
+                    }
                 }
                 catch (final IOException e) {
                     throw new RuntimeException(e);

@@ -31,6 +31,11 @@ public final class IntervalGeneticFactoryTest {
 
     private static class TrivialIntervalFitnessFactory implements FitnessFactory {
 
+        @Override
+        public void ready() {
+            // Nothing to do
+        }
+
         private static class TrivialIntervalFitness extends AbstractFitness {
 
             Genotype _genotype;

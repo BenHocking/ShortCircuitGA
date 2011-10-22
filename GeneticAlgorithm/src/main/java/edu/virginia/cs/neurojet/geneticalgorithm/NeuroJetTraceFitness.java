@@ -37,10 +37,10 @@ import java.util.logging.Logger;
 public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
 
     /**
-     * Run time + 2 activity measures + trend measure + shape meeasure + performance measure + target measure
+     * Run time + 2 activity measures + trend measure + shape measure + performance measure + target measure
      */
     public static final int NUM_FIT_VALS = 7;
-    private static final int WAIT_TIME = 20 /* minutes */ * 60 /* seconds per minute */ * 1000 /* ms per sec */;
+    private static final int WAIT_TIME = 120 /* minutes */ * 60 /* seconds per minute */ * 1000 /* ms per sec */;
     private static final double ACTIVITY_MULTIPLIER = 1E-5;
     private static int NUM_TRIALS = 150;
     private final NeuroJetTraceFitnessIntermediary _parent;
@@ -58,6 +58,7 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     private final static List<Double> _desiredShape = new ArrayList<Double>();
     private FitnessGenerator _tstGenerator = null;
     private boolean _isPrepared = false;
+    private File _scriptFile = null;
 
     NeuroJetTraceFitness(final NeuroJetTraceFitnessIntermediary parent, final int dirID) {
         _parent = parent;
@@ -242,17 +243,15 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
                         while ((line = out.readLine()) != null) {
                             _out.append(line);
                         }
-                        try {
-                            final BufferedReader err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
-                            while ((line = err.readLine()) != null) {
-                                _err.append(line);
-                            }
+                        out.close();
+                        final BufferedReader err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
+                        while ((line = err.readLine()) != null) {
+                            _err.append(line);
                         }
-                        catch (final IOException e) {
-                            _err.append(e.getStackTrace().toString());
-                        }
+                        err.close();
                     }
                 }
+                _scriptFile = scriptFile;
                 _isPrepared = true;
             }
             catch (FileNotFoundException ex) {
@@ -367,34 +366,29 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     // TODO Add listener to process
     private void runSimulationInThread() {
         synchronized (_lock2) {
+            BufferedReader out = null;
+            BufferedReader err = null;
             try {
-                // Each fitness calculation happens in its own directory, allowing this function to be run in parallel
-                File scriptFile = getGrandparent().getMainFile();
-                final ScriptUpdater updater = getGrandparent().getUpdater();
-                final File lastReadyFile = new File(_tempDir, "fit2_300.dat.ready");
                 // Launch NeuroJet
                 final List<String> command = new ArrayList<String>();
                 try {
                     //
                     command.add(getGrandparent().getNeuroJet().getCanonicalPath());
-                    command.add(scriptFile.getCanonicalPath());
+                    command.add(_scriptFile.getCanonicalPath());
                     final ProcessBuilder builder = new ProcessBuilder(command);
                     builder.directory(_tempDir);
                     _process = builder.start();
-                    final BufferedReader out = new BufferedReader(new InputStreamReader(_process.getInputStream()));
+                    out = new BufferedReader(new InputStreamReader(_process.getInputStream()));
                     String line;
                     while ((line = out.readLine()) != null) {
                         _out.append(line);
                     }
-                    try {
-                        final BufferedReader err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
-                        while ((line = err.readLine()) != null) {
-                            _err.append(line);
-                        }
+                    out.close();
+                    err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
+                    while ((line = err.readLine()) != null) {
+                        _err.append(line);
                     }
-                    catch (final IOException e) {
-                        _err.append(e.getStackTrace().toString());
-                    }
+                    err.close();
                 }
                 catch (final IOException e) {
                     if (!_halted) {
@@ -403,7 +397,20 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
                 }
             }
             finally {
-                _end = 1;
+                try {
+                    if (out != null) {
+                        out.close();
+                    }
+                    if (err != null) {
+                        err.close();
+                    }
+                }
+                catch (IOException ex) {
+                    Logger.getLogger(NeuroJetTraceFitness.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                finally {
+                    _end = 1;
+                }
             }
         }
     }

@@ -29,6 +29,10 @@ import edu.virginia.cs.geneticalgorithm.fitness.ShortCircuitFitness;
 import edu.virginia.cs.geneticalgorithm.gene.Genotype;
 import edu.virginia.cs.geneticalgorithm.select.Select;
 import edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class governing how a population of individuals in a genetic algorithm reproduce. It requires the specification of a
@@ -46,6 +50,8 @@ public final class Reproduction {
     private final List<Distribution> _popHist = new ArrayList<Distribution>();
     private int _numElites = 0;
     private int _currentGeneration = 0;
+    private File _endPrepareAction = null;
+
     /**
      * DEBUG_LEVEL controls detail of messages to standard out (0 is quiet)
      */
@@ -108,6 +114,7 @@ public final class Reproduction {
             fitnesses.add(new OrderedPair<Genotype, Fitness>(i, fitFn));
             fitFn.prepare();
         }
+        endPrepare();
         for (final Pair<Genotype, Fitness> pair : fitnesses) {
             if (DEBUG_LEVEL > 1) System.out.println("Finding fitness of individual #" + ++ctr);
             if (DEBUG_LEVEL == 1) System.out.print(" " + ++ctr);
@@ -145,9 +152,14 @@ public final class Reproduction {
                     }
                     if (!alreadyAccountedFor) {
                         priorGenerations.append(String.valueOf(_currentGeneration));
-                        final PrintStream out = new PrintStream(new FileOutputStream(generationFile));
-                        out.println(priorGenerations.toString());
-                        out.close();
+                        PrintStream out = null;
+                        try {
+                            out = new PrintStream(new FileOutputStream(generationFile));
+                            out.println(priorGenerations.toString());
+                        }
+                        finally {
+                            out.close();
+                        }
                     }
                 }
                 catch (final Exception e) {
@@ -244,5 +256,31 @@ public final class Reproduction {
      */
     public List<Double> getMeanFits() {
         return new ArrayList<Double>(_meanFits);
+    }
+
+    public void setEndPrepareAction(File PrepareAction) {
+        _endPrepareAction = PrepareAction;
+    }
+
+    private void endPrepare() {
+        if (_endPrepareAction != null) {
+            try {
+                final List<String> command = new ArrayList<String>();
+                command.add(_endPrepareAction.getCanonicalPath());
+                final ProcessBuilder builder = new ProcessBuilder(command);
+                builder.directory(_endPrepareAction.getParentFile());
+                Process process = builder.start();
+                final BufferedReader out = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+                while ((line = out.readLine()) != null) {
+                }
+                final BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+                while ((line = err.readLine()) != null) {
+                }
+            }
+            catch (IOException ex) {
+                Logger.getLogger(Reproduction.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }

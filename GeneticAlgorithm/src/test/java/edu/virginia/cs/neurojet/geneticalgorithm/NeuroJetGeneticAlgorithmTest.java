@@ -31,12 +31,12 @@ public class NeuroJetGeneticAlgorithmTest {
         final File scriptFile = new File(dataDir, "trace_full.nj");
         workingDir.deleteOnExit();
         final String[] args = {
-            "2", "2", neuroJet.getAbsolutePath(), workingDir.getAbsolutePath(), scriptFile.getAbsolutePath()
+            "2", "2", "3", neuroJet.getAbsolutePath(), workingDir.getAbsolutePath(), scriptFile.getAbsolutePath()
         };
         NeuroJetGeneticAlgorithm.main(args);
         assertTrue(workingDir.exists());
         final String[] bad_args = {
-            "0", "0"
+            "0", "0", "1"
         };
         try {
             NeuroJetGeneticAlgorithm.main(bad_args);
@@ -46,7 +46,7 @@ public class NeuroJetGeneticAlgorithmTest {
             assertEquals("Cannot perform PCA without history.", e.getMessage());
         }
         final String[] bad_args2 = {
-            "1", "1", neuroJet.getAbsolutePath(), workingDir.getAbsolutePath(), scriptFile.getAbsolutePath()
+            "1", "1", "2", neuroJet.getAbsolutePath(), workingDir.getAbsolutePath(), scriptFile.getAbsolutePath()
         };
         try {
             NeuroJetGeneticAlgorithm.main(bad_args2);

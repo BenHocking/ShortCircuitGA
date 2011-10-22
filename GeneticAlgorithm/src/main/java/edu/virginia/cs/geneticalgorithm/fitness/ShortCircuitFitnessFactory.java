@@ -93,4 +93,10 @@ public class ShortCircuitFitnessFactory implements FitnessFactory {
         retval.setPostScale(_postScale);
         return retval;
     }
+
+    @Override
+    public void ready() {
+        _preFit.ready();
+        if (_postFit != null) _postFit.ready();
+    }
 }

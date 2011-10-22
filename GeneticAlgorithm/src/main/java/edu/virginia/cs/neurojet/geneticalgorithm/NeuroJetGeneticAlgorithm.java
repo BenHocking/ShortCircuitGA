@@ -93,6 +93,7 @@ public final class NeuroJetGeneticAlgorithm {
         final boolean allowDuplicates = false;
         final boolean keepHistory = true;
         _reproduction = new Reproduction(allowDuplicates, keepHistory);
+        _reproduction.setEndPrepareAction(PREPAREFILE);
         _reproduction.setNumElites(Math.round(popSize * 0.1f));
         final List<Double> ranking = Arrays.asList(0.0, 0.1, 0.1, 0.1, 0.1, 0.0, 0.1, 0.1, 0.4, 2.0, 1.2, 3.0);
         _select = new BonusSelect(new Random(seed), ranking);
@@ -213,22 +214,23 @@ public final class NeuroJetGeneticAlgorithm {
         // TODO: Change these arguments
         final int pop_size = args.length > 0 ? Integer.valueOf(args[0]) : 100;
         final int num_generations = args.length > 1 ? Integer.valueOf(args[1]) : 150;
-        if (args.length > 2) {
-            NJ = new File(args[2]);
-        }
+        final int seed = args.length > 2 ? Integer.valueOf(args[2]) : 3;
         if (args.length > 3) {
-            WORKINGDIR = new File(args[3]);
+            NJ = new File(args[3]);
+        }
+        if (args.length > 4) {
+            WORKINGDIR = new File(args[4]);
             if (!WORKINGDIR.exists()) {
                 WORKINGDIR.mkdir();
             }
         }
-        if (args.length > 4) {
-            SCRIPTFILE = new File(args[4]);
-        }
         if (args.length > 5) {
-            PREPAREFILE = new File(args[5]);
+            SCRIPTFILE = new File(args[5]);
         }
-        final NeuroJetGeneticAlgorithm nga = new NeuroJetGeneticAlgorithm(3, pop_size);
+        if (args.length > 6) {
+            PREPAREFILE = new File(args[6]);
+        }
+        final NeuroJetGeneticAlgorithm nga = new NeuroJetGeneticAlgorithm(seed, pop_size);
         for (int i = 0; i < num_generations; ++i) {
             nga.reproduce();
             System.out.println("Generation #" + (i + 1));

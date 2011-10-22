@@ -146,6 +146,11 @@ public class ShortCircuitFitnessFactoryTest {
             _numThresholds = numThresholds;
         }
 
+        @Override
+        public void ready() {
+            // Nothing to do
+        }
+
         /**
          * @see edu.virginia.cs.geneticalgorithm.fitness.ProxyFitnessFactory#createFitness(edu.virginia.cs.geneticalgorithm.gene.Genotype)
          */

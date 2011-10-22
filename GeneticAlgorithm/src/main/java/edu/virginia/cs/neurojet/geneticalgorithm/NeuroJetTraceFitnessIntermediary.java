@@ -78,7 +78,7 @@ public final class NeuroJetTraceFitnessIntermediary {
     private NeuroJetTraceFitnessIntermediary(final NeuroJetTraceFitnessFactory parent, final StandardGenotype individual,
                                              final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet,
                                              final File workingDir, final int maxSamples) {
-        if (scriptFiles == null || scriptFiles.size() == 0)
+        if (scriptFiles == null || scriptFiles.isEmpty())
             throw new IllegalArgumentException("Argument scriptFiles cannot be null or empty");
         if (neuroJet == null || !neuroJet.canExecute())
             throw new IllegalArgumentException("Argument neuroJet must refer to an executable");
