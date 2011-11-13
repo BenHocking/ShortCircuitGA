@@ -55,9 +55,11 @@ public final class NeuroJetGeneticAlgorithm {
         final double xOverProb = 0.6;
         final double geneXOverProb = 0.25;
         final double mutateProb = 0.03;
-        final double probDecay = -0.0002; // Negative value meaning the mutate probability actually increases (slightly)
+//        final double probDecay = -0.0002; // Negative value meaning the mutate probability actually increases (slightly)
+        final double probDecay = 0;
         final double mutateSigma = 0.2;
-        final double sigmaDecay = 0.00005; // Sigma decays by about 5% (0.9995^100) every generation
+//        final double sigmaDecay = 0.00005; // Sigma decays by about 5% (0.9995^100) every generation
+        final double sigmaDecay = 0;
         final Mutator mutator = new DecayingIntervalMutator(mutateProb, probDecay, mutateSigma, sigmaDecay, new Random(seed));
         return new IntervalGeneticFactory(seed, xOverProb, geneXOverProb, mutator);
     }
@@ -95,7 +97,7 @@ public final class NeuroJetGeneticAlgorithm {
         _reproduction = new Reproduction(allowDuplicates, keepHistory);
         _reproduction.setEndPrepareAction(PREPAREFILE);
         _reproduction.setNumElites(Math.round(popSize * 0.1f));
-        final List<Double> ranking = Arrays.asList(0.0, 0.1, 0.1, 0.1, 0.1, 0.0, 0.1, 0.1, 0.4, 2.0, 1.2, 3.0);
+        final List<Double> ranking = Arrays.asList(0.0, 0.05, 0.05, 0.05, 0.05, 0.0, 0.05, 0.05, 0.2, 0.6, 1.4, 3.0);
         _select = new BonusSelect(new Random(seed), ranking);
     }
 

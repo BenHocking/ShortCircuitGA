@@ -25,6 +25,13 @@ import org.junit.Test;
  * @since Feb 26, 2011
  */
 public class SandboxTest {
+    private interface Fred {
+        
+    }
+
+    private class Flintstone implements Fred {
+        
+    }
 
     private static class GrowingList extends ArrayList<Integer> {
 
@@ -58,6 +65,7 @@ public class SandboxTest {
         // final Integer i2 = Integer.valueOf(2);
         // TestUtils.testEqualityProperty(tet1, tet2, "a", i1, i2, true);
         // TestUtils.testEqualityProperty(tet1, tet2, "b", i1, i2, false);
+        System.out.println(Fred.class.toString());
         String s = "&amp; & &nsbp; &tc., &tc. &tc";
         final String regex = "&([^;\\W]*([^;\\w]|$))";
         final String replacement = "&amp;$1";

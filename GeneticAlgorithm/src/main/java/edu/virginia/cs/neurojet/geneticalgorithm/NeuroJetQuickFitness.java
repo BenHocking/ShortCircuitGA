@@ -106,6 +106,7 @@ public final class NeuroJetQuickFitness implements ProxyFitness {
      */
     @Override
     public int numFitnessValues() {
+        // 1 + 2 + 2 = 5
         return 1 /* elapsed time */+ _trnGenerator.numFitnessValues() + _tstGenerator.numFitnessValues();
     }
 }

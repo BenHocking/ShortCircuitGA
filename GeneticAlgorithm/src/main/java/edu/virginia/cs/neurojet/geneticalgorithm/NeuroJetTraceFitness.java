@@ -239,16 +239,25 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
                         builder.directory(_tempDir);
                         _process = builder.start();
                         final BufferedReader out = new BufferedReader(new InputStreamReader(_process.getInputStream()));
-                        String line;
-                        while ((line = out.readLine()) != null) {
-                            _out.append(line);
+                        try {
+                            String line;
+                            while ((line = out.readLine()) != null) {
+                                _out.append(line);
+                            }
                         }
-                        out.close();
+                        finally {
+                            out.close();
+                        }
                         final BufferedReader err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
-                        while ((line = err.readLine()) != null) {
-                            _err.append(line);
+                        try {
+                            String line;
+                            while ((line = err.readLine()) != null) {
+                                _err.append(line);
+                            }
                         }
-                        err.close();
+                        finally {
+                            err.close();
+                        }
                     }
                 }
                 _scriptFile = scriptFile;
@@ -293,7 +302,9 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         synchronized (_lock) {
             if (_fitnessValues.isEmpty()) {
                 _halted = false;
-                invoke();
+                if (_end < 0) {
+                    invoke();
+                }
                 double totalFitness = 0;
                 if (_halted) {
                     for (int i = 0; i < NUM_FIT_VALS; ++i) {
@@ -364,7 +375,7 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     }
 
     // TODO Add listener to process
-    private void runSimulationInThread() {
+    private void runSimulation() {
         synchronized (_lock2) {
             BufferedReader out = null;
             BufferedReader err = null;
@@ -569,26 +580,12 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
     }
 
     /**
-     * Begin calculating the fitness function in a separate thread. This need to handle multithreading correctly.
+     * Calculates the fitness function.
      * @param individual {@link Genotype} to return the multi-objective fitness values for.
      */
     private void invoke() {
-        final Thread thread = new InvokerThread(this);
-        thread.start();
-    }
-
-    private static class InvokerThread extends Thread {
-
-        private final NeuroJetTraceFitness _invokee;
-
-        InvokerThread(final NeuroJetTraceFitness invokee) {
-            _invokee = invokee;
-        }
-
-        @Override
-        public void run() {
-            _invokee.runSimulationInThread();
-        }
+        // No longer does threading
+        runSimulation();
     }
 
     private static class FitnessFinished implements Condition {

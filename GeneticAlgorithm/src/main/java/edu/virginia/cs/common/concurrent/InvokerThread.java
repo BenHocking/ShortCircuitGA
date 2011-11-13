@@ -70,12 +70,18 @@ public class InvokerThread extends Thread {
                             builder.directory(_workingDir);
                             _process = builder.start();
                             out = new BufferedReader(new InputStreamReader(_process.getInputStream()));
-                            String line;
-                            while ((line = out.readLine()) != null) {
-                                _out.append(line);
-                            }
                             try {
-                                err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
+                                String line;
+                                while ((line = out.readLine()) != null) {
+                                    _out.append(line);
+                                }
+                            }
+                            finally {
+                                out.close();
+                            }
+                            err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
+                            try {
+                                String line;
                                 while ((line = err.readLine()) != null) {
                                     _err.append(line);
                                 }
@@ -85,16 +91,10 @@ public class InvokerThread extends Thread {
                                 _err.append(e.getStackTrace().toString());
                             }
                         }
-                        catch (final IOException e) {
-                            if (out != null) try {
-                                out.close();
-                            }
-                            catch (IOException ex) {
+                        catch (final IOException ex) {
+                            if (!_halted) {
                                 Logger.getLogger(InvokerThread.class.getName()).log(Level.SEVERE, null, ex);
                                 throw new RuntimeException(ex);
-                            }
-                            if (!_halted) {
-                                throw new RuntimeException(e);
                             }
                         }
                     }
@@ -104,7 +104,7 @@ public class InvokerThread extends Thread {
                 }
             }
         };
-        t.run();
+        t.start();
     }
 
     /**
