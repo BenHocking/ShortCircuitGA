@@ -6,7 +6,7 @@ package edu.virginia.cs.neurojet.model;
 import static edu.virginia.cs.common.utils.ArrayNumberUtils.slope;
 import static edu.virginia.cs.common.utils.ArrayNumberUtils.sum;
 import static org.junit.Assert.*;
-import static edu.virginia.cs.data.TestFileLoader.*;
+import static edu.virginia.cs.data.FileLoader.*;
 
 import java.io.File;
 import java.net.URISyntaxException;

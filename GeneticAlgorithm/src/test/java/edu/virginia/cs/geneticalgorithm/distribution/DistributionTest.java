@@ -14,15 +14,24 @@ import org.junit.Test;
  */
 public class DistributionTest {
 
+    public static Distribution createDistribution(DistributionMember dm) {
+        final Distribution d = new Distribution();
+        d.add(dm);
+        return d;
+    }
+
+    public static Distribution createDistribution() {
+        return createDistribution(DistributionMemberTest.createDistributionMember(0.5));
+    }
+
     /**
      * Test method for
      * {@link edu.virginia.cs.geneticalgorithm.distribution.Distribution#Distribution(edu.virginia.cs.geneticalgorithm.distribution.Distribution)}.
      */
     @Test
     public final void testDistributionCopyConstructor() {
-        final Distribution d = new Distribution();
         final DistributionMember dm = DistributionMemberTest.createDistributionMember(0.5);
-        d.add(dm);
+        final Distribution d = createDistribution(dm);
         assertEquals(dm, d.get(0));
         final Distribution dc = new Distribution(d);
         assertNotSame(d.get(0), dc.get(0));
@@ -34,9 +43,8 @@ public class DistributionTest {
      */
     @Test
     public final void testGetLast() {
-        final Distribution d = new Distribution();
         final DistributionMember dm = DistributionMemberTest.createDistributionMember(0.5);
-        d.add(dm);
+        final Distribution d = createDistribution(dm);
         assertEquals(dm, d.getLast());
     }
 

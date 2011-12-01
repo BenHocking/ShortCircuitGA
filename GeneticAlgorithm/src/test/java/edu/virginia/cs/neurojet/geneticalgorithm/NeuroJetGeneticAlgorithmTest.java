@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 
 import org.junit.Test;
 
-import edu.virginia.cs.data.TestFileLoader;
+import edu.virginia.cs.data.FileLoader;
 
 /**
  * Test harness for NeuroJetGeneticAlgorithm
@@ -25,7 +25,7 @@ public class NeuroJetGeneticAlgorithmTest {
      */
     @Test
     public final void testMain() throws URISyntaxException {
-        final File dataDir = TestFileLoader.getDataDirectory();
+        final File dataDir = FileLoader.getDataDirectory();
         final File neuroJet = new File("/Users/bhocking/Documents/workspace/NeuroJet/build/NeuroJet");
         final File workingDir = new File(dataDir, "test_output");
         final File scriptFile = new File(dataDir, "trace_full.nj");
@@ -35,6 +35,7 @@ public class NeuroJetGeneticAlgorithmTest {
         };
         NeuroJetGeneticAlgorithm.main(args);
         assertTrue(workingDir.exists());
+/* PCA is currently disabled
         final String[] bad_args = {
             "0", "0", "1"
         };
@@ -54,7 +55,7 @@ public class NeuroJetGeneticAlgorithmTest {
         }
         catch (final RuntimeException e) {
             assertEquals("Cannot perform PCA without at least two rows of data.", e.getMessage());
-        }
+        }*/
     }
 
 }

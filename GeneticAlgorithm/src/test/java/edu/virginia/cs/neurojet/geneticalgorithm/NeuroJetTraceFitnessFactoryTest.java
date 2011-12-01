@@ -14,7 +14,7 @@ import java.util.List;
 import org.junit.Test;
 
 import edu.virginia.cs.geneticalgorithm.fitness.Fitness;
-import edu.virginia.cs.data.TestFileLoader;
+import edu.virginia.cs.data.FileLoader;
 import edu.virginia.cs.geneticalgorithm.gene.StandardGenotypeTest;
 
 /**
@@ -24,12 +24,30 @@ import edu.virginia.cs.geneticalgorithm.gene.StandardGenotypeTest;
  */
 public class NeuroJetTraceFitnessFactoryTest {
 
+    private class MockFile extends File {
+        private final boolean _canExecute;
+        private final boolean _exists;
+        MockFile(String fileName, boolean canExecute, boolean exists) {
+            super(fileName);
+            _canExecute = canExecute;
+            _exists = exists;
+        }
+        @Override
+        public boolean canExecute() {
+            return _canExecute;
+        }
+        @Override
+        public boolean exists() {
+            return _exists;
+        }
+    }
+
     /**
      * @return NeuroJet executable
      * @throws URISyntaxException Shouldn't happen
      */
     public static File getNeuroJet() throws URISyntaxException {
-        return TestFileLoader.getFile("NeuroJet");
+        return FileLoader.getFile("NeuroJet");
     }
 
     /**
@@ -37,10 +55,23 @@ public class NeuroJetTraceFitnessFactoryTest {
      * @throws URISyntaxException Shouldn't happen
      */
     public static NeuroJetTraceFitnessFactory createNeuroJetTraceFitness() throws URISyntaxException {
-        final File scriptFile = TestFileLoader.getFile("trace_full.nj");
+        return createNeuroJetTraceFitness(getNeuroJet(), null);
+    }
+
+    /**
+     * @param NeuroJet NeuroJet executable
+     * @param prepareScript Executable to run prior to launching NeuroJet instances (null to skip that step)
+     * @return NeuroJetTraceFitness suitable for testing
+     * @throws URISyntaxException Shouldn't happen
+     */
+    public static NeuroJetTraceFitnessFactory createNeuroJetTraceFitness(File NeuroJet, File prepareScript) throws URISyntaxException {
+        final File scriptFile = FileLoader.getFile("trace_full.nj");
         final List<File> scriptFiles = Collections.singletonList(scriptFile);
-        return new NeuroJetTraceFitnessFactory(scriptFiles, NeuroJetGeneticAlgorithm.buildScriptUpdater(), getNeuroJet(),
-                                               TestFileLoader.getDataDirectory());
+        return prepareScript == null ?
+            new NeuroJetTraceFitnessFactory(scriptFiles, NeuroJetGeneticAlgorithm.buildScriptUpdater(), NeuroJet,
+                                               FileLoader.getDataDirectory()) :
+            new NeuroJetTraceFitnessFactory(scriptFiles, NeuroJetGeneticAlgorithm.buildScriptUpdater(), NeuroJet,
+                                               FileLoader.getDataDirectory(), prepareScript);
     }
 
     /**
@@ -64,7 +95,7 @@ public class NeuroJetTraceFitnessFactoryTest {
         catch (final IllegalArgumentException e) {
             assertEquals("Argument scriptFiles cannot be null or empty", e.getMessage());
         }
-        final File scriptFile = TestFileLoader.getFile("trace_full.nj");
+        final File scriptFile = FileLoader.getFile("trace_full.nj");
         final List<File> scriptFiles = Collections.singletonList(scriptFile);
         try {
             new NeuroJetTraceFitnessFactory(scriptFiles, null, null, null, null);
@@ -73,8 +104,22 @@ public class NeuroJetTraceFitnessFactoryTest {
         catch (final IllegalArgumentException e) {
             assertEquals("Argument neuroJet must refer to an executable", e.getMessage());
         }
+        try {
+            new NeuroJetTraceFitnessFactory(scriptFiles, null, new MockFile("dne", true, false), null, null);
+            fail("No NeuroJet");
+        }
+        catch (final IllegalArgumentException e) {
+            assertEquals("Argument neuroJet must refer to an executable", e.getMessage());
+        }
+        try {
+            new NeuroJetTraceFitnessFactory(scriptFiles, null, new MockFile("dne", false, true), null, null);
+            fail("No NeuroJet");
+        }
+        catch (final IllegalArgumentException e) {
+            assertEquals("Argument neuroJet must refer to an executable", e.getMessage());
+        }
         new NeuroJetTraceFitnessFactory(scriptFiles, new ScriptUpdater(), getNeuroJet());
-        new NeuroJetTraceFitnessFactory(scriptFiles, new ScriptUpdater(), getNeuroJet(), TestFileLoader.getDataDirectory());
+        new NeuroJetTraceFitnessFactory(scriptFiles, new ScriptUpdater(), getNeuroJet(), FileLoader.getDataDirectory());
     }
 
     /**
@@ -102,5 +147,21 @@ public class NeuroJetTraceFitnessFactoryTest {
         }
         final Fitness f = factory.createFitness(StandardGenotypeTest.createStandardIntervalGenotype(30, 0.5));
         assertTrue(f instanceof NeuroJetTraceFitness);
+    }
+
+    /**
+     * Test method for
+     * {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitnessFactory#ready()}
+     * .
+     * @throws URISyntaxException Shouldn't happen
+     */
+    @Test
+    public final void testReady() throws URISyntaxException {
+        NeuroJetTraceFitnessFactory factory = createNeuroJetTraceFitness();
+        factory.ready(); // Just tests to make sure no error is thrown
+        factory = createNeuroJetTraceFitness(getNeuroJet(), getNeuroJet());
+        factory.ready(); // Just tests to make sure no error is thrown
+        factory = createNeuroJetTraceFitness(getNeuroJet(), new MockFile("dne", true, true));
+        factory.ready(); // Just tests to make sure no error is thrown
     }
 }

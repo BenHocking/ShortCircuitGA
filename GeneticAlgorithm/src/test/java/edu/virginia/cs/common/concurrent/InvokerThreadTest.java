@@ -7,12 +7,10 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.List;
 
 import org.junit.Test;
 
-import edu.virginia.cs.data.TestFileLoader;
+import edu.virginia.cs.data.FileLoader;
 import org.junit.Ignore;
 
 /**
@@ -28,6 +26,7 @@ public class InvokerThreadTest {
          * @see java.lang.Runnable#run()
          */
         @Override
+        @SuppressWarnings("SleepWhileHoldingLock")
         public void run() {
             for (int i = 0; i < 100; ++i) {
                 try {
@@ -47,13 +46,12 @@ public class InvokerThreadTest {
      * @throws URISyntaxException Shouldn't happen
      */
     public static InvokerThread createThread(final String exeName, final Runnable pre) throws URISyntaxException {
-        final File echo = new File(TestFileLoader.getDataDirectory(), exeName);
+        final File echo = new File(FileLoader.getDataDirectory(), exeName);
         if (!echo.canExecute()) {
             echo.setExecutable(true);
         }
         assertTrue(echo.canExecute());
-        final List<String> args = Collections.singletonList("Hello world!");
-        return new InvokerThread(pre, echo, args, TestFileLoader.getDataDirectory());
+        return new InvokerThread(pre, FileLoader.getDataDirectory(), echo, "Hello world!");
     }
 
     /**
@@ -63,7 +61,7 @@ public class InvokerThreadTest {
     @Test
     public final void testRun() throws URISyntaxException {
         final InvokerThread t = createThread("echo", null);
-        t.run();
+        t.start();
     }
 
     /**
@@ -74,10 +72,10 @@ public class InvokerThreadTest {
     @Ignore
     public final void testGetDuration() throws URISyntaxException {
         InvokerThread t = createThread("cp", new RunnableTester());
-        t.run();
+        t.start();
         final long d1 = t.getDuration();
         t = createThread("echo", null);
-        t.run();
+        t.start();
         final long d2 = t.getDuration();
         assertTrue(d2 < d1);
     }

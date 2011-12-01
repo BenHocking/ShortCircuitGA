@@ -13,7 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +21,7 @@ import edu.virginia.cs.common.utils.ArrayNumberUtils;
 import edu.virginia.cs.common.utils.Condition;
 import edu.virginia.cs.common.utils.IntegerRange;
 import edu.virginia.cs.common.utils.Pause;
+import edu.virginia.cs.common.utils.ProcessBuilderUtils;
 import edu.virginia.cs.common.utils.ShapeMatcher;
 import edu.virginia.cs.geneticalgorithm.fitness.FitnessGenerator;
 import edu.virginia.cs.geneticalgorithm.fitness.HaltableFitness;
@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:benjaminhocking@gmail.com">Ashlie Benjamin Hocking</a>
  * @since Apr 27, 2010
  */
-public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
+public class NeuroJetTraceFitness implements HaltableFitness {
 
     /**
      * Run time + 2 activity measures + trend measure + shape measure + performance measure + target measure
@@ -231,33 +231,7 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
                     deleteExistingFiles(getGrandparent().getScriptFiles());
                     final File prepareScript = getGrandparent().getPrepareScript();
                     if (prepareScript != null) {
-                        final List<String> command = new ArrayList<String>();
-                        command.add(prepareScript.getCanonicalPath());
-                        command.add(scriptFile.getParentFile().getCanonicalPath());
-                        command.add(String.valueOf(_dirID));
-                        final ProcessBuilder builder = new ProcessBuilder(command);
-                        builder.directory(_tempDir);
-                        _process = builder.start();
-                        final BufferedReader out = new BufferedReader(new InputStreamReader(_process.getInputStream()));
-                        try {
-                            String line;
-                            while ((line = out.readLine()) != null) {
-                                _out.append(line);
-                            }
-                        }
-                        finally {
-                            out.close();
-                        }
-                        final BufferedReader err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
-                        try {
-                            String line;
-                            while ((line = err.readLine()) != null) {
-                                _err.append(line);
-                            }
-                        }
-                        finally {
-                            err.close();
-                        }
+                        ProcessBuilderUtils.invoke(_out, _err, _tempDir, prepareScript, scriptFile.getParentFile().getCanonicalPath(), String.valueOf(_dirID));
                     }
                 }
                 _scriptFile = scriptFile;
@@ -302,7 +276,7 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         synchronized (_lock) {
             if (_fitnessValues.isEmpty()) {
                 _halted = false;
-                if (_end < 0) {
+                if (!isFinished()) {
                     invoke();
                 }
                 double totalFitness = 0;
@@ -359,69 +333,22 @@ public class NeuroJetTraceFitness implements HaltableFitness, Runnable {
         }
     }
 
-    /**
-     * Preprocessor prior to invoking thread
-     * @see java.lang.Runnable#run()
-     */
-    @Override
-    public void run() {
-        throw new UnsupportedOperationException("Shouldn't be using this run method");
-        /*
-         * deleteExistingFiles(); if (NeuroJetTraceFitnessIntermediary.DELETE_WORKING_FILES) { _tempDir.deleteOnExit(); } final
-         * ScriptUpdater updater = getGrandparent().getUpdater(); for (final File f : getGrandparent().getScriptFiles()) { final
-         * File script = new File(_tempDir, f.getName()); try { updater.createScriptFromTemplate(script, f, _parent.getGenotype(),
-         * _dirID); } catch (final IOException e) { throw new RuntimeException(e); } }
-         */
-    }
-
-    // TODO Add listener to process
     private void runSimulation() {
         synchronized (_lock2) {
-            BufferedReader out = null;
-            BufferedReader err = null;
             try {
                 // Launch NeuroJet
-                final List<String> command = new ArrayList<String>();
                 try {
-                    //
-                    command.add(getGrandparent().getNeuroJet().getCanonicalPath());
-                    command.add(_scriptFile.getCanonicalPath());
-                    final ProcessBuilder builder = new ProcessBuilder(command);
-                    builder.directory(_tempDir);
-                    _process = builder.start();
-                    out = new BufferedReader(new InputStreamReader(_process.getInputStream()));
-                    String line;
-                    while ((line = out.readLine()) != null) {
-                        _out.append(line);
-                    }
-                    out.close();
-                    err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
-                    while ((line = err.readLine()) != null) {
-                        _err.append(line);
-                    }
-                    err.close();
+                    ProcessBuilderUtils.invoke(_out, _err, _tempDir, getGrandparent().getNeuroJet(), _scriptFile.getCanonicalPath());
                 }
                 catch (final IOException e) {
                     if (!_halted) {
+                        Logger.getLogger(NeuroJetTraceFitness.class.getName()).log(Level.SEVERE, null, e);
                         throw new RuntimeException(e);
                     }
                 }
             }
             finally {
-                try {
-                    if (out != null) {
-                        out.close();
-                    }
-                    if (err != null) {
-                        err.close();
-                    }
-                }
-                catch (IOException ex) {
-                    Logger.getLogger(NeuroJetTraceFitness.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                finally {
-                    _end = 1;
-                }
+                _end = 1;
             }
         }
     }

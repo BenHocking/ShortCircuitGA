@@ -106,20 +106,6 @@ public class NeuroJetTraceFitnessTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness#run()}.
-     * @throws URISyntaxException Shouldn't happen
-     */
-    @Test
-    @Ignore // FIXME
-    public final void testRun() throws URISyntaxException {
-        createFitness();
-        NeuroJetTraceFitnessIntermediary.DELETE_WORKING_FILES = false;
-        _fitness.run(); // TODO Make test more robust
-        NeuroJetTraceFitnessIntermediary.DELETE_WORKING_FILES = true;
-        _fitness.run();
-    }
-
-    /**
      * Test method for {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness#hasTargetBehavior()}.
      * @throws URISyntaxException Shouldn't happen
      */
@@ -138,7 +124,6 @@ public class NeuroJetTraceFitnessTest {
     public final void testHalt() throws URISyntaxException {
         createFitness();
         _fitness.halt();
-        //FIXME _fitness.run();
         _fitness.halt();
     }
 

@@ -5,7 +5,7 @@ package edu.virginia.cs.neurojet.model;
 
 import static org.junit.Assert.*;
 import static edu.virginia.cs.common.utils.ArrayNumberUtils.*;
-import static edu.virginia.cs.data.TestFileLoader.*;
+import static edu.virginia.cs.data.FileLoader.*;
 
 import java.util.List;
 
@@ -21,12 +21,16 @@ public class NeuroJetActivityTest {
 
     private NeuroJetActivity _activityFile;
 
+    public static NeuroJetActivity getActivityFile() throws Exception {
+        return new NeuroJetActivity(getDataDirectory(), "trnWithinAct.dat", 1);
+    }
+
     /**
      * @throws java.lang.Exception If the file cannot be accessed
      */
     @Before
     public void setUp() throws Exception {
-        _activityFile = new NeuroJetActivity(getDataDirectory(), "trnWithinAct.dat", 1);
+        _activityFile = getActivityFile();
     }
 
     /**

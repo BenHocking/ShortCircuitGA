@@ -3,12 +3,9 @@
  */
 package edu.virginia.cs.common.concurrent;
 
-import java.io.BufferedReader;
+import edu.virginia.cs.common.utils.ProcessBuilderUtils;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +18,7 @@ public class InvokerThread extends Thread {
 
     private final Runnable _preprocessor;
     private final File _executable;
-    private final List<String> _arguments;
+    private final String[] _arguments;
     private final File _workingDir;
     private Process _process;
     private long _start = -1;
@@ -38,11 +35,11 @@ public class InvokerThread extends Thread {
      * @param arguments Arguments to pass to the executable
      * @param workingDir Directory to run the executable from
      */
-    public InvokerThread(final Runnable preprocessor, final File executable, final List<String> arguments, final File workingDir) {
+    public InvokerThread(final Runnable preprocessor, final File workingDir, final File executable, final String... arguments) {
         _preprocessor = preprocessor;
+        _workingDir = workingDir;
         _executable = executable;
         _arguments = arguments;
-        _workingDir = workingDir;
         _halted = false;
     }
 
@@ -57,39 +54,11 @@ public class InvokerThread extends Thread {
                         _halted = false;
                         _start = System.currentTimeMillis();
                         _end = -1;
-                        BufferedReader err = null;
-                        BufferedReader out = null;
                         try {
                             if (_preprocessor != null) {
                                 _preprocessor.run();
                             }
-                            final List<String> command = new ArrayList<String>();
-                            command.add(_executable.getCanonicalPath());
-                            command.addAll(_arguments);
-                            final ProcessBuilder builder = new ProcessBuilder(command);
-                            builder.directory(_workingDir);
-                            _process = builder.start();
-                            out = new BufferedReader(new InputStreamReader(_process.getInputStream()));
-                            try {
-                                String line;
-                                while ((line = out.readLine()) != null) {
-                                    _out.append(line);
-                                }
-                            }
-                            finally {
-                                out.close();
-                            }
-                            err = new BufferedReader(new InputStreamReader(_process.getErrorStream()));
-                            try {
-                                String line;
-                                while ((line = err.readLine()) != null) {
-                                    _err.append(line);
-                                }
-                            }
-                            catch (final IOException e) {
-                                err.close();
-                                _err.append(e.getStackTrace().toString());
-                            }
+                            ProcessBuilderUtils.invoke(_out, _err, _workingDir, _executable, _arguments);
                         }
                         catch (final IOException ex) {
                             if (!_halted) {

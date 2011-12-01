@@ -22,7 +22,7 @@ public class NeuroJetRandomGeneratorTest {
     @Test
     public void testGenerator() throws IOException {
         final IntervalGene basis = new IntervalGene();
-        final NeuroJetRandomGenerator instance = new NeuroJetRandomGenerator(10001, basis, "Vol", 10000);
+        final NeuroJetRandomGenerator instance = new NeuroJetRandomGenerator(20001, basis, "Vol", 2);
         instance.generateScripts();
     }
 }

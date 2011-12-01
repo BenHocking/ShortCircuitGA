@@ -15,7 +15,7 @@ import edu.virginia.cs.neurojet.model.NeuroJetActivity;
  */
 final class ActivityDetailFitnessGenerator extends ActivityFitnessGenerator {
 
-    private final NeuroJetActivity _activityFile;
+    final NeuroJetActivity _activityFile;
 
     /**
      * @param activityFile NeuroJetActivity file containing activity information

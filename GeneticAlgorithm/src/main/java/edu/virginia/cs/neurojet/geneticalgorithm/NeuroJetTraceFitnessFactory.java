@@ -3,6 +3,7 @@
  */
 package edu.virginia.cs.neurojet.geneticalgorithm;
 
+import edu.virginia.cs.common.utils.ProcessBuilderUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -130,17 +131,7 @@ public class NeuroJetTraceFitnessFactory implements FitnessFactory {
     public void ready() {
         if (_prepareScript != null) {
             try {
-                final List<String> command = new ArrayList<String>();
-                command.add(_prepareScript.getCanonicalPath());
-                final ProcessBuilder builder = new ProcessBuilder(command);
-                builder.directory(getWorkingDir());
-                Process process = builder.start();
-                final BufferedReader out = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                while (out.readLine() != null) {
-                }
-                final BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-                while (err.readLine() != null) {
-                }
+                ProcessBuilderUtils.invoke(getWorkingDir(), _prepareScript);
             }
             catch (IOException ex) {
                 Logger.getLogger(NeuroJetTraceFitnessFactory.class.getName()).log(Level.SEVERE, null, ex);

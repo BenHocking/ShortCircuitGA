@@ -216,7 +216,7 @@ public final class NeuroJetGeneticAlgorithm {
         // TODO: Change these arguments
         final int pop_size = args.length > 0 ? Integer.valueOf(args[0]) : 100;
         final int num_generations = args.length > 1 ? Integer.valueOf(args[1]) : 150;
-        final int seed = args.length > 2 ? Integer.valueOf(args[2]) : 3;
+        final int seed = args.length > 2 ? Integer.valueOf(args[2]) : 101;
         if (args.length > 3) {
             NJ = new File(args[3]);
         }
