@@ -6,7 +6,6 @@ package edu.virginia.cs.neurojet.geneticalgorithm;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +13,7 @@ import edu.virginia.cs.common.utils.ArrayNumberUtils;
 import edu.virginia.cs.geneticalgorithm.fitness.Fitness;
 import edu.virginia.cs.geneticalgorithm.gene.Genotype;
 import edu.virginia.cs.geneticalgorithm.gene.StandardGenotype;
+import java.util.WeakHashMap;
 
 /**
  * Calculates a short-circuit fitness to determine whether this is a reasonable choice of parameter settings
@@ -43,7 +43,7 @@ public final class NeuroJetTraceFitnessIntermediary {
     private int _numSums;
     private final NeuroJetTraceFitnessFactory _parent;
     private final StandardGenotype _genotype;
-    private static final Map<Genotype, NeuroJetTraceFitnessIntermediary> _fitMap = new HashMap<Genotype, NeuroJetTraceFitnessIntermediary>();
+    private static final Map<Genotype, NeuroJetTraceFitnessIntermediary> _fitMap = new WeakHashMap<Genotype, NeuroJetTraceFitnessIntermediary>();
 
     static Fitness createFitness(final NeuroJetTraceFitnessFactory factory, final StandardGenotype individual,
                                  final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet,
