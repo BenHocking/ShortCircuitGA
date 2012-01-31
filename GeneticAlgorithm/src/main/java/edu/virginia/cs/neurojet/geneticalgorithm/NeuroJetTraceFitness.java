@@ -37,9 +37,9 @@ import java.util.logging.Logger;
 public class NeuroJetTraceFitness implements HaltableFitness {
 
     /**
-     * Run time + 2 activity measures + trend measure + shape measure + performance measure + target measure
+     * 2 activity measures + 2 trend measures + 2 shape measures + performance measure + target measure
      */
-    public static final int NUM_FIT_VALS = 7;
+    public static final int NUM_FIT_VALS = 8;
     private static final int WAIT_TIME = 120 /* minutes */ * 60 /* seconds per minute */ * 1000 /* ms per sec */;
     private static final double ACTIVITY_MULTIPLIER = 1E-5;
     private static int NUM_TRIALS = 150;
@@ -48,12 +48,12 @@ public class NeuroJetTraceFitness implements HaltableFitness {
     private final int _dirID;
     private Process _process = null;
     private boolean _halted = false;
-    private long _end = -1; // FIXME
+    private boolean _finished = false;
     // private NeuroJetNeuronBuffer _tstBuff = null;
     private final Object _lock = new Object();
     private final Object _lock2 = new Object();
-    private final StringBuffer _out = new StringBuffer();
-    private final StringBuffer _err = new StringBuffer();
+    private final StringBuffer _out = new StringBuffer(1000);
+    private final StringBuffer _err = new StringBuffer(1000);
     private final List<Double> _fitnessValues = new ArrayList<Double>();
     private final static List<Double> _desiredShape = new ArrayList<Double>();
     private FitnessGenerator _tstGenerator = null;
@@ -64,6 +64,13 @@ public class NeuroJetTraceFitness implements HaltableFitness {
         _parent = parent;
         _dirID = dirID;
         _tempDir = new File(_parent.getParent().getWorkingDir(), "trace_" + String.valueOf(dirID));
+        // deleteExistingFiles(); // TODO reconsider this
+    }
+
+    NeuroJetTraceFitness(final File workingDir, final int dirID) {
+        _parent = null;
+        _dirID = dirID;
+        _tempDir = new File(workingDir, "trace_" + String.valueOf(dirID));
         // deleteExistingFiles(); // TODO reconsider this
     }
 
@@ -133,7 +140,11 @@ public class NeuroJetTraceFitness implements HaltableFitness {
     }
 
     boolean isFinished() {
-        return _end > 0;
+        return _finished;
+    }
+
+    void setFinished(boolean finished) {
+        _finished = finished;
     }
 
     private void addActivityMeasures(final List<Double> fitnessValues) {
@@ -151,7 +162,7 @@ public class NeuroJetTraceFitness implements HaltableFitness {
         return summaryBuffData.getData();
     }
 
-    private void addTrendMeasure(final List<Double> fitnessValues) {
+    private void addTrendMeasures(final List<Double> fitnessValues) {
         double bestValue = 0.0;
         for (int trialNum = 50; trialNum <= NUM_TRIALS; trialNum += 50) {
             final double curValue = slopeContribution(slope(getFracFired(trialNum)));
@@ -159,7 +170,15 @@ public class NeuroJetTraceFitness implements HaltableFitness {
                 bestValue = curValue;
             }
         }
+        double averageValue = 0.0;
+        int count = 0;
+        for (int trialNum = 100; trialNum <= Math.min(NUM_TRIALS, 200); trialNum += 50) {
+            final double curValue = slopeContribution(slope(getFracFired(trialNum)));
+            averageValue += curValue;
+            ++count;
+        }
         fitnessValues.add(bestValue);
+        fitnessValues.add(averageValue / count);
     }
 
     private double slopeContribution(final double slope) {
@@ -183,7 +202,7 @@ public class NeuroJetTraceFitness implements HaltableFitness {
         return _desiredShape;
     }
 
-    private void addShapeMeasure(final List<Double> fitnessValues) {
+    private void addShapeMeasures(final List<Double> fitnessValues) {
         final List<Double> desiredShape = getDesiredShape();
         double bestValue = 0.0;
         for (int trialNum = 50; trialNum <= NUM_TRIALS; trialNum += 50) {
@@ -193,7 +212,16 @@ public class NeuroJetTraceFitness implements HaltableFitness {
                 bestValue = curValue;
             }
         }
+        double averageValue = 0.0;
+        int count = 0;
+        for (int trialNum = 100; trialNum <= Math.min(NUM_TRIALS, 200); trialNum += 50) {
+            final List<Double> shape = getFracFired(trialNum);
+            final double curValue = 100 / ShapeMatcher.squareDeviation(desiredShape, shape);
+            averageValue += curValue;
+            ++count;
+        }
         fitnessValues.add(bestValue);
+        fitnessValues.add(averageValue / count);
     }
 
     @Override
@@ -224,7 +252,7 @@ public class NeuroJetTraceFitness implements HaltableFitness {
                 // System.out.println("lastReadyFile.exists(): " + lastReadyFile.exists());
                 // }
                 if (filesMatch(scriptFile, cfFile) && lastReadyFile.exists()) {
-                    _end = 1; // Signifies completion
+                    _finished = true; // Signifies completion
                     _halted = true; // So that we don't try to halt an unstarted thread
                 }
                 else {
@@ -252,7 +280,7 @@ public class NeuroJetTraceFitness implements HaltableFitness {
     @Override
     public List<Double> fitnessValues() {
         runSimulationIfNeeded();
-        return _parent.getMeanFitnessValues();
+        return _parent != null ? _parent.getMeanFitnessValues() : _fitnessValues;
     }
 
     /**
@@ -261,7 +289,7 @@ public class NeuroJetTraceFitness implements HaltableFitness {
     @Override
     public double totalFitness() {
         runSimulationIfNeeded();
-        return _parent.getMeanTotalFitness();
+        return _parent != null ? _parent.getMeanTotalFitness() : calcTotalFitness(_fitnessValues);
     }
 
     /**
@@ -287,25 +315,26 @@ public class NeuroJetTraceFitness implements HaltableFitness {
                 }
                 else {
                     Pause.untilConditionMet(new FitnessFinished(this), WAIT_TIME);
-                    _fitnessValues.add(1.0); //FIXME: Remove this (need to adjust other calculations)
                     addActivityMeasures(_fitnessValues);
-                    addTrendMeasure(_fitnessValues);
-                    addShapeMeasure(_fitnessValues);
-                    final double fitness = generateTraceFitness();
+                    addTrendMeasures(_fitnessValues);
+                    addShapeMeasures(_fitnessValues);
+                    final double fitness = 1E6 * generateTraceFitness();
                     assert (fitness >= 0);
                     _fitnessValues.add(fitness);
-                    _fitnessValues.add(hasTargetBehavior());
+                    _fitnessValues.add(1E5 * hasTargetBehavior());
                     totalFitness = calcTotalFitness(_fitnessValues);
                 }
                 checkFitnessSize(this, _fitnessValues);
-                _parent.addToSummedFitnessValues(_fitnessValues, totalFitness);
+                if (_parent != null) {
+                    _parent.addToSummedFitnessValues(_fitnessValues, totalFitness);
+                }
             }
         }
     }
 
     private double calcTotalFitness(final List<Double> fitVals) {
         // final double actFitness = 1E-5 * getQuickGenerator().overallFitness();
-        // final double slopeFitness = slopeContribution(fitVals.get(3));
+        // final double slope§Fitness = slopeContribution(fitVals.get(3));
         // return 1 / (fitVals.get(0) + 1) + actFitness + slopeFitness + fitVals.get(5) + fitVals.get(6);
         double retval = 0;
         for (final Double d : fitVals) {
@@ -348,7 +377,7 @@ public class NeuroJetTraceFitness implements HaltableFitness {
                 }
             }
             finally {
-                _end = 1;
+                _finished = true;
             }
         }
     }

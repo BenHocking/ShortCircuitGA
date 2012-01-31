@@ -3,20 +3,12 @@
  */
 package edu.virginia.cs;
 
-import static org.junit.Assert.*;
-
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OptionalDataException;
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -58,6 +50,7 @@ public class SandboxTest {
      * @throws Exception It's a sandbox!
      */
     @Test
+    @Ignore
     public void sandbox() throws Exception {
         // final TestEqualityTester tet1 = new TestEqualityTester();
         // final TestEqualityTester tet2 = new TestEqualityTester();

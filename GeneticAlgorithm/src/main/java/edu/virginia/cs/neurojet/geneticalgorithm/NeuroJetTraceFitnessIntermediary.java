@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.virginia.cs.common.utils.ArrayNumberUtils;
+import edu.virginia.cs.geneticalgorithm.fitness.AbstractFitness;
 import edu.virginia.cs.geneticalgorithm.fitness.Fitness;
 import edu.virginia.cs.geneticalgorithm.gene.Genotype;
 import edu.virginia.cs.geneticalgorithm.gene.StandardGenotype;
@@ -62,6 +63,10 @@ public final class NeuroJetTraceFitnessIntermediary {
         if (_instances.size() < _maxSamples) {
             _instances.add(new NeuroJetTraceFitness(this, ++_counter));
         }
+        return lastFitness();
+    }
+
+    private Fitness lastFitness() {
         return _instances.get(_instances.size() - 1);
     }
 
@@ -104,6 +109,8 @@ public final class NeuroJetTraceFitnessIntermediary {
     }
 
     void addToSummedFitnessValues(final List<Double> listToAdd, final double totalToAdd) {
+        AbstractFitness.checkFitnessSize(lastFitness(), listToAdd);
+        AbstractFitness.checkFitnessSize(lastFitness(), _summedFitnessValues);
         _summedFitnessValues = ArrayNumberUtils.add(_summedFitnessValues, listToAdd);
         _summedTotalFitness += totalToAdd;
         ++_numSums;

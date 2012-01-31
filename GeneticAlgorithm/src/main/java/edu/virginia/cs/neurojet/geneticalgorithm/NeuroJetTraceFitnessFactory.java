@@ -12,9 +12,6 @@ import edu.virginia.cs.geneticalgorithm.fitness.Fitness;
 import edu.virginia.cs.geneticalgorithm.fitness.FitnessFactory;
 import edu.virginia.cs.geneticalgorithm.gene.Genotype;
 import edu.virginia.cs.geneticalgorithm.gene.StandardGenotype;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

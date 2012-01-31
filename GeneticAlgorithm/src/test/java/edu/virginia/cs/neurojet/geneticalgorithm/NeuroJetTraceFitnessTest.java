@@ -13,6 +13,7 @@ import org.junit.Test;
 import edu.virginia.cs.common.utils.IntegerRange;
 import edu.virginia.cs.geneticalgorithm.fitness.Fitness;
 import edu.virginia.cs.geneticalgorithm.gene.StandardGenotypeTest;
+import java.io.File;
 import org.junit.Ignore;
 
 /**
@@ -135,6 +136,43 @@ public class NeuroJetTraceFitnessTest {
     public final void testToString() throws URISyntaxException {
         createFitness();
         assertTrue(_fitness.toString().contains("data/trace_"));
+    }
+
+    private List<Double> getFolderFitnessValues(final File workingDir, final int dirId, final double desiredAct,
+            final double mePct) {
+        NeuroJetTraceFitness instance = new NeuroJetTraceFitness(workingDir, dirId) {
+            @Override
+            public double getDesiredAct() {
+                return desiredAct;
+            }
+            @Override
+            public double getMePct() {
+                return mePct;
+            }
+        };
+        instance.setFinished(true);
+        return instance.fitnessValues();
+    }
+
+    /**
+     * Finds the fitness score for a particular folder
+     */
+    @Test
+    public final void evaluateFolder() {
+        int dirId = 3814;
+        final File workingDir = new File("/Users/bhocking/Documents/workspace/ShortCircuitGA/scripts");
+        double desiredAct = 0.0030998257089591887;
+        double mePct = 0.3107368052647797;
+        List<Double> fitnessValues = getFolderFitnessValues(workingDir, dirId, desiredAct, mePct);
+        System.out.println("===============");
+        System.out.println(fitnessValues);
+        dirId = 3952;
+        desiredAct = 0.0030998257089591887;
+        mePct = 0.5;
+        fitnessValues = getFolderFitnessValues(workingDir, dirId, desiredAct, mePct);
+        System.out.println("===============");
+        System.out.println(fitnessValues);
+        System.out.println("===============");
     }
 
     /**

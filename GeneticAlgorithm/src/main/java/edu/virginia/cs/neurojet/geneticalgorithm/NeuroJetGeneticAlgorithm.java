@@ -34,7 +34,7 @@ public final class NeuroJetGeneticAlgorithm {
     // TODO: Generalize the location of these File objects
     static File NJ = new File("/Users/bhocking/Documents/workspace/NeuroJet/build/NeuroJet");
     static File WORKINGDIR = new File("/Users/bhocking/Documents/workspace/ShortCircuitGA/scripts");
-    static File SCRIPTFILE = new File(WORKINGDIR, "trace_full.nj");
+    static File SCRIPTFILE = null;
     static File PREPAREFILE = null;
     final static int GENOTYPE_SIZE = 21; // 0 - 20
     private final static double PRE_THRESHOLD = 1e5;
@@ -97,7 +97,7 @@ public final class NeuroJetGeneticAlgorithm {
         _reproduction = new Reproduction(allowDuplicates, keepHistory);
         _reproduction.setEndPrepareAction(PREPAREFILE);
         _reproduction.setNumElites(Math.round(popSize * 0.1f));
-        final List<Double> ranking = Arrays.asList(0.0, 0.05, 0.05, 0.05, 0.05, 0.0, 0.05, 0.05, 0.2, 0.6, 1.4, 3.0);
+        final List<Double> ranking = Arrays.asList(0.0, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.2, 0.2, 0.6, 0.6, 1.4, 3.0);
         _select = new BonusSelect(new Random(seed), ranking);
     }
 
@@ -228,6 +228,9 @@ public final class NeuroJetGeneticAlgorithm {
         }
         if (args.length > 5) {
             SCRIPTFILE = new File(args[5]);
+        }
+        else {
+            SCRIPTFILE = new File(WORKINGDIR, "trace_full.nj");
         }
         if (args.length > 6) {
             PREPAREFILE = new File(args[6]);
