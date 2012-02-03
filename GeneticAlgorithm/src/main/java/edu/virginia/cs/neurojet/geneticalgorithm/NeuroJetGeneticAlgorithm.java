@@ -32,7 +32,7 @@ import edu.virginia.cs.geneticalgorithm.select.Select;
 public final class NeuroJetGeneticAlgorithm {
 
     // TODO: Generalize the location of these File objects
-    static File NJ = new File("/Users/bhocking/Documents/workspace/NeuroJet/build/NeuroJet");
+    static File NJ = new File("/Users/bhocking/Documents/workspace/NeuroJet/build/src/main/c++/NeuroJet");
     static File WORKINGDIR = new File("/Users/bhocking/Documents/workspace/ShortCircuitGA/scripts");
     static File SCRIPTFILE = null;
     static File PREPAREFILE = null;
@@ -86,10 +86,11 @@ public final class NeuroJetGeneticAlgorithm {
         final NeuroJetTraceFitnessFactory traceFitnessFactory = new NeuroJetTraceFitnessFactory(traceScriptFiles,
                                                                                                 buildScriptUpdater(), NJ,
                                                                                                 WORKINGDIR, PREPAREFILE);
-        final ProxyFitnessFactory quickFitnessFactory = new NeuroJetQuickFitnessFactory(traceFitnessFactory);
-        _fitnessFactory = new ShortCircuitFitnessFactory(quickFitnessFactory, Collections.singletonList(PRE_THRESHOLD),
-                                                         NeuroJetTraceFitness.NUM_FIT_VALS);
-        ((ShortCircuitFitnessFactory) _fitnessFactory).setPostScale(POST_SCALE_FACTOR);
+//        final ProxyFitnessFactory quickFitnessFactory = new NeuroJetQuickFitnessFactory(traceFitnessFactory);
+//        _fitnessFactory = new ShortCircuitFitnessFactory(quickFitnessFactory, Collections.singletonList(PRE_THRESHOLD),
+//                                                         NeuroJetTraceFitness.NUM_FIT_VALS);
+//        ((ShortCircuitFitnessFactory) _fitnessFactory).setPostScale(POST_SCALE_FACTOR);
+        _fitnessFactory = traceFitnessFactory;
         _factory = createGeneticFactory(seed);
         _population = createPopulation(_factory, seed, popSize);
         final boolean allowDuplicates = false;
@@ -97,7 +98,8 @@ public final class NeuroJetGeneticAlgorithm {
         _reproduction = new Reproduction(allowDuplicates, keepHistory);
         _reproduction.setEndPrepareAction(PREPAREFILE);
         _reproduction.setNumElites(Math.round(popSize * 0.1f));
-        final List<Double> ranking = Arrays.asList(0.0, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.2, 0.2, 0.6, 0.6, 1.4, 3.0);
+//        final List<Double> ranking = Arrays.asList(0.0, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.2, 0.2, 0.6, 0.6, 1.4, 3.0);
+        final List<Double> ranking = Arrays.asList(1.0, 0.5);
         _select = new BonusSelect(new Random(seed), ranking);
     }
 

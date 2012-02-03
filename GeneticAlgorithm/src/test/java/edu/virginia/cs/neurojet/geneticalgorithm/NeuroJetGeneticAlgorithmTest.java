@@ -26,7 +26,7 @@ public class NeuroJetGeneticAlgorithmTest {
     @Test
     public final void testMain() throws URISyntaxException {
         final File dataDir = FileLoader.getDataDirectory();
-        final File neuroJet = new File("/Users/bhocking/Documents/workspace/NeuroJet/build/NeuroJet");
+        final File neuroJet = new File("/Users/bhocking/Documents/workspace/NeuroJet/build/src/main/c++/NeuroJet");
         final File workingDir = new File(dataDir, "test_output");
         final File scriptFile = new File(dataDir, "trace_full.nj");
         workingDir.deleteOnExit();

@@ -3,9 +3,7 @@
  */
 package edu.virginia.cs.neurojet.geneticalgorithm;
 
-import static edu.virginia.cs.common.utils.ArrayNumberUtils.*;
 import static edu.virginia.cs.geneticalgorithm.fitness.AbstractFitness.*;
-import static edu.virginia.cs.neurojet.geneticalgorithm.ActivitySummaryFitnessGenerator.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,10 +18,10 @@ import java.util.List;
 import edu.virginia.cs.common.utils.ArrayNumberUtils;
 import edu.virginia.cs.common.utils.Condition;
 import edu.virginia.cs.common.utils.IntegerRange;
+import edu.virginia.cs.common.utils.OrderedPair;
+import edu.virginia.cs.common.utils.Pair;
 import edu.virginia.cs.common.utils.Pause;
 import edu.virginia.cs.common.utils.ProcessBuilderUtils;
-import edu.virginia.cs.common.utils.ShapeMatcher;
-import edu.virginia.cs.geneticalgorithm.fitness.FitnessGenerator;
 import edu.virginia.cs.geneticalgorithm.fitness.HaltableFitness;
 import edu.virginia.cs.neurojet.model.FileData;
 import java.util.logging.Level;
@@ -37,11 +35,10 @@ import java.util.logging.Logger;
 public class NeuroJetTraceFitness implements HaltableFitness {
 
     /**
-     * 2 activity measures + 2 trend measures + 2 shape measures + performance measure + target measure
+     * blink performance measure + collapse performance measure
      */
-    public static final int NUM_FIT_VALS = 8;
-    private static final int WAIT_TIME = 120 /* minutes */ * 60 /* seconds per minute */ * 1000 /* ms per sec */;
-    private static final double ACTIVITY_MULTIPLIER = 1E-5;
+    public static final int NUM_FIT_VALS = 2;
+    private static final int WAIT_TIME = 360 /* minutes */ * 60 /* seconds per minute */ * 1000 /* ms per sec */;
     private static int NUM_TRIALS = 150;
     private final NeuroJetTraceFitnessIntermediary _parent;
     private final File _tempDir;
@@ -55,8 +52,6 @@ public class NeuroJetTraceFitness implements HaltableFitness {
     private final StringBuffer _out = new StringBuffer(1000);
     private final StringBuffer _err = new StringBuffer(1000);
     private final List<Double> _fitnessValues = new ArrayList<Double>();
-    private final static List<Double> _desiredShape = new ArrayList<Double>();
-    private FitnessGenerator _tstGenerator = null;
     private boolean _isPrepared = false;
     private File _scriptFile = null;
 
@@ -72,16 +67,6 @@ public class NeuroJetTraceFitness implements HaltableFitness {
         _dirID = dirID;
         _tempDir = new File(workingDir, "trace_" + String.valueOf(dirID));
         // deleteExistingFiles(); // TODO reconsider this
-    }
-
-    private FitnessGenerator getQuickGenerator() {
-        if (_tstGenerator == null) {
-            final File signalFile = new File(_tempDir, SIGNAL_FILE);
-            final FileData activityFile = new FileData(_tempDir, MEAN_TEST_ACTIVITY_DATA_FILE, WAIT_TIME, signalFile);
-            final FileData ssdFile = new FileData(_tempDir, SSD_TEST_ACTIVITY_DATA_FILE, WAIT_TIME, signalFile);
-            _tstGenerator = new ActivitySummaryFitnessGenerator(activityFile, ssdFile, getDesiredAct());
-        }
-        return _tstGenerator;
     }
 
     NeuroJetTraceFitnessFactory getGrandparent() {
@@ -147,81 +132,15 @@ public class NeuroJetTraceFitness implements HaltableFitness {
         _finished = finished;
     }
 
-    private void addActivityMeasures(final List<Double> fitnessValues) {
-        fitnessValues.addAll(ArrayNumberUtils.multiply(getQuickGenerator().fitnessValues(), ACTIVITY_MULTIPLIER));
-    }
-
     private List<Double> getFracFired() {
-        return getFracFired(150);
+        return getFracFired(NUM_TRIALS);
     }
 
     private List<Double> getFracFired(final int whichTrial) {
         // _tstBuff = new NeuroJetNeuronBuffer(_tempDir, "tstBuff.dat", WAIT_TIME);
         final FileData summaryBuffData = new FileData(_tempDir, "fit2_" + whichTrial + ".dat", WAIT_TIME,
-            new File(_tempDir, "fit2_150.dat.ready"));
+            new File(_tempDir, "fit2_" + whichTrial + ".dat.ready"));
         return summaryBuffData.getData();
-    }
-
-    private void addTrendMeasures(final List<Double> fitnessValues) {
-        double bestValue = 0.0;
-        for (int trialNum = 50; trialNum <= NUM_TRIALS; trialNum += 50) {
-            final double curValue = slopeContribution(slope(getFracFired(trialNum)));
-            if (curValue > bestValue) {
-                bestValue = curValue;
-            }
-        }
-        double averageValue = 0.0;
-        int count = 0;
-        for (int trialNum = 100; trialNum <= Math.min(NUM_TRIALS, 200); trialNum += 50) {
-            final double curValue = slopeContribution(slope(getFracFired(trialNum)));
-            averageValue += curValue;
-            ++count;
-        }
-        fitnessValues.add(bestValue);
-        fitnessValues.add(averageValue / count);
-    }
-
-    private double slopeContribution(final double slope) {
-        final double minSlope = -0.05;
-        if (slope < minSlope) {
-            return 0;
-        }
-        return 1000 * Math.pow(slope - minSlope, 2);
-    }
-
-    private List<Double> getDesiredShape() {
-        if (_desiredShape.isEmpty()) {
-            for (int i = 0; i < 11; ++i) { // Flat for the first 550 ms
-                _desiredShape.add(Double.valueOf(0.0));
-            }
-            _desiredShape.add(1.0); // Then blink 100 ms before puff
-            _desiredShape.add(1.0);
-            _desiredShape.add(0.5); // Reduced activity during puff
-            _desiredShape.add(0.5);
-        }
-        return _desiredShape;
-    }
-
-    private void addShapeMeasures(final List<Double> fitnessValues) {
-        final List<Double> desiredShape = getDesiredShape();
-        double bestValue = 0.0;
-        for (int trialNum = 50; trialNum <= NUM_TRIALS; trialNum += 50) {
-            final List<Double> shape = getFracFired(trialNum);
-            final double curValue = 100 / ShapeMatcher.squareDeviation(desiredShape, shape);
-            if (curValue > bestValue) {
-                bestValue = curValue;
-            }
-        }
-        double averageValue = 0.0;
-        int count = 0;
-        for (int trialNum = 100; trialNum <= Math.min(NUM_TRIALS, 200); trialNum += 50) {
-            final List<Double> shape = getFracFired(trialNum);
-            final double curValue = 100 / ShapeMatcher.squareDeviation(desiredShape, shape);
-            averageValue += curValue;
-            ++count;
-        }
-        fitnessValues.add(bestValue);
-        fitnessValues.add(averageValue / count);
     }
 
     @Override
@@ -315,13 +234,9 @@ public class NeuroJetTraceFitness implements HaltableFitness {
                 }
                 else {
                     Pause.untilConditionMet(new FitnessFinished(this), WAIT_TIME);
-                    addActivityMeasures(_fitnessValues);
-                    addTrendMeasures(_fitnessValues);
-                    addShapeMeasures(_fitnessValues);
-                    final double fitness = 1E6 * generateTraceFitness();
-                    assert (fitness >= 0);
-                    _fitnessValues.add(fitness);
-                    _fitnessValues.add(1E5 * hasTargetBehavior());
+                    final Pair<Double, Double> referenceValues = calcReferenceValues();
+                    _fitnessValues.add(referenceValues.getFirst());
+                    _fitnessValues.add(referenceValues.getLast());
                     totalFitness = calcTotalFitness(_fitnessValues);
                 }
                 checkFitnessSize(this, _fitnessValues);
@@ -332,15 +247,29 @@ public class NeuroJetTraceFitness implements HaltableFitness {
         }
     }
 
+    private double blinkTransform(double blink) {
+        return blinkTransform(blink, 0.6);
+    }
+
+    private double blinkTransform(double blink, double power) {
+        return Math.pow(blink, power);
+    }
+
+    private double collapseTransform(double collapse) {
+        return collapseTransform(collapse, 3.25, 100);
+    }
+
+    private double collapseTransform(double collapse, double power, double multiplier) {
+        final double threshold = 0.15;
+        return 1 / (1 + Math.exp(multiplier * (Math.pow(collapse, power) - Math.pow(threshold, power))));
+    }
+
     private double calcTotalFitness(final List<Double> fitVals) {
-        // final double actFitness = 1E-5 * getQuickGenerator().overallFitness();
-        // final double slope§Fitness = slopeContribution(fitVals.get(3));
-        // return 1 / (fitVals.get(0) + 1) + actFitness + slopeFitness + fitVals.get(5) + fitVals.get(6);
-        double retval = 0;
-        for (final Double d : fitVals) {
-            retval += d;
-        }
-        return retval;
+        checkFitnessSize(this, fitVals);
+        final double b = blinkTransform(fitVals.get(0));
+        final double c = collapseTransform(fitVals.get(1));
+        final double alpha = 0.05;
+        return (alpha * b + (1 - alpha) * c) * b * c;
     }
 
     private void deleteExistingFiles(final List<File> list) {
@@ -504,20 +433,11 @@ public class NeuroJetTraceFitness implements HaltableFitness {
         return (fracPuffFired / (0.3 * getMePct()));
     }
 
-    private double generateTraceFitness() {
-        double maxFracPuffFired = 0.0;
-        int maxEra = -1;
+    private Pair<Double, Double> calcReferenceValues() {
         final List<Double> fracFired = getFracFired();
-        for (int i = 0; i < fracFired.size(); ++i) {
-            if (maxFracPuffFired < fracFired.get(i)) {
-                maxFracPuffFired = fracFired.get(i);
-                maxEra = i * 50;
-            }
-        }
-        final int early = 200;
-        final double fracPuffEarlyFired = (maxEra > early) ? fracFired.get(1) : 0.0;
-        final double retval = (maxFracPuffFired - fracPuffEarlyFired) * generateTimeValue(maxEra + 1) / getMePct();
-        return retval;
+        final double blink = ArrayNumberUtils.mean(fracFired, 11, 12);
+        final double collapse = ArrayNumberUtils.mean(fracFired, 3, 7);
+        return new OrderedPair<Double, Double>(blink, collapse);
     }
 
     @Override
