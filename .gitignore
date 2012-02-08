@@ -16,3 +16,4 @@ tmp*
 GeneticAlgorithm/jars/shortcircuitga.jar
 GeneticAlgorithm/src/report
 GeneticAlgorithm/bin
+*/target

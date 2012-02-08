@@ -1,11 +1,12 @@
 function plotPuffMvgAvg(dir_num)
 
 subdir = ['trace_',num2str(dir_num),'/'];
-me = load([subdir,'me.dat'])
-activityHz = load([subdir,'ActivityHz.dat']);
-mePct = load([subdir,'mePct.dat']);
+script = [subdir, 'trace_full.nj'];
+activityHz = readVar(script, 'ActivityHz');
+mePct = readVar(script, 'mePct');
 ni = 2048;
 extAct = ni * activityHz * mePct;
+me = round(ni * mePct / 10);
 desiredAct = extAct / me;
 buff = full(spconvert(load([subdir,'tstBuff.dat'])));
 puff = buff(:, (me+1):(2*me));
