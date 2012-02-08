@@ -1,6 +1,6 @@
 @CreateVar(
 #  numTrainTrials 200
-  numTrainTrials 300
+  numTrainTrials 150
   dwellTime 144       # ms
   OffRate InsertIHere # ms
   OnRate InsertJHere           # ms
