@@ -1,18 +1,15 @@
-all:
-	mkdir -p classes
-	ant all
+.PHONY: all clean coverage javadocs
+
+all: coverage javadocs
+	mvn install
 
 clean:
-	find . -name "*.ser" -delete
-	rm -rf edu/virginia/cs/test/data/test_output
-	rm -rf edu/virginia/cs/test/data/trace_[0-9]*
-	rm -rf classes test-classes instrumented-classes
-	rm -f jars/shortcircuitga.jar
+	mvn clean
 
 coverage:
-	rm -rf edu/virginia/cs/test/data/test_output
-	rm -rf edu/virginia/cs/test/data/trace_[0-9]*
-	mkdir -p classes
-	ant _compile
-	ant coverage
-	open coberta-report/index.html
+	mvn clean cobertura:cobertura
+	open target/site/cobertura/index.html
+
+javadocs:
+	mvn javadoc:javadoc
+	open target/site/apidocs/index.html

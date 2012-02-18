@@ -56,9 +56,9 @@ public class NeuroJetRandomGenerator {
         int dirID = _seed - 1;
         int seed = _seed;
         for (final Genotype i : _population) {
-            final File tempDir = new File(NeuroJetGeneticAlgorithm.WORKINGDIR, "rand" + _randType + "_" + String.valueOf(++dirID));
-            final File script = new File(tempDir, NeuroJetGeneticAlgorithm.SCRIPTFILE.getName());
-            _scriptUpdater.createScriptFromTemplate(script, NeuroJetGeneticAlgorithm.SCRIPTFILE, (StandardGenotype) i, ++seed);
+            final File tempDir = new File(NeuroJetGeneticAlgorithm.WORKING_DIR, "rand" + _randType + "_" + String.valueOf(++dirID));
+            final File script = new File(tempDir, NeuroJetGeneticAlgorithm.SCRIPT_FILE.getName());
+            _scriptUpdater.createScriptFromTemplate(script, NeuroJetGeneticAlgorithm.SCRIPT_FILE, (StandardGenotype) i, ++seed);
         }
     }
 }

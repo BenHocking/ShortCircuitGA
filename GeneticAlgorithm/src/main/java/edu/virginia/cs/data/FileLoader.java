@@ -5,6 +5,7 @@ package edu.virginia.cs.data;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Properties;
 
 /**
  * File loader for files used in tests
@@ -12,6 +13,23 @@ import java.net.URISyntaxException;
  * @since Feb 19, 2011
  */
 public class FileLoader {
+
+    /**
+     * @param configFile Properties to get file or directory name from
+     * @param property Property name of file or directory name
+     * @param defaultVal Value to use if property does not exist
+     * @return Corresponding File object
+     * @throws URISyntaxException If file name is invalid
+     */
+    public static File getFileFromProperty(final Properties configFile,
+                                           final String property, final String defaultVal) throws URISyntaxException {
+        String fileName = configFile.getProperty(property, defaultVal);
+        if (fileName.contains("[data]")) {
+            fileName = fileName.replace("[data]", getDataDirectory().getAbsolutePath());
+        }
+        final File retval = new File(fileName);
+        return retval;
+    }
 
     /**
      * @param fileName name of file name residing in the data directory

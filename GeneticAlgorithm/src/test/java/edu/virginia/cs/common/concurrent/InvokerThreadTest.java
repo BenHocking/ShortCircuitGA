@@ -26,7 +26,6 @@ public class InvokerThreadTest {
          * @see java.lang.Runnable#run()
          */
         @Override
-        @SuppressWarnings("SleepWhileHoldingLock")
         public void run() {
             for (int i = 0; i < 100; ++i) {
                 try {
@@ -85,6 +84,7 @@ public class InvokerThreadTest {
      * @throws Exception Shouldn't happen
      */
     @Test
+    @Ignore
     public final void testHalt() throws Exception {
         final InvokerThread t = createThread("cp", new RunnableTester());
         t.start();

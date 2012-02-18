@@ -46,7 +46,7 @@ public class NeuroJetTraceFitnessTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness#getDesiredAct()}.
+     * Test method for {@link edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness#getDesiredAct()}.
      * @throws URISyntaxException Shouldn't happen
      */
     @Test
@@ -56,7 +56,7 @@ public class NeuroJetTraceFitnessTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness#getMePct()}.
+     * Test method for {@link edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness#getMePct()}.
      * @throws URISyntaxException Shouldn't happen
      */
     @Test
@@ -66,7 +66,7 @@ public class NeuroJetTraceFitnessTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness#getNumNeurons()}.
+     * Test method for {@link edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness#getNumNeurons()}.
      */
     @Test
     public final void testGetNumNeurons() {
@@ -74,7 +74,7 @@ public class NeuroJetTraceFitnessTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness#getMe()}.
+     * Test method for {@link edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness#getMe()}.
      * @throws URISyntaxException Shouldn't happen
      */
     @Test
@@ -84,7 +84,7 @@ public class NeuroJetTraceFitnessTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness#getPuffRange()}.
+     * Test method for {@link edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness#getPuffRange()}.
      * @throws URISyntaxException Shouldn't happen
      */
     @Test
@@ -94,11 +94,12 @@ public class NeuroJetTraceFitnessTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness#fitnessValues()}.
+     * Test method for {@link edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness#fitnessValues()}.
      * @throws URISyntaxException Shouldn't happen
      */
     @Test
-    @Ignore // FIXME: results vary depending on where it's run from
+    @Ignore
+    // FIXME: results vary depending on where it's run from
     public final void testFitnessValues() throws URISyntaxException {
         createFitness();
         final List<Double> result = _fitness.fitnessValues();
@@ -107,18 +108,19 @@ public class NeuroJetTraceFitnessTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness#hasTargetBehavior()}.
+     * Test method for {@link edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness#hasTargetBehavior()}.
      * @throws URISyntaxException Shouldn't happen
      */
     @Test
-    @Ignore // FIXME: results vary depending on where it's run from
+    @Ignore
+    // FIXME: results vary depending on where it's run from
     public final void testHasTargetBehavior() throws URISyntaxException {
         createFitness();
         assertEquals(0.0, _fitness.hasTargetBehavior(), 0.0);
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness#halt()}.
+     * Test method for {@link edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness#halt()}.
      * @throws URISyntaxException Shouldn't happen
      */
     @Test
@@ -129,7 +131,7 @@ public class NeuroJetTraceFitnessTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness#toString()}.
+     * Test method for {@link edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness#toString()}.
      * @throws URISyntaxException Shouldn't happen
      */
     @Test
@@ -138,13 +140,14 @@ public class NeuroJetTraceFitnessTest {
         assertTrue(_fitness.toString().contains("data/trace_"));
     }
 
-    private List<Double> getFolderFitnessValues(final File workingDir, final int dirId, final double desiredAct,
-            final double mePct) {
-        NeuroJetTraceFitness instance = new NeuroJetTraceFitness(workingDir, dirId) {
+    private List<Double> getFolderFitnessValues(final File workingDir, final int dirId, final double desiredAct, final double mePct) {
+        final NeuroJetTraceFitness instance = new NeuroJetTraceFitness(workingDir, dirId) {
+
             @Override
             public double getDesiredAct() {
                 return desiredAct;
             }
+
             @Override
             public double getMePct() {
                 return mePct;
@@ -164,6 +167,7 @@ public class NeuroJetTraceFitnessTest {
         double desiredAct = 0.0030998257089591887;
         double mePct = 0.3107368052647797;
         List<Double> fitnessValues = getFolderFitnessValues(workingDir, dirId, desiredAct, mePct);
+        // TODO: Check actual values
         System.out.println("===============");
         System.out.println(fitnessValues);
         dirId = 3952;
@@ -176,18 +180,19 @@ public class NeuroJetTraceFitnessTest {
     }
 
     /**
-     * Test method for {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitness#totalFitness()}.
+     * Test method for {@link edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness#totalFitness()}.
      * @throws URISyntaxException Shouldn't happen
      */
     @Test
-    @Ignore // FIXME: results vary depending on where it's run from
+    @Ignore
+    // FIXME: results vary depending on where it's run from
     public final void testTotalFitness() throws URISyntaxException {
         createFitness();
         assertEquals(602.5112858084858, _fitness.totalFitness(), 1E-5); // TODO Make test more robust
         Fitness f = buildFitness(0.0);
         assertEquals(275.1024912636019, f.totalFitness(), 1E-5);
         f = buildFitness(1.0);
-//FIXME        assertEquals(2.511775, f.totalFitness(), 1E-5);
+        // FIXME assertEquals(2.511775, f.totalFitness(), 1E-5);
     }
 
 }
