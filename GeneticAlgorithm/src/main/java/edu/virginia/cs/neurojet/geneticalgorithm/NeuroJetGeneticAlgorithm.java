@@ -210,15 +210,25 @@ public final class NeuroJetGeneticAlgorithm {
         final int num_generations = Integer.valueOf(configFile.getProperty("NUM_GENERATIONS", "150"));
         final int seed = Integer.valueOf(configFile.getProperty("SEED", "101"));
         NJ = new File(configFile.getProperty("NJ", NJ.getPath()));
+        if (!NJ.canExecute())
+            throw new IllegalArgumentException("Property NJ ('" + NJ.getAbsolutePath()
+                                               + "') must refer to an executable");
         WORKING_DIR = FileLoader.getFileFromProperty(configFile, "WORKING_DIR", WORKING_DIR.getPath());
         if (!WORKING_DIR.exists()) {
             WORKING_DIR.mkdir();
         }
         SCRIPT_FILE = FileLoader.getFileFromProperty(configFile, "SCRIPT_FILE",
                                                      new File(WORKING_DIR, "trace_full.nj").getPath());
+        if (!SCRIPT_FILE.exists()) {
+            throw new IllegalArgumentException("Property SCRIPT_FILE ('" + SCRIPT_FILE.getAbsolutePath()
+                                               + "') must refer to an existing file");
+        }
         final String prepareFileName = configFile.getProperty("PREPARE_FILE");
         if (prepareFileName != null && !prepareFileName.isEmpty()) {
             PREPARE_FILE = new File(prepareFileName);
+            if (!PREPARE_FILE.canExecute())
+                throw new IllegalArgumentException("Property PREPARE_FILE ('" + NJ.getAbsolutePath()
+                                                   + "') must refer to an executable if it is not blank");
         }
         final boolean useProxy = Boolean.valueOf(configFile.getProperty("USE_PROXY", "true"));
         final NeuroJetGeneticAlgorithm nga = new NeuroJetGeneticAlgorithm(seed, pop_size, useProxy);

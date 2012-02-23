@@ -44,7 +44,8 @@ public final class NeuroJetTraceFitnessIntermediary {
     private int _numSums;
     private final NeuroJetTraceFitnessFactory _parent;
     private final StandardGenotype _genotype;
-    private static final Map<Genotype, NeuroJetTraceFitnessIntermediary> _fitMap = new WeakHashMap<Genotype, NeuroJetTraceFitnessIntermediary>();
+    private static final Map<Genotype, NeuroJetTraceFitnessIntermediary> _fitMap =
+            new WeakHashMap<Genotype, NeuroJetTraceFitnessIntermediary>();
 
     static Fitness createFitness(final NeuroJetTraceFitnessFactory factory, final StandardGenotype individual,
                                  final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet,
@@ -52,8 +53,13 @@ public final class NeuroJetTraceFitnessIntermediary {
         final Genotype normalizedGenotype = updater.normalizeGenotype(individual);
         NeuroJetTraceFitnessIntermediary intermediary = _fitMap.get(normalizedGenotype);
         if (intermediary == null) {
-            _fitMap.put(normalizedGenotype, new NeuroJetTraceFitnessIntermediary(factory, individual, scriptFiles, updater,
-                                                                                 neuroJet, workingDir, maxSamples));
+            _fitMap.put(normalizedGenotype, new NeuroJetTraceFitnessIntermediary(factory,
+                                                                                 individual,
+                                                                                 scriptFiles,
+                                                                                 updater,
+                                                                                 neuroJet,
+                                                                                 workingDir,
+                                                                                 maxSamples));
             intermediary = _fitMap.get(normalizedGenotype);
         }
         return intermediary.createFitness();
@@ -72,21 +78,26 @@ public final class NeuroJetTraceFitnessIntermediary {
 
     /**
      * Constructor
-     * @param scriptFiles {@link java.util.List List} of script files that NeuroJet needs to run the experiment. The first file in
-     * the list is the one actually run, with the other files presumably a dependency of it.
+     * @param scriptFiles {@link java.util.List List} of script files that NeuroJet needs to run the experiment. The
+     *            first file in the list is the one actually run, with the other files presumably a dependency of it.
      * @param updater {@link ScriptUpdater} that contains the parameter values to map to the
-     * {@link edu.virginia.cs.geneticalgorithm.gene.Genotype Genotype}.
+     *            {@link edu.virginia.cs.geneticalgorithm.gene.Genotype Genotype}.
      * @param neuroJet Location of the NeuroJet executable
-     * @param workingDir Directory that subdirectories will be created off (if null, this uses the location of the first file in the
-     * scriptFiles {@link java.util.List List}).
+     * @param workingDir Directory that subdirectories will be created off (if null, this uses the location of the first
+     *            file in the scriptFiles {@link java.util.List List}).
      */
-    private NeuroJetTraceFitnessIntermediary(final NeuroJetTraceFitnessFactory parent, final StandardGenotype individual,
-                                             final List<File> scriptFiles, final ScriptUpdater updater, final File neuroJet,
+    private NeuroJetTraceFitnessIntermediary(final NeuroJetTraceFitnessFactory parent,
+                                             final StandardGenotype individual,
+                                             final List<File> scriptFiles, final ScriptUpdater updater,
+                                             final File neuroJet,
                                              final File workingDir, final int maxSamples) {
         if (scriptFiles == null || scriptFiles.isEmpty())
-            throw new IllegalArgumentException("Argument scriptFiles cannot be null or empty");
+            throw new IllegalArgumentException("Argument scriptFiles cannot be "
+                                               + (scriptFiles == null ? "null" : "empty"));
         if (neuroJet == null || !neuroJet.canExecute())
-            throw new IllegalArgumentException("Argument neuroJet must refer to an executable");
+            throw new IllegalArgumentException("Argument neuroJet ('"
+                                               + (neuroJet == null ? "null" : neuroJet.getAbsolutePath())
+                                               + "') must refer to an executable");
         _parent = parent;
         _genotype = individual;
         _mainFile = scriptFiles.get(0);
