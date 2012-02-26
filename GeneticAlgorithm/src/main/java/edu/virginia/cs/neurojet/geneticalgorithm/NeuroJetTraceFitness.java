@@ -40,8 +40,11 @@ public class NeuroJetTraceFitness implements HaltableFitness {
      * 2 activity measures + 2 trend measures + 2 shape measures + 2 performance measures + target measure
      */
     public static final int NUM_FIT_VALS = 9;
+    /**
+     * How much time (in milliseconds) to wait before giving up on a file being present
+     */
     // private static final int WAIT_TIME = 5 /* minutes */* 60 /* seconds per minute */* 1000 /* ms per sec */;
-    private static final int WAIT_TIME = 720 /* minutes */* 60 /* seconds per minute */* 1000 /* ms per sec */;
+    public static int WAIT_TIME = 720 /* minutes */* 60 /* seconds per minute */* 1000 /* ms per sec */;
     private static final double ACTIVITY_MULTIPLIER = 1E-5;
     private static int NUM_TRIALS = 150;
     private final NeuroJetTraceFitnessIntermediary _parent;

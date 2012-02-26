@@ -136,28 +136,28 @@ public final class NeuroJetGeneticAlgorithm {
      */
     public static ScriptUpdater buildScriptUpdater() {
         final ScriptUpdater updater = new ScriptUpdater();
-        updater.addDoubleMapping(0, "A", 2.0, 8.0); // InternrnExcDecay
-        updater.addIntegerMapping(1, "C", 1, 4); // InternrnAxonalDelay
-        updater.addIntegerMapping(2, "D", 3, 15); // dendFilterWidth
-        updater.addIntegerMapping(3, "E", 1, 5); // minAxDelay
-        updater.addIntegerMapping(4, "F", "E", 7); // maxAxDelay
-        updater.addDesiredActMapping(5, "G", 1, 5); // Desired activity (Hz)
-        updater.addDoubleMapping(6, "H", 0, 1); // Synaptic failure
-        updater.addDoubleMapping(7, "I", 90, 190); // Off-rate time constant
-        updater.addDoubleMapping(8, "J", 2, 19); // On-rate time constant
-        updater.addDoubleMapping(9, "K", 0, 0.1); // KFB
-        updater.addDoubleMapping(10, "L", 0, 0.1); // KFF
+        updater.addDoubleMapping(0, "A", 2.0, 4.0); // InternrnExcDecay
+        updater.addIntegerMapping(1, "C", 1, 3); // InternrnAxonalDelay
+        updater.addIntegerMapping(2, "D", 5, 15); // dendFilterWidth
+        updater.addIntegerMapping(3, "E", 1, 3); // minAxDelay
+        updater.addIntegerMapping(4, "F", "E", 6); // maxAxDelay
+        updater.addDesiredActMapping(5, "G", 2.5, 3.7); // Desired activity (Hz)
+        updater.addDoubleMapping(6, "H", 0, 0.3); // Synaptic failure
+        updater.addDoubleMapping(7, "I", 100, 170); // Off-rate time constant
+        updater.addDoubleMapping(8, "J", 4, 15); // On-rate time constant
+        updater.addDoubleMapping(9, "K", 0.05, 0.15); // KFB
+        updater.addDoubleMapping(10, "L", 0.01, 0.1); // KFF
         updater.addDoubleMapping(11, "M", 0, 0.1); // K0
         updater.addConstantMapping(-1, "N", 500); // Trace duration (constant)
-        updater.addDoubleMapping(12, "O", 0.005, 0.1); // mu
-        updater.addDoubleMapping(13, "P", 0, 2); // lambda
+        updater.addDoubleMapping(12, "O", 0.008, 0.02); // mu
+        updater.addDoubleMapping(13, "P", 0.5, 1.5); // lambda
         updater.addDoubleMapping(14, "Q", 0.01, 0.03); // IzhA
         updater.addDoubleMapping(15, "R", -0.1, -0.05); // IzhB
         updater.addDoubleMapping(16, "S", -70, -50); // IzhC
         updater.addDoubleMapping(17, "T", 5, 7); // IzhD
         updater.addDoubleMapping(18, "U", -70, -50); // IzhvStart
         updater.addDoubleMapping(19, "W", 5, 15); // IzhIMult
-        updater.addMePctMapping(20, "X", 0.2, 0.5); // mePct
+        updater.addMePctMapping(20, "X", 0.15, 0.4); // mePct
         return updater;
     }
 
@@ -230,6 +230,9 @@ public final class NeuroJetGeneticAlgorithm {
                 throw new IllegalArgumentException("Property PREPARE_FILE ('" + NJ.getAbsolutePath()
                                                    + "') must refer to an executable if it is not blank");
         }
+        // The WAIT_TIME parameter is in minutes, but we need to convert it to milliseconds
+        final int WAIT_TIME = Integer.valueOf(configFile.getProperty("WAIT_TIME", "5")) * 60000;
+        NeuroJetTraceFitness.WAIT_TIME = WAIT_TIME;
         final boolean useProxy = Boolean.valueOf(configFile.getProperty("USE_PROXY", "true"));
         final NeuroJetGeneticAlgorithm nga = new NeuroJetGeneticAlgorithm(seed, pop_size, useProxy);
         for (int i = 0; i < num_generations; ++i) {

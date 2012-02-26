@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.virginia.cs</groupId>
   <artifactId>geneticalgorithm</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.5-SNAPSHOT</version>
   <name>Short Circuit Genetic Algorithm Project</name>
   <packaging>jar</packaging>
   <properties>

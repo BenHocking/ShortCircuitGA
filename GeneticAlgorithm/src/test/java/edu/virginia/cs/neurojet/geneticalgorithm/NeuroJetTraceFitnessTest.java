@@ -42,7 +42,8 @@ public class NeuroJetTraceFitnessTest {
                 _factory = NeuroJetTraceFitnessFactoryTest.createNeuroJetTraceFitness();
             }
         }
-        return (NeuroJetTraceFitness) _factory.createFitness(StandardGenotypeTest.createStandardIntervalGenotype(30, val));
+        return (NeuroJetTraceFitness) _factory.createFitness(StandardGenotypeTest.createStandardIntervalGenotype(30,
+                                                                                                                 val));
     }
 
     /**
@@ -52,7 +53,7 @@ public class NeuroJetTraceFitnessTest {
     @Test
     public final void testGetDesiredAct() throws URISyntaxException {
         createFitness();
-        assertEquals(3.0, _fitness.getDesiredAct(), 0);
+        assertEquals(3.1, _fitness.getDesiredAct(), 0);
     }
 
     /**
@@ -62,7 +63,7 @@ public class NeuroJetTraceFitnessTest {
     @Test
     public final void testGetMePct() throws URISyntaxException {
         createFitness();
-        assertEquals(0.35, _fitness.getMePct(), 0);
+        assertEquals(0.275, _fitness.getMePct(), 0);
     }
 
     /**
@@ -80,7 +81,7 @@ public class NeuroJetTraceFitnessTest {
     @Test
     public final void testGetMe() throws URISyntaxException {
         createFitness();
-        assertEquals(72, _fitness.getMe());
+        assertEquals(56, _fitness.getMe());
     }
 
     /**
@@ -90,7 +91,7 @@ public class NeuroJetTraceFitnessTest {
     @Test
     public final void testGetPuffRange() throws URISyntaxException {
         createFitness();
-        assertEquals(new IntegerRange(73, 144), _fitness.getPuffRange());
+        assertEquals(new IntegerRange(57, 112), _fitness.getPuffRange());
     }
 
     /**
@@ -100,7 +101,8 @@ public class NeuroJetTraceFitnessTest {
     @Test
     @Ignore
     // FIXME: results vary depending on where it's run from
-    public final void testFitnessValues() throws URISyntaxException {
+            public final
+            void testFitnessValues() throws URISyntaxException {
         createFitness();
         final List<Double> result = _fitness.fitnessValues();
         assertEquals(1.8326745894124435E-6, result.get(1), 1E-7);
@@ -114,7 +116,8 @@ public class NeuroJetTraceFitnessTest {
     @Test
     @Ignore
     // FIXME: results vary depending on where it's run from
-    public final void testHasTargetBehavior() throws URISyntaxException {
+            public final
+            void testHasTargetBehavior() throws URISyntaxException {
         createFitness();
         assertEquals(0.0, _fitness.hasTargetBehavior(), 0.0);
     }
@@ -140,7 +143,8 @@ public class NeuroJetTraceFitnessTest {
         assertTrue(_fitness.toString().contains("data/trace_"));
     }
 
-    private List<Double> getFolderFitnessValues(final File workingDir, final int dirId, final double desiredAct, final double mePct) {
+    private List<Double> getFolderFitnessValues(final File workingDir, final int dirId, final double desiredAct,
+                                                final double mePct) {
         final NeuroJetTraceFitness instance = new NeuroJetTraceFitness(workingDir, dirId) {
 
             @Override
@@ -186,7 +190,8 @@ public class NeuroJetTraceFitnessTest {
     @Test
     @Ignore
     // FIXME: results vary depending on where it's run from
-    public final void testTotalFitness() throws URISyntaxException {
+            public final
+            void testTotalFitness() throws URISyntaxException {
         createFitness();
         assertEquals(602.5112858084858, _fitness.totalFitness(), 1E-5); // TODO Make test more robust
         Fitness f = buildFitness(0.0);
