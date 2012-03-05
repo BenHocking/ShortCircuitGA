@@ -263,8 +263,13 @@ public class NeuroJetTraceFitness implements HaltableFitness {
                     deleteExistingFiles(getGrandparent().getScriptFiles());
                     final File prepareScript = getGrandparent().getPrepareScript();
                     if (prepareScript != null) {
-                        ProcessBuilderUtils.invoke(_out, _err, _tempDir, prepareScript, scriptFile.getParentFile()
-                                                                                                  .getCanonicalPath(),
+                        ProcessBuilderUtils.invoke(_out,
+                                                   _err,
+                                                   _tempDir,
+                                                   prepareScript,
+                                                   null,
+                                                   scriptFile.getParentFile()
+                                                             .getCanonicalPath(),
                                                    String.valueOf(_dirID));
                     }
                 }
@@ -406,6 +411,7 @@ public class NeuroJetTraceFitness implements HaltableFitness {
                                                _err,
                                                _tempDir,
                                                getGrandparent().getNeuroJet(),
+                                               null,
                                                _scriptFile.getCanonicalPath());
                 }
                 catch (final IOException e) {

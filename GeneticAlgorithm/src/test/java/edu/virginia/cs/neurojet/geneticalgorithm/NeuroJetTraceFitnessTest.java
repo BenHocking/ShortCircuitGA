@@ -98,11 +98,10 @@ public class NeuroJetTraceFitnessTest {
      * Test method for {@link edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitness#fitnessValues()}.
      * @throws URISyntaxException Shouldn't happen
      */
+    // FIXME: results vary depending on where it's run from
     @Test
     @Ignore
-    // FIXME: results vary depending on where it's run from
-            public final
-            void testFitnessValues() throws URISyntaxException {
+    public final void testFitnessValues() throws URISyntaxException {
         createFitness();
         final List<Double> result = _fitness.fitnessValues();
         assertEquals(1.8326745894124435E-6, result.get(1), 1E-7);

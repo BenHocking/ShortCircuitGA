@@ -3,7 +3,9 @@
  */
 package edu.virginia.cs.common.concurrent;
 
+import edu.virginia.cs.common.utils.InterruptListener;
 import edu.virginia.cs.common.utils.ProcessBuilderUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -20,13 +22,14 @@ public class InvokerThread extends Thread {
     private final File _executable;
     private final String[] _arguments;
     private final File _workingDir;
-    private Process _process;
     private long _start = -1;
     private long _end = -1;
     private boolean _halted;
     private final Object _lock = new Object();
+    private final InterruptListener _interrupter = new InterruptListener();
     private final StringBuffer _out = new StringBuffer();
     private final StringBuffer _err = new StringBuffer();
+    private IOException _exception = null;
 
     /**
      * Constructor
@@ -35,7 +38,8 @@ public class InvokerThread extends Thread {
      * @param arguments Arguments to pass to the executable
      * @param workingDir Directory to run the executable from
      */
-    public InvokerThread(final Runnable preprocessor, final File workingDir, final File executable, final String... arguments) {
+    public InvokerThread(final Runnable preprocessor, final File workingDir, final File executable,
+                         final String... arguments) {
         _preprocessor = preprocessor;
         _workingDir = workingDir;
         _executable = executable;
@@ -50,30 +54,44 @@ public class InvokerThread extends Thread {
             @Override
             public void run() {
                 synchronized (_lock) {
-                    try {
-                        _halted = false;
-                        _start = System.currentTimeMillis();
-                        _end = -1;
+                    _start = System.currentTimeMillis();
+                    if (!_interrupter.wantsInterrupt()) {
                         try {
-                            if (_preprocessor != null) {
-                                _preprocessor.run();
+                            _halted = false;
+                            _end = -1;
+                            try {
+                                if (_preprocessor != null) {
+                                    _preprocessor.run();
+                                }
+                                ProcessBuilderUtils.invoke(_out,
+                                                           _err,
+                                                           _workingDir,
+                                                           _executable,
+                                                           _interrupter,
+                                                           _arguments);
                             }
-                            ProcessBuilderUtils.invoke(_out, _err, _workingDir, _executable, _arguments);
-                        }
-                        catch (final IOException ex) {
-                            if (!_halted) {
-                                Logger.getLogger(InvokerThread.class.getName()).log(Level.SEVERE, null, ex);
-                                throw new RuntimeException(ex);
+                            catch (final IOException ex) {
+                                if (!_halted) {
+                                    _exception = ex;
+                                    Logger.getLogger(InvokerThread.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                             }
                         }
-                    }
-                    finally {
-                        _end = System.currentTimeMillis();
+                        finally {
+                            _end = System.currentTimeMillis();
+                        }
                     }
                 }
             }
         };
         t.start();
+    }
+
+    /**
+     * @return Exception if one has been encountered, otherwise null
+     */
+    public Exception getException() {
+        return _exception;
     }
 
     /**
@@ -94,10 +112,10 @@ public class InvokerThread extends Thread {
     public void halt() {
         synchronized (_lock) {
             if (!_halted) {
-                if (_process != null) {
-                    _process.destroy();
+                _interrupter.askForInterrupt();
+                if (_end < 0) {
+                    _end = System.currentTimeMillis();
                 }
-                _end = System.currentTimeMillis();
                 _halted = true;
             }
         }

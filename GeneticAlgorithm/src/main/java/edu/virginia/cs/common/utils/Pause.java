@@ -18,12 +18,12 @@ public class Pause {
 
     /**
      * Pauses until a condition is met, or a certain time has elapsed
-     * @param c Condition that needs to be met
+     * @param c Condition that needs to be met (a null Condition will never be met)
      * @param maxWait Maximum number of milliseconds to wait for
      * @return Whether the condition was met
      */
     public static boolean untilConditionMet(final Condition c, final int maxWait) {
-        boolean retval = c.met();
+        boolean retval = c != null && c.met();
         int timeElapsed = 0;
         while ((!retval) && timeElapsed < maxWait) {
             try {
@@ -31,7 +31,7 @@ public class Pause {
             }
             catch (final InterruptedException e) { /* do nothing */
             }
-            retval = c.met();
+            retval = c != null && c.met();
             timeElapsed += SLEEP_INTERVAL;
         }
         return retval;

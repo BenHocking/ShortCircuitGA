@@ -27,15 +27,18 @@ public class NeuroJetTraceFitnessFactoryTest {
     private class MockFile extends File {
         private final boolean _canExecute;
         private final boolean _exists;
-        MockFile(String fileName, boolean canExecute, boolean exists) {
+
+        MockFile(final String fileName, final boolean canExecute, final boolean exists) {
             super(fileName);
             _canExecute = canExecute;
             _exists = exists;
         }
+
         @Override
         public boolean canExecute() {
             return _canExecute;
         }
+
         @Override
         public boolean exists() {
             return _exists;
@@ -64,14 +67,20 @@ public class NeuroJetTraceFitnessFactoryTest {
      * @return NeuroJetTraceFitness suitable for testing
      * @throws URISyntaxException Shouldn't happen
      */
-    public static NeuroJetTraceFitnessFactory createNeuroJetTraceFitness(File NeuroJet, File prepareScript) throws URISyntaxException {
+    public static NeuroJetTraceFitnessFactory
+            createNeuroJetTraceFitness(final File NeuroJet, final File prepareScript) throws URISyntaxException {
         final File scriptFile = FileLoader.getFile("trace_full.nj");
         final List<File> scriptFiles = Collections.singletonList(scriptFile);
         return prepareScript == null ?
-            new NeuroJetTraceFitnessFactory(scriptFiles, NeuroJetGeneticAlgorithm.buildScriptUpdater(), NeuroJet,
-                                               FileLoader.getDataDirectory()) :
-            new NeuroJetTraceFitnessFactory(scriptFiles, NeuroJetGeneticAlgorithm.buildScriptUpdater(), NeuroJet,
-                                               FileLoader.getDataDirectory(), prepareScript);
+                                    new NeuroJetTraceFitnessFactory(scriptFiles,
+                                                                    NeuroJetGeneticAlgorithm.buildScriptUpdater(),
+                                                                    NeuroJet,
+                                                                    FileLoader.getDataDirectory()) :
+                                    new NeuroJetTraceFitnessFactory(scriptFiles,
+                                                                    NeuroJetGeneticAlgorithm.buildScriptUpdater(),
+                                                                    NeuroJet,
+                                                                    FileLoader.getDataDirectory(),
+                                                                    prepareScript);
     }
 
     /**
@@ -79,7 +88,6 @@ public class NeuroJetTraceFitnessFactoryTest {
      * @throws URISyntaxException Shouldn't happen
      */
     @Test
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public final void testConstructors() throws URISyntaxException {
         try {
             new NeuroJetTraceFitnessFactory(null, null, null, null, null);
@@ -124,7 +132,7 @@ public class NeuroJetTraceFitnessFactoryTest {
 
     /**
      * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitnessFactory#createFitness(edu.virginia.cs.geneticalgorithm.Genotype)}
+     * {@link edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitnessFactory#createFitness(edu.virginia.cs.geneticalgorithm.gene.Genotype)}
      * .
      * @throws URISyntaxException Shouldn't happen
      */
@@ -150,9 +158,7 @@ public class NeuroJetTraceFitnessFactoryTest {
     }
 
     /**
-     * Test method for
-     * {@link edu.virginia.cs.geneticalgorithm.neurojet.NeuroJetTraceFitnessFactory#ready()}
-     * .
+     * Test method for {@link edu.virginia.cs.neurojet.geneticalgorithm.NeuroJetTraceFitnessFactory#ready()} .
      * @throws URISyntaxException Shouldn't happen
      */
     @Test
