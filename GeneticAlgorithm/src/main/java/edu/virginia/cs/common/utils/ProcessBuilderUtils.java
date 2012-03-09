@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,12 +53,12 @@ public class ProcessBuilderUtils {
         if (!wantsInterrupt(interruptListener)) {
             final Process process = builder.start();
             processStream(outBuff, process.getInputStream(), interruptListener);
-            if (!wantsInterrupt(interruptListener)) {
+            if (wantsInterrupt(interruptListener)) {
                 process.destroy();
             }
             else {
                 processStream(errBuff, process.getErrorStream(), interruptListener);
-                if (!wantsInterrupt(interruptListener)) {
+                if (wantsInterrupt(interruptListener)) {
                     process.destroy();
                 }
             }
@@ -79,17 +80,19 @@ public class ProcessBuilderUtils {
         try {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (buff != null) {
-                    buff.append(line);
-                }
                 if (wantsInterrupt(interruptListener)) {
                     break;
+                }
+                if (buff != null) {
+                    buff.append(line);
+                    buff.append(System.getProperty("line.separator"));
                 }
             }
         }
         catch (final IOException e) {
             if (buff != null) {
-                buff.append(e.getStackTrace().toString());
+                final PrintStream printStream = new PrintStream(new StringBufferOutputStream(buff));
+                e.printStackTrace(printStream);
             }
             throw e;
         }

@@ -13,7 +13,6 @@ import org.junit.Test;
 import edu.virginia.cs.common.utils.Condition;
 import edu.virginia.cs.common.utils.Pause;
 import edu.virginia.cs.data.FileLoader;
-import org.junit.Ignore;
 
 /**
  * Test harness for InvokerThread
