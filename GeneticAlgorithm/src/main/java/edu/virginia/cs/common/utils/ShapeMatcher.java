@@ -22,8 +22,8 @@ public final class ShapeMatcher {
     }
 
     /**
-     * Generates a mean square deviation value for one list of numbers from another list of numbers, in a manner invariant to the
-     * mean value of the second list of numbers
+     * Generates a mean square deviation value for one list of numbers from another list of numbers, in a manner
+     * invariant to the mean value of the second list of numbers
      * @param expected List of numbers describing the desired shape
      * @param actual List of numbers describing the actual shape
      * @return Mean-invariant square deviation
@@ -32,8 +32,8 @@ public final class ShapeMatcher {
         // Add zeroes to smaller list until sizes match
         expandToMatch(expected, actual);
         expandToMatch(actual, expected);
-        final double minExpected = Collections.min(expected);
-        final double minActual = Collections.min(actual);
+        final double minExpected = expected.isEmpty() ? 0.0 : Collections.min(expected);
+        final double minActual = actual.isEmpty() ? 0.0 : Collections.min(actual);
         List<Double> actualAdjusted = ArrayNumberUtils.add(actual, minExpected - minActual);
         final double sumExpected = ArrayNumberUtils.sum(expected);
         final double sumActual = ArrayNumberUtils.sum(actualAdjusted);

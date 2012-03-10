@@ -21,6 +21,42 @@ import org.junit.Test;
 public class PauseTest {
 
     /**
+     * Test method for {@link edu.virginia.cs.common.utils.Pause#untilConditionMet(Condition, int)}.
+     */
+    @Test
+    public final void testUntilConditionMet() {
+        // Test that Pause.untilConditionMet handles interrupts gracefully
+        final Thread interruptibleThread = new Thread() {
+            @Override
+            public void run() {
+                Pause.untilConditionMet(new Condition() {
+                    @Override
+                    public boolean met() {
+                        return false; // Never met
+                    }
+
+                }, 5000);
+            }
+        };
+        long begin = System.currentTimeMillis();
+        interruptibleThread.start();
+        interruptibleThread.interrupt();
+        Pause.untilConditionMet(new Condition() {
+            @Override
+            public boolean met() {
+                return !interruptibleThread.isAlive();
+            }
+        }, 5000);
+        assertTrue(System.currentTimeMillis() - begin < 1000);
+        // Test that Pause.untilConditionMet times out correctly
+        begin = System.currentTimeMillis();
+        // Also tests the null condition (which is never met)
+        Pause.untilConditionMet(null, 500);
+        assertTrue(System.currentTimeMillis() - begin >= 500);
+        // other methods test regular functionality of untilConditionMet
+    }
+
+    /**
      * Test method for {@link edu.virginia.cs.common.utils.Pause#untilExists(java.io.File, int)}.
      * @throws IOException if unable to create tmp_535231.dat
      */

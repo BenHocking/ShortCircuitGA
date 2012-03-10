@@ -18,10 +18,14 @@ import org.junit.Test;
 public class ShapeMatcherTest {
 
     /**
-     * Test method for {@link edu.virginia.cs.common.utils.ShapeMatcher#squareDeviation(java.util.List, java.util.List)}.
+     * Test method for {@link edu.virginia.cs.common.utils.ShapeMatcher#squareDeviation(java.util.List, java.util.List)}
+     * .
      */
     @Test
     public final void testSquareDeviation() {
+        new ShapeMatcher(); // just for trivial coverage
+        // Test case where no data at all
+        assertEquals(0.0, ShapeMatcher.squareDeviation(new ArrayList<Double>(), new ArrayList<Double>()), 0.0);
         // Test parabolas
         final List<Double> targetParabola = new ArrayList<Double>();
         final List<Double> actual1 = new ArrayList<Double>();
@@ -32,6 +36,9 @@ public class ShapeMatcherTest {
             actual1.add(1.5 * Math.pow(i, 2) + 1.7);
             actual2.add(-1.5 * Math.pow(i, 2) + 100);
         }
+        // Test empty data
+        assertEquals(ArrayNumberUtils.sumOfSquares(targetParabola) / numPoints,
+                     ShapeMatcher.squareDeviation(targetParabola, new ArrayList<Double>()), 1E-10);
         // The shapes only differ by scale and offset
         assertEquals(0.0, ShapeMatcher.squareDeviation(targetParabola, actual1), 1E-10);
         // Should not allow for inverse shape, though
@@ -59,12 +66,18 @@ public class ShapeMatcherTest {
                     expected += Math.pow(2 * j + 1, 2);
                 }
                 expected /= (numPoints / 2);
-                assertEquals("For actual #" + i, expected, ShapeMatcher.squareDeviation(targetLine, actuals.get(i)), 1E-10);
+                assertEquals("For actual #" + i,
+                             expected,
+                             ShapeMatcher.squareDeviation(targetLine, actuals.get(i)),
+                             1E-10);
             }
             else if (i == zeroPt) {
                 // Should not allow for flat shape (result will just be sum of first n-1 squares divided by n)
                 final double expected = ((numPoints - 1) * numPoints * (2 * numPoints - 1)) / (numPoints * 6.0);
-                assertEquals("For actual #" + i, expected, ShapeMatcher.squareDeviation(targetLine, actuals.get(i)), 1E-10);
+                assertEquals("For actual #" + i,
+                             expected,
+                             ShapeMatcher.squareDeviation(targetLine, actuals.get(i)),
+                             1E-10);
             }
             else {
                 // The shapes only differ by scale

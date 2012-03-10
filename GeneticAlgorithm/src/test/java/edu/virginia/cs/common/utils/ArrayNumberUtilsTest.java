@@ -304,4 +304,29 @@ public class ArrayNumberUtilsTest {
         pntList.add(1.0); // Can't get a slope from a single point
         assertEquals(Double.NaN, slope(pntList), 0);
     }
+
+    /**
+     * Tests add in ArrayNumberUtils
+     */
+    @Test
+    public void testSubtract() {
+        final List<Double> list1 = new ArrayList<Double>();
+        list1.add(1.5);
+        list1.add(-2.1);
+        final List<Double> list2 = new ArrayList<Double>();
+        list2.add(2.3);
+        list2.add(1.05);
+        final List<Double> expected = new ArrayList<Double>();
+        expected.add(1.5 - 2.3);
+        expected.add(-2.1 - 1.05);
+        assertEquals(expected, subtract(list1, list2));
+        assertEquals(new ArrayList<Double>(), subtract(new ArrayList<Double>(), new ArrayList<Double>()));
+        try {
+            subtract(list1, new ArrayList<Double>());
+            fail("Should not be able to subtract lists of differing sizes.");
+        }
+        catch (final IllegalArgumentException ex) {
+            assertEquals("Lists being subtracted must be of the same size.", ex.getMessage());
+        }
+    }
 }

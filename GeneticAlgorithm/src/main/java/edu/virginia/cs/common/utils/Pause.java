@@ -14,7 +14,7 @@ import javax.swing.JFrame;
  */
 public class Pause {
 
-    private static final int SLEEP_INTERVAL = 50;
+    private static final int SLEEP_INTERVAL = 50; // milliseconds
 
     /**
      * Pauses until a condition is met, or a certain time has elapsed
@@ -29,7 +29,8 @@ public class Pause {
             try {
                 Thread.sleep(SLEEP_INTERVAL);
             }
-            catch (final InterruptedException e) { /* do nothing */
+            catch (final InterruptedException e) {
+                break; /* If interrupted, then stop looking for the condition to be met */
             }
             retval = c != null && c.met();
             timeElapsed += SLEEP_INTERVAL;
