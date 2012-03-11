@@ -34,7 +34,7 @@ public class FileLoader {
     /**
      * @param fileName name of file name residing in the data directory
      * @return File object referencing desired file
-     * @throws URISyntaxException if fileName cannot be resolved as a URI
+     * @throws URISyntaxException should never happen
      */
     public static File getFile(final String fileName) throws URISyntaxException {
         return new File(getDataDirectory(), fileName);
@@ -42,7 +42,7 @@ public class FileLoader {
 
     /**
      * @return File object referencing the directory holding this class
-     * @throws URISyntaxException if fileName cannot be resolved as a URI
+     * @throws URISyntaxException should never happen
      */
     public static File getDataDirectory() throws URISyntaxException {
         return new File(FileLoader.class.getResource(".").toURI());
